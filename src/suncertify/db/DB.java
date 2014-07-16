@@ -60,7 +60,7 @@ public interface DB {
      * value that begins with criteria[n]. (For example, "Fred"
      * matches "Fred" or "Freddy".)
     
-     * @param criteria a String array representing record fields
+     * @param criteria a String array representing search criteria
      * @return an array of record numbers that match the criteria
      */
     public int[] find(String[] criteria);
@@ -98,7 +98,8 @@ public interface DB {
      * @param cookie
      * @throws RecordNotFoundException if the record does not exist
      * in the database
-     * @throws SecurityException
+     * @throws SecurityException if the cookie parameter is not
+     * the cookie returned when the record was locked
      */
     public void unlock(int recNo, long cookie)
       throws RecordNotFoundException, SecurityException;
