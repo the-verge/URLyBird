@@ -26,14 +26,6 @@ public class Data implements DB {
     private static DBAccessor database;
     
     /**
-     * The location of the database that will be used by all
-     * instances of the Data class.  The first object created from
-     * the Data class will initialise this variable, after which 
-     * it will not change.
-     */
-    private static String databaseLocation;
-    
-    /**
      * Logger instance for Data.java.
      */
     private Logger log = Logger.getLogger("Data.java");
@@ -43,42 +35,34 @@ public class Data implements DB {
      * @param dbLocation
      */
     public Data(final String dbLocation) {
-        if (databaseLocation == null) {
-            databaseLocation = dbLocation;
-        }
-        else if (dbLocation != databaseLocation) {
-            log.logp(Level.WARNING, "Data.java", "Constructor", 
-                    "Ignored database file path "
-                  + "- database location already initialised");;
-        }
-        database = new DBAccessor(databaseLocation);
+        database = new DBAccessor(dbLocation);
     }
 
     @Override
     public String[] read(int recNo) throws RecordNotFoundException {
-        return database.readRecord(recNo);
+        return database.read(recNo);
     }
 
     @Override
     public void update(int recNo, String[] data, long lockCookie)
             throws RecordNotFoundException, SecurityException {
-        database.updateRecord(recNo, data, lockCookie);
+        database.update(recNo, data, lockCookie);
     }
 
     @Override
     public void delete(int recNo, long lockCookie)
             throws RecordNotFoundException, SecurityException {
-        database.deleteRecord(recNo, lockCookie);
+        database.delete(recNo, lockCookie);
     }
 
     @Override
     public int[] find(String[] criteria) {
-        return database.findRecords(criteria);
+        return database.find(criteria);
     }
 
     @Override
     public int create(String[] data) throws DuplicateKeyException {
-        return database.createRecord(data);
+        return database.create(data);
     }
 
     @Override

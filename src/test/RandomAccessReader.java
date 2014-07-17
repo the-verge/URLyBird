@@ -60,7 +60,7 @@ public class RandomAccessReader {
             byte[] fieldNameLengthByteArray = new byte[1];
             db.read(fieldNameLengthByteArray);
             int fieldNameLength = new BigInteger(fieldNameLengthByteArray).intValue();
-            this.schemaSectionLength += (fieldNameLength + 2);;
+            this.schemaSectionLength += (fieldNameLength + 2);
             
             byte[] fieldNameByteArray = new byte[fieldNameLength];
             db.read(fieldNameByteArray);
@@ -75,6 +75,7 @@ public class RandomAccessReader {
             this.recordFields.put(fieldKey, fieldLength);
             
             System.out.println("FIELD NAME: " + fieldName);
+            System.out.println("FIELD NAME LENGTH: " + fieldNameLength);
             System.out.println("FIELD LENGTH (bytes): " + fieldLength);
             System.out.println("***************************");
         }
@@ -109,6 +110,7 @@ public class RandomAccessReader {
         }
         db.close();
         System.out.println("Total number of records: " + count);
+        System.out.println("Data section offset: " + this.dataSectionOffset);
     }
    
     

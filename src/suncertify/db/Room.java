@@ -15,6 +15,24 @@ public class Room implements Serializable {
      */
     private static final long serialVersionUID = 1441L;
     
+    static final int VALID_RECORD_LENGTH = 1;
+    
+    static final int NAME_LENGTH = 64;
+    
+    static final int LOCATION_LENGTH = 64;
+    
+    static final int SIZE_LENGTH = 4;
+    
+    static final int SMOKING_LENGTH = 1;
+            
+    static final int RATE_LENGTH = 8;
+    
+    static final int DATE_LENGTH = 10;
+    
+    static final int OWNER_LENGTH = 8;
+    
+    static final int RECORD_LENGTH = 160;
+    
     /**
      * The name of the hotel.
      */
