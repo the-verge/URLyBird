@@ -46,13 +46,13 @@ public class Data implements DB {
     @Override
     public void update(int recNo, String[] data, long lockCookie)
             throws RecordNotFoundException, SecurityException {
-        database.update(recNo, data, lockCookie);
+        database.updateRecord(recNo, data, lockCookie);
     }
 
     @Override
     public void delete(int recNo, long lockCookie)
             throws RecordNotFoundException, SecurityException {
-        database.delete(recNo, lockCookie);
+        database.deleteRecord(recNo, lockCookie);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class Data implements DB {
 
     @Override
     public int create(String[] data) throws DuplicateKeyException {
-        return database.create(data);
+        return database.createRecord(data);
     }
 
     @Override

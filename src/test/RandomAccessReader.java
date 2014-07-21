@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class RandomAccessReader {
     
-    private static final String DATABASE_LOCATION = "/Users/john/instructions-113/db-1x3.db";
+    private static final String DATABASE_LOCATION = "/Users/john/workspace/URLyBird/db-1x3.db";
     
     private int startOfFileLength = 6;
     
@@ -25,11 +25,12 @@ public class RandomAccessReader {
     
     private Map<String, Integer> recordFields = new LinkedHashMap<String, Integer>();
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         
         RandomAccessFile db = null;
         try {
             db = new RandomAccessFile(DATABASE_LOCATION, "rw");
+            System.out.println("DATABASE LENGTH: " + db.length());
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         }
