@@ -40,7 +40,7 @@ public class Data implements DB {
 
     @Override
     public String[] read(int recNo) throws RecordNotFoundException {
-        return database.read(recNo);
+        return database.readRecord(recNo);
     }
 
     @Override
