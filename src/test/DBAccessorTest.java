@@ -4,8 +4,10 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.List;
 
 import suncertify.db.DBAccessor;
+import suncertify.db.Room;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -85,6 +87,13 @@ public class DBAccessorTest {
         assertEquals(updatedRecord[4], "$250.54");
         assertEquals(updatedRecord[5], "2014/07/21");
         assertEquals(updatedRecord[6], "12345678");
+    }
+    
+    @Test
+    public void matchRecordTest() {
+//        String[] criteria = {"Dew", "Smallville", "4", "Y", "", "2005/05/02", null};
+//        boolean match = accessor.matchRecord(null, criteria);
+//        assertEquals(match, true);
     }
 
 }

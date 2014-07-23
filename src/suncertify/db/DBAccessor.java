@@ -6,6 +6,8 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The DBAccessor class provides direct access to the underlying database file.
@@ -14,6 +16,8 @@ import java.util.logging.Logger;
  * @author 
  */
 public class DBAccessor {
+    
+    private static final int NUMBER_OF_FIELDS_IN_RECORD = 7;
     
     /**
      * <code>int</code> value that denotes where the data
@@ -240,7 +244,7 @@ public class DBAccessor {
     }
     
     /**
-     * Calculates the record number from the postion of a record in the file.
+     * Calculates the record number from the position of a record in the file.
      * @param filePosition the position of the record in the database file.
      * @return <code>int</code> record number of the file at the specified
      * position.
@@ -248,6 +252,42 @@ public class DBAccessor {
      */
     private int calculateRecordNumber(long filePosition) throws IOException {
         return (int) (database.length() - DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
+    }
+    
+    /**
+     * SHOULD BE PRIVATE AFTER TESTING
+     * @param recordFields
+     * @param criteria
+     * @return
+     */
+    public boolean matchRecord(String[] recordFields, String[] criteria) {
+        
+        int nullCriteria = 0;
+        int matches = 0;
+        
+        for(int i = 0; i < criteria.length; i++) {
+            String query = criteria[i];
+            String field = recordFields[i];
+            if (query == null) {
+                nullCriteria++;
+                continue;
+            }
+            else {
+                Pattern pattern = Pattern.compile(query);
+                Matcher matcher = pattern.matcher(field);
+                if (matcher.find(0)) {
+                    matches++;
+                }
+            }
+        }
+        
+        int fieldsToMatch = NUMBER_OF_FIELDS_IN_RECORD - nullCriteria;
+        
+        if (matches == fieldsToMatch) {
+            return true;
+        }
+        
+        return false;
     }
     
     public RandomAccessFile getDatabase() {
