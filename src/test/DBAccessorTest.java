@@ -91,9 +91,23 @@ public class DBAccessorTest {
     
     @Test
     public void matchRecordTest() {
-//        String[] criteria = {"Dew", "Smallville", "4", "Y", "", "2005/05/02", null};
-//        boolean match = accessor.matchRecord(null, criteria);
-//        assertEquals(match, true);
+        String[] criteria = {null, "sMaLlViLl", "4", "Y", "$210.0", "2005/05/02", null};
+        boolean match = accessor.matchRecord(null, criteria);
+        assertTrue(match);
+    }
+    
+    @Test
+    public void matchNullCriteriaTest() {
+        String[] nullCriteria = {null, null, null, null, null, null, null};
+        boolean match = accessor.matchRecord(null, nullCriteria);
+        assertFalse(match);
+    }
+    
+    @Test
+    public void matchEmptyStringTest() {
+        String[] emptyStringCriteria = {null, "sMaLlViLl", "", "Y", "$210.0", "2005/05/02", null};
+        boolean match = accessor.matchRecord(null, emptyStringCriteria);
+        assertFalse(match);
     }
 
 }

@@ -256,11 +256,14 @@ public class DBAccessor {
     
     /**
      * SHOULD BE PRIVATE AFTER TESTING
-     * @param recordFields
-     * @param criteria
+     * @param recordFields array containing the fields of a record.
+     * @param criteria array containing the query criteria
+     * for each element in the record field array.  An attempt is made
+     * to match <code>recordFields[n]</code> with <code>criteria[n]</code>.
      * @return
      */
     public boolean matchRecord(String[] recordFields, String[] criteria) {
+        recordFields = readRecord(1); // hack for testing
         
         int nullCriteria = 0;
         int matches = 0;
@@ -273,9 +276,10 @@ public class DBAccessor {
                 continue;
             }
             else {
-                Pattern pattern = Pattern.compile(query);
+                String escapedQuery = Pattern.quote(query);
+                Pattern pattern = Pattern.compile(escapedQuery, Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(field);
-                if (matcher.find(0)) {
+                if (matcher.lookingAt()) {
                     matches++;
                 }
             }
@@ -283,7 +287,7 @@ public class DBAccessor {
         
         int fieldsToMatch = NUMBER_OF_FIELDS_IN_RECORD - nullCriteria;
         
-        if (matches == fieldsToMatch) {
+        if (matches == fieldsToMatch && nullCriteria != NUMBER_OF_FIELDS_IN_RECORD) {
             return true;
         }
         
