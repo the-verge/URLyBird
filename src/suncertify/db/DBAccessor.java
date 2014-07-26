@@ -17,19 +17,35 @@ import java.util.regex.Pattern;
  */
 public class DBAccessor {
     
+    /**
+     * The number of fields in a record.
+     */
     private static final int NUMBER_OF_FIELDS_IN_RECORD = 7;
     
     /**
-     * <code>int</code> value that denotes where the data
-     * section of the database files begins.
+     * The number of bytes in a record before the data
+     * section begins (the first byte contains the deleted
+     * record flag).
      */
-    private static final int DATA_SECTION_OFFSET = 56;
+    private static final int RECORD_DATA_SECTION_OFFSET = 1;
     
     /**
-     * <code>byte</code> value that denotes a deleted
+     * The number of bytes in the database file before the data section begins.
+     */
+    private static final int FILE_DATA_SECTION_OFFSET = 56;
+    
+    /**
+     * The value that denotes a deleted
      * record in the database file.
      */
-    private final byte deletedFlag = (byte) 0xFF;
+    private static final byte DELETED_FLAG = (byte) 0xFF;
+    
+    /**
+     * An array that holds the lengths of the data fields of a 
+     * record in the database file.
+     */
+    private static final int[] FIELD_LENGTHS_ARRAY = {Room.NAME_LENGTH, Room.LOCATION_LENGTH, 
+        Room.SIZE_LENGTH, Room.SMOKING_LENGTH, Room.RATE_LENGTH, Room.DATE_LENGTH, Room.OWNER_LENGTH};
     
     /**
      * The location of the database that will be used by all
@@ -38,13 +54,6 @@ public class DBAccessor {
      * it will not change.
      */
     private static String databaseLocation;
-    
-    /**
-     * An array that holds the lengths of the data fields of a 
-     * record in the database file.
-     */
-    private final static int[] fieldLengths = {Room.NAME_LENGTH, Room.LOCATION_LENGTH, 
-        Room.SIZE_LENGTH, Room.SMOKING_LENGTH, Room.RATE_LENGTH, Room.DATE_LENGTH, Room.OWNER_LENGTH};
     
     /**
      * The RandomAccessfile instance <code>database</code> 
@@ -99,8 +108,7 @@ public class DBAccessor {
                 e.printStackTrace();
             }
         }
-        String[] result = {};
-        result = recordToStringArray(record);
+        String[] result = recordToStringArray(record);
         
         log.exiting("DBAccessor.java", "readRecord", result);
         
@@ -116,7 +124,7 @@ public class DBAccessor {
      */
     public void updateRecord(int recNo, String[] data, long lockCookie) {
         final long position = findPositionInFile(recNo);
-        byte[] record = stringArrayToRecord(data, false);
+        byte[] record = stringArrayToRecord(data);
         
         synchronized (database) {
             try {
@@ -130,7 +138,8 @@ public class DBAccessor {
     }
     
     /**
-     * Flags a record as being deleted.
+     * Flags a record as being deleted by assigning the
+     * first bye of the record a value of 0xFF.
      * @param recNo the number of the record to delete.
      * @param lockCookie
      */
@@ -140,7 +149,7 @@ public class DBAccessor {
         synchronized (database) {
             try {
                 database.seek(position);
-                database.writeByte(deletedFlag);
+                database.writeByte(DELETED_FLAG);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -161,7 +170,7 @@ public class DBAccessor {
      */
     public int createRecord(String[] data) {
         log.entering("DBAccessor.java", "createRecord", data);
-        byte[] record = stringArrayToRecord(data, true);
+        byte[] record = stringArrayToRecord(data);
         int recordNumber = 0;
         synchronized (database) {
             try {
@@ -191,10 +200,10 @@ public class DBAccessor {
         int validRecord = validRecordByte.intValue();
         
         int offset = Room.VALID_RECORD_LENGTH;
-        String[] result = new String[fieldLengths.length];
+        String[] result = new String[FIELD_LENGTHS_ARRAY.length];
         
-        for (int i = 0; i < fieldLengths.length; i++) {
-            int fieldLength = fieldLengths[i];
+        for (int i = 0; i < FIELD_LENGTHS_ARRAY.length; i++) {
+            int fieldLength = FIELD_LENGTHS_ARRAY[i];
             String field = "";
             try {
                 field = new String(record, offset, fieldLength, "US-ASCII").trim();
@@ -213,19 +222,22 @@ public class DBAccessor {
      * to a <code>byte</code> array that can be written to file.
      * @param data <code>String</code> array containing the 
      * fields of the record to be written to file.
-     * @param createRecord
-     * @return
+     * @return a <code>byte</code> array that can be written to file.
      */
-    private byte[] stringArrayToRecord(String[] data, boolean createRecord) {
+    private byte[] stringArrayToRecord(String[] data) {
         byte[] emptyRecordByteArray = new byte[Room.RECORD_LENGTH];
         String emptyRecordString = new String(emptyRecordByteArray);
         StringBuilder builder = new StringBuilder(emptyRecordString);
-        int startPosition = Room.VALID_RECORD_LENGTH;
+        //BYTES OR CHAR POSITION?
+        int startPosition = RECORD_DATA_SECTION_OFFSET;
         
-        for (int i = 0; i < fieldLengths.length; i++) {
-            int endPosition = startPosition + data[i].length();
-            builder.replace(startPosition, endPosition, data[i]);
-            int maxFieldLength = fieldLengths[i];
+        for (int i = 0; i < FIELD_LENGTHS_ARRAY.length; i++) {
+            String recordField = data[i];
+            if (recordField != null) {
+                int endPosition = startPosition + recordField.length();
+                builder.replace(startPosition, endPosition, recordField);
+            }
+            int maxFieldLength = FIELD_LENGTHS_ARRAY[i];
             startPosition += maxFieldLength;
         }
         byte[] record = builder.toString().getBytes();
@@ -240,7 +252,7 @@ public class DBAccessor {
      * is stored.
      */
     private long findPositionInFile(int recNo) {
-        return DATA_SECTION_OFFSET + ((recNo - 1) * Room.RECORD_LENGTH);
+        return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * Room.RECORD_LENGTH);
     }
     
     /**
@@ -251,7 +263,7 @@ public class DBAccessor {
      * @throws IOException
      */
     private int calculateRecordNumber(long filePosition) throws IOException {
-        return (int) (database.length() - DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
+        return (int) (database.length() - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
     }
     
     /**
