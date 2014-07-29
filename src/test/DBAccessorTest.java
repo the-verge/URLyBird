@@ -4,21 +4,25 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.List;
+import java.util.ArrayList;
 
 import suncertify.db.DBAccessor;
-import suncertify.db.Room;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+
 public class DBAccessorTest {
+	
+	static final int FILE_DATA_SECTION_OFFSET = 56;
     
     static final int RECORD_LENGTH = 160;
     
-    static DBAccessor accessor = new DBAccessor("/Users/john/workspace/URLyBird/db-1x3.db");
+    static DBAccessor accessor = new DBAccessor("/home/ejhnhng/URLyBird/db-1x3.db");
+    
+    static Class<? extends DBAccessor> DBAccessorClass = accessor.getClass();
     
     static RandomAccessFile database = accessor.getDatabase();
     
@@ -78,8 +82,8 @@ public class DBAccessorTest {
     }
     
     @Test
-    public void createRecordTest() throws IOException {
-        // For now, record always appended to end of file
+    public void appendRecordTest() throws IOException {
+    	
         long initialFileLength = database.length();
         String[] data = {"Newgrange", "Kildare", "4", "Y", "$250.54", "2014/07/21", "12345678"};
         int recordNumber = accessor.createRecord(data);
@@ -88,18 +92,31 @@ public class DBAccessorTest {
         
         String[] newRecord = accessor.readRecord(recordNumber);
         
-        assertEquals("Newgrange", data[0]);
-        assertEquals("Kildare", data[1]);
-        assertEquals("4", data[2]);
-        assertEquals("Y", data[3]);
-        assertEquals("$250.54", data[4]);
-        assertEquals("2014/07/21", data[5]);
-        assertEquals("12345678", data[6]);
+        assertEquals(newRecord[0], data[0]);
+        assertEquals(newRecord[1], data[1]);
+        assertEquals(newRecord[2], data[2]);
+        assertEquals(newRecord[3], data[3]);
+        assertEquals(newRecord[4], data[4]);
+        assertEquals(newRecord[5], data[5]);
+        assertEquals(newRecord[6], data[6]);
     }
     
     @Test
-    public void deleteRecordTest() {
-        //accessor.deleteRecord(1, 1L);
+    public void insertRecordTest() throws IOException {
+    	accessor.deleteRecord(3, 1L);
+        String[] data = {"Wynn's", "Dublin", "2", "N", "$120", "2014/07/29", "77777777"};
+        int recordNumber = accessor.createRecord(data);
+        assertEquals(3, recordNumber);
+        
+        String[] newRecord = accessor.readRecord(recordNumber);
+        
+        assertEquals(newRecord[0], data[0]);
+        assertEquals(newRecord[1], data[1]);
+        assertEquals(newRecord[2], data[2]);
+        assertEquals(newRecord[3], data[3]);
+        assertEquals(newRecord[4], data[4]);
+        assertEquals(newRecord[5], data[5]);
+        assertEquals(newRecord[6], data[6]);
     }
     
     @Test
@@ -120,21 +137,6 @@ public class DBAccessorTest {
     }
     
     @Test
-    public void updateWithNullFieldsTest() {
-        String[] updatedData = {"The Mews", null, null, null, null, null, null};
-        accessor.updateRecord(30, updatedData, 1L);
-        String[] data = accessor.readRecord(30);
-        
-        assertEquals("The Mews", data[0]);
-        assertEquals("Lendmarch", data[1]);
-//        assertEquals("6", data[2]);
-//        assertEquals("Y", data[3]);
-//        assertEquals("$170.00", data[4]);
-//        assertEquals("2005/03/10", data[5]);
-//        assertEquals("", data[6]);
-    }
-    
-    @Test
     public void matchRecordTest() {
         String[] criteria = {null, "sMaLlViLl", "4", "Y", "$210.0", "2005/05/02", null};
         boolean match = accessor.matchRecord(null, criteria);
@@ -143,9 +145,35 @@ public class DBAccessorTest {
     
     @Test
     public void matchNullCriteriaTest() {
-        String[] nullCriteria = {null, null, null, null, null, null, null};
+        String[] nullCriteria = {"", null, null, null, null, null, null};
         boolean match = accessor.matchRecord(null, nullCriteria);
         assertFalse(match);
     }
+    
+    @Test
+    public void calculateRecordNumberTest() throws IOException {
+    	int recordNumber;
+    	recordNumber = accessor.calculateRecordNumber(FILE_DATA_SECTION_OFFSET);
+    	assertEquals(1, recordNumber);
+    	recordNumber = accessor.calculateRecordNumber(FILE_DATA_SECTION_OFFSET + RECORD_LENGTH);
+    	assertEquals(2, recordNumber);
+    	recordNumber = accessor.calculateRecordNumber(FILE_DATA_SECTION_OFFSET + (2* RECORD_LENGTH));
+    	assertEquals(3, recordNumber);
+    }
+    
+    @Test
+    public void firstAvailablePositionTest() throws IOException {
+    	long firstAvailablePosition = accessor.firstAvailablePosition();
+    	long recordPosition = accessor.findPositionInFile(32); //suspect
+    	assertEquals(recordPosition, firstAvailablePosition);
+    }
+    
+    @Test
+    public void retrieveAllRecordsTest() throws IOException {
+    	ArrayList<String[]> allRecords = accessor.retrieveAllRecords();
+    	int total = allRecords.size();
+    	assertEquals(31, total);
+    }
+    
     
 }

@@ -73,7 +73,7 @@ public class Room implements Serializable {
     /**
      * 
      */
-    private transient Logger log = Logger.getLogger("Booking.java");
+    private transient Logger log = Logger.getLogger("Room.java");
     
     
     /**

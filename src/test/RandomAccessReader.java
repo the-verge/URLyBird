@@ -1,19 +1,16 @@
 package test;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RandomAccessReader {
     
-    private static final String DATABASE_LOCATION = "/Users/john/workspace/URLyBird/db-1x3.db";
+    private static final String DATABASE_LOCATION = "/home/ejhnhng/URLyBird/db-1x3.db";
     
     private int startOfFileLength = 6;
     
