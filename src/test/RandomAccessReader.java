@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class RandomAccessReader {
     
-    private static final String DATABASE_LOCATION = "/home/ejhnhng/URLyBird/db-1x3.db";
+    private static final String DATABASE_LOCATION = "/Users/john/workspace/URLyBird/db-1x3.db";
     
     private int startOfFileLength = 6;
     

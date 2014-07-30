@@ -163,7 +163,27 @@ public class DBAccessor {
     }
 
     public int[] find(String[] criteria) {
-        return null;
+        ArrayList<Integer> matches = new ArrayList<Integer>();
+        ArrayList<String[]> allRecords = retrieveAllRecords();
+        
+        for (int i = 0; i < allRecords.size(); i++) {
+            String[] recordFields = allRecords.get(i);
+            boolean match = this.matchRecord(recordFields, criteria);
+            int recordNumber = i + 1;
+            if(match) {
+                matches.add(recordNumber);
+            }
+        }
+        
+        return arrayListToArray(matches);
+    }
+    
+    private int[] arrayListToArray(ArrayList<Integer> list) {
+        int[] result = new int[list.size()];
+        for(int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
     
     /**
@@ -192,15 +212,20 @@ public class DBAccessor {
         return recordNumber;
     }
     
-    public ArrayList<String[]> retrieveAllRecords() throws IOException {
+    public ArrayList<String[]> retrieveAllRecords() {
     	ArrayList<String[]> result = new ArrayList<String[]>();
     	long filePosition = FILE_DATA_SECTION_OFFSET;
-		while (filePosition < database.length()) {
-			byte[] record = retrieveRecord(filePosition);
-			String[] array = recordToStringArray(record);
-			result.add(array);
-			filePosition += Room.RECORD_LENGTH;
-		}
+        try {
+            while (filePosition < database.length()) {
+                byte[] record = retrieveRecord(filePosition);
+                String[] array = recordToStringArray(record);
+                result.add(array);
+                filePosition += Room.RECORD_LENGTH;
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     	return result;
     }
     
@@ -294,7 +319,6 @@ public class DBAccessor {
      */
     //SHOULD BE PRIVATE AFTER TESTING
     public boolean matchRecord(String[] recordFields, String[] criteria) {
-        recordFields = readRecord(1); // hack for testing
         
         int nullCriteria = 0;
         int matches = 0;

@@ -20,9 +20,7 @@ public class DBAccessorTest {
     
     static final int RECORD_LENGTH = 160;
     
-    static DBAccessor accessor = new DBAccessor("/home/ejhnhng/URLyBird/db-1x3.db");
-    
-    static Class<? extends DBAccessor> DBAccessorClass = accessor.getClass();
+    static DBAccessor accessor = new DBAccessor("/Users/john/workspace/URLyBird/db-1x3.db");
     
     static RandomAccessFile database = accessor.getDatabase();
     
@@ -87,67 +85,68 @@ public class DBAccessorTest {
         long initialFileLength = database.length();
         String[] data = {"Newgrange", "Kildare", "4", "Y", "$250.54", "2014/07/21", "12345678"};
         int recordNumber = accessor.createRecord(data);
+        
         assertEquals(31, recordNumber);
         assertEquals(initialFileLength + RECORD_LENGTH, database.length());
         
         String[] newRecord = accessor.readRecord(recordNumber);
+        assertArrayEquals(data, newRecord);
         
-        assertEquals(newRecord[0], data[0]);
-        assertEquals(newRecord[1], data[1]);
-        assertEquals(newRecord[2], data[2]);
-        assertEquals(newRecord[3], data[3]);
-        assertEquals(newRecord[4], data[4]);
-        assertEquals(newRecord[5], data[5]);
-        assertEquals(newRecord[6], data[6]);
     }
     
     @Test
     public void insertRecordTest() throws IOException {
     	accessor.deleteRecord(3, 1L);
         String[] data = {"Wynn's", "Dublin", "2", "N", "$120", "2014/07/29", "77777777"};
+        
         int recordNumber = accessor.createRecord(data);
         assertEquals(3, recordNumber);
         
         String[] newRecord = accessor.readRecord(recordNumber);
-        
-        assertEquals(newRecord[0], data[0]);
-        assertEquals(newRecord[1], data[1]);
-        assertEquals(newRecord[2], data[2]);
-        assertEquals(newRecord[3], data[3]);
-        assertEquals(newRecord[4], data[4]);
-        assertEquals(newRecord[5], data[5]);
-        assertEquals(newRecord[6], data[6]);
+        assertArrayEquals(data, newRecord);
     }
     
     @Test
     public void updateRecordTest() {
-        String[] updatedData = {"The Mews", "Donegal", "4", "Y", "$250.54", "2014/07/21", "12345678"};
-        accessor.updateRecord(30, updatedData, 1L);
+        String[] newData = {"The Mews", "Donegal", "4", "Y", "$250.54", "2014/07/21", "12345678"};
+        accessor.updateRecord(30, newData, 1L);
         
         String[] updatedRecord = accessor.readRecord(30);
-        
-        assertEquals("The Mews", updatedRecord[0]);
-        assertEquals("Donegal", updatedRecord[1]);
-        assertEquals("4", updatedRecord[2]);
-        assertEquals("Y", updatedRecord[3]);
-        assertEquals("$250.54", updatedRecord[4]);
-        assertEquals("2014/07/21", updatedRecord[5]);
-        assertEquals("12345678", updatedRecord[6]);
-        
+        assertArrayEquals(newData, updatedRecord);
     }
     
     @Test
     public void matchRecordTest() {
+        String[] record = accessor.readRecord(1);
         String[] criteria = {null, "sMaLlViLl", "4", "Y", "$210.0", "2005/05/02", null};
-        boolean match = accessor.matchRecord(null, criteria);
+        boolean match = accessor.matchRecord(record, criteria);
         assertTrue(match);
     }
     
     @Test
     public void matchNullCriteriaTest() {
+        String[] record = accessor.readRecord(1);
         String[] nullCriteria = {"", null, null, null, null, null, null};
-        boolean match = accessor.matchRecord(null, nullCriteria);
+        boolean match = accessor.matchRecord(record, nullCriteria);
         assertFalse(match);
+    }
+    
+    @Test
+    public void matchRecordsTest() {
+        int[] matches;
+    
+        String[] criteria = {null, "sMaLlViLl", "4", "Y", "$210.0", "2005/05/02", null};
+        matches = accessor.find(criteria);
+        
+        assertEquals(1, matches.length);
+        assertEquals(1, matches[0]);
+        
+        String[] dewDropCriteria = {"Dew Drop Inn", null, null, null, null, null, null};
+        matches = accessor.find(dewDropCriteria);
+        assertEquals(3, matches.length);
+        assertEquals(1, matches[0]);
+        assertEquals(5, matches[1]);
+        assertEquals(25, matches[2]);
     }
     
     @Test
@@ -173,7 +172,11 @@ public class DBAccessorTest {
     	ArrayList<String[]> allRecords = accessor.retrieveAllRecords();
     	int total = allRecords.size();
     	assertEquals(31, total);
+    	
+    	for(int i = 0; i < allRecords.size(); i++) {
+    	    String[] record = accessor.readRecord(i + 1);
+    	    assertArrayEquals(record, allRecords.get(i));
+    	}
     }
-    
     
 }
