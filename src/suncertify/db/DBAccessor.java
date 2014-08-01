@@ -101,6 +101,7 @@ public class DBAccessor {
         final long position = findPositionInFile(recNo);
         byte[] record = retrieveRecord(position);
         
+        // WHAT IF RECORD NUMBER DOES NOT EXIST?
         if (isDeletedRecord(record)) {
             log.warning("Tried to retrieve deleted record: number " + recNo);
             throw new RecordNotFoundException();
@@ -229,6 +230,7 @@ public class DBAccessor {
         try {
             while (filePosition < database.length()) {
                 byte[] record = retrieveRecord(filePosition);
+                filePosition += Room.RECORD_LENGTH;
                 if (isDeletedRecord(record)) {
                     log.fine("Found deleted record at position " + filePosition);
                     continue;
@@ -237,7 +239,6 @@ public class DBAccessor {
                     String[] data = recordToStringArray(record);
                     result.add(data);
                 }
-                filePosition += Room.RECORD_LENGTH;
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block

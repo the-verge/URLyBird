@@ -52,6 +52,8 @@ public class DBAccessorTest {
         
         database.setLength(initialDatabaseLength);
         assertEquals(4856, database.length());
+        
+        database.close();
     }
 
     @Test
@@ -208,8 +210,13 @@ public class DBAccessorTest {
             assertArrayEquals(record, allRecords.get(i));
         }
     }
-    // PROBLEMS HERE
-    @Ignore
+    
+    @Test(expected=RecordNotFoundException.class)
+    public void recordNotFoundExceptionTest() throws RecordNotFoundException {
+        accessor.deleteRecord(34, 1L);
+        accessor.readRecord(34);
+    }
+    
     @Test
     public void retrieveAllRecordsAfterDeleteTest() {
         ArrayList<String[]> allRecords;
@@ -218,28 +225,19 @@ public class DBAccessorTest {
         accessor.deleteRecord(31, 1L);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
-        assertEquals(33, total);
+        assertEquals(32, total);
         
         accessor.deleteRecord(32, 1L);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
-        assertEquals(32, total);
+        assertEquals(31, total);
        
         accessor.deleteRecord(33, 1L);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
-        assertEquals(31, total);
-        
-        accessor.deleteRecord(34, 1L);
-        allRecords = accessor.retrieveAllRecords();
-        total = allRecords.size();
         assertEquals(30, total);
+        
     }
     
-    @Test(expected=RecordNotFoundException.class)
-    public void recordNotFoundExceptionTest() throws RecordNotFoundException {
-        accessor.deleteRecord(34, 1L);
-        accessor.readRecord(34);
-    }
     
 }
