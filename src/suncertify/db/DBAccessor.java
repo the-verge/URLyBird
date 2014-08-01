@@ -94,11 +94,18 @@ public class DBAccessor {
      * @param recNo the record number to retrieve.
      * @return a <code>String</code> array containing
      * the fields of the record.
+     * @throws RecordNotFoundException 
      */
-    public String[] readRecord(int recNo) {
+    public String[] readRecord(int recNo) throws RecordNotFoundException {
         log.entering("DBAccessor.java", "readRecord", recNo);
         final long position = findPositionInFile(recNo);
         byte[] record = retrieveRecord(position);
+        
+        if (isDeletedRecord(record)) {
+            log.warning("Tried to retrieve deleted record: number " + recNo);
+            throw new RecordNotFoundException();
+        }
+        
         String[] result = recordToStringArray(record);
         log.exiting("DBAccessor.java", "readRecord", result);
         
@@ -106,6 +113,7 @@ public class DBAccessor {
     }
     
     private byte[] retrieveRecord(long position) {
+        log.entering("DBAccessor.java", "retrieveRecord", position);
     	final byte[] record = new byte[Room.RECORD_LENGTH];
         
         synchronized (database) {
@@ -117,6 +125,7 @@ public class DBAccessor {
                 e.printStackTrace();
             }
         }
+        
         return record;
     }
     
@@ -164,11 +173,11 @@ public class DBAccessor {
 
     public int[] find(String[] criteria) {
         ArrayList<Integer> matches = new ArrayList<Integer>();
-        ArrayList<String[]> allRecords = retrieveAllRecords();
+        ArrayList<String[]> allData = retrieveAllRecords();
         
-        for (int i = 0; i < allRecords.size(); i++) {
-            String[] recordFields = allRecords.get(i);
-            boolean match = this.matchRecord(recordFields, criteria);
+        for (int i = 0; i < allData.size(); i++) {
+            String[] data = allData.get(i);
+            boolean match = this.matchRecord(data, criteria);
             int recordNumber = i + 1;
             if(match) {
                 matches.add(recordNumber);
@@ -213,19 +222,29 @@ public class DBAccessor {
     }
     
     public ArrayList<String[]> retrieveAllRecords() {
+        log.entering("DBAccessor.java", "retrieveAllRecords");
+        
     	ArrayList<String[]> result = new ArrayList<String[]>();
     	long filePosition = FILE_DATA_SECTION_OFFSET;
         try {
             while (filePosition < database.length()) {
                 byte[] record = retrieveRecord(filePosition);
-                String[] array = recordToStringArray(record);
-                result.add(array);
+                if (isDeletedRecord(record)) {
+                    log.fine("Found deleted record at position " + filePosition);
+                    continue;
+                }
+                else {
+                    String[] data = recordToStringArray(record);
+                    result.add(data);
+                }
                 filePosition += Room.RECORD_LENGTH;
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        log.exiting("DBAccessor.java", "retrieveAllRecords", result);
+        
     	return result;
     }
     
@@ -237,11 +256,9 @@ public class DBAccessor {
      * the record.
      */
     private String[] recordToStringArray(byte[] record) {
-        Byte validRecordByte = record[0];
-        int validRecord = validRecordByte.intValue();
         
         int offset = RECORD_DATA_SECTION_OFFSET;
-        String[] result = new String[FIELD_LENGTHS_ARRAY.length];
+        String[] data = new String[FIELD_LENGTHS_ARRAY.length];
         
         for (int i = 0; i < FIELD_LENGTHS_ARRAY.length; i++) {
             int fieldLength = FIELD_LENGTHS_ARRAY[i];
@@ -252,10 +269,10 @@ public class DBAccessor {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            result[i] = field;
+            data[i] = field;
             offset += fieldLength;
         }
-        return result;
+        return data;
     }
     
     /**
@@ -274,10 +291,10 @@ public class DBAccessor {
         // 1st byte will automatically be 0 and therefore be a valid record
         
         for (int i = 0; i < FIELD_LENGTHS_ARRAY.length; i++) {
-            String recordField = data[i];
-            if (recordField != null) {
-                int endPosition = startPosition + recordField.length();
-                builder.replace(startPosition, endPosition, recordField);
+            String field = data[i];
+            if (field != null) {
+                int endPosition = startPosition + field.length();
+                builder.replace(startPosition, endPosition, field);
             }
             int maxFieldLength = FIELD_LENGTHS_ARRAY[i];
             startPosition += maxFieldLength;
@@ -305,7 +322,6 @@ public class DBAccessor {
      * position.
      * @throws IOException
      */
-    // PRIVATE AFTER TESTING - THIS IS ONLY VALID FOR APPENDING - TOTAL NO OF RECORDS
     public int calculateRecordNumber(long filePosition) {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
     }
@@ -318,14 +334,14 @@ public class DBAccessor {
      * @return
      */
     //SHOULD BE PRIVATE AFTER TESTING
-    public boolean matchRecord(String[] recordFields, String[] criteria) {
+    public boolean matchRecord(String[] data, String[] criteria) {
         
         int nullCriteria = 0;
         int matches = 0;
         
         for(int i = 0; i < criteria.length; i++) {
             String query = criteria[i];
-            String field = recordFields[i];
+            String field = data[i];
             // should send null from gui if textfield is empty string
             if (query == null || query.equals("")) {
                 nullCriteria++;
@@ -367,17 +383,9 @@ public class DBAccessor {
     	}
     }
     
-    // PRIVATE AFTER TESTING
-    public boolean isDeletedRecord(long filePosition) throws IOException {
-    	byte validRecord;
-    	synchronized(database) {
-    		database.seek(filePosition);
-    		validRecord = database.readByte();
-    	}
-    	if(validRecord == DELETED_FLAG) {
-    		return true;
-    	}
-    	return false;
+    
+    private boolean isDeletedRecord(byte[] record) {
+        return record[0] == DELETED_FLAG;
     }
     
     public RandomAccessFile getDatabase() {
