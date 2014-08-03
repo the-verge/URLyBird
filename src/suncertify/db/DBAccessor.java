@@ -114,6 +114,7 @@ public class DBAccessor {
     }
     
     private byte[] retrieveRecord(long position) {
+        // NEED TO THROW RecordNotFoundException HERE IF POSITION NOT VALID
         log.entering("DBAccessor.java", "retrieveRecord", position);
     	final byte[] record = new byte[Room.RECORD_LENGTH];
         
