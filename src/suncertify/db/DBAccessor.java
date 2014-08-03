@@ -101,7 +101,7 @@ public class DBAccessor {
         final long position = findPositionInFile(recNo);
         byte[] record = retrieveRecord(position);
         
-        // WHAT IF RECORD NUMBER DOES NOT EXIST?
+        // WHAT IF RECORD NUMBER DOES NOT EXIST OR POSITION IN FILE > DATABASE LENGTH?
         if (isDeletedRecord(record)) {
             log.warning("Tried to retrieve deleted record: number " + recNo);
             throw new RecordNotFoundException();
