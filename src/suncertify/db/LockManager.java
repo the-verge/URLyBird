@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import suncertify.db.SecurityException;
 
-public class LockManager {
+public class LockManager implements RecordLocker {
     
     private static final String mutex = "MUTEX";
     
