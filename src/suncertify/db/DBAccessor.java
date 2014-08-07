@@ -80,7 +80,7 @@ public class DBAccessor {
         else if (dbLocation != databaseLocation) {
             log.logp(Level.WARNING, "DBAccessor.java", "Constructor", 
                     "Ignored database file path "
-                  + "- database location already initialised");;
+                  + "- database location already initialised");
         }
         try {
             database = new RandomAccessFile(databaseLocation, "rw");
@@ -157,7 +157,8 @@ public class DBAccessor {
      * Flags a record as being deleted by assigning the
      * first bye of the record a value of 0xFF.
      * @param recNo the number of the record to delete.
-     * @param lockCookie
+     * @param lockCookie the cookie that the record was
+     * locked with.
      */
     public void deleteRecord(int recNo, long lockCookie) {
         log.entering("DBAccessor.java", "deleteRecord", recNo);
@@ -172,7 +173,14 @@ public class DBAccessor {
             }
         }
     }
-
+    
+    /**
+     * Searches the database file for records whose fields match
+     * the supplied criteria. 
+     * @param criteria the criteria for which to search.
+     * @return <code>int[]</code> the record numbers that match the
+     * criteria.
+     */
     public int[] find(String[] criteria) {
         ArrayList<Integer> matches = new ArrayList<Integer>();
         ArrayList<String[]> allData = retrieveAllRecords();
@@ -181,7 +189,7 @@ public class DBAccessor {
             String[] data = allData.get(i);
             boolean match = this.matchRecord(data, criteria);
             int recordNumber = i + 1;
-            if(match) {
+            if (match) {
                 matches.add(recordNumber);
             }
         }
@@ -189,9 +197,60 @@ public class DBAccessor {
         return arrayListToArray(matches);
     }
     
+    /**
+     * Attempts to match a record's fields with supplied criteria.
+     * If the criteria String matches the beginning of the record field, 
+     * a match in that field is recorded.  For a record to match the criteria, 
+     * criteria[n] must match the beginning of data[n] 
+     * for all non-null criteria[n].
+     * @param data array containing the fields of a record.
+     * @param criteria array containing the query criteria
+     * for each element in the record field array.  An attempt is made
+     * to match the beginning of <code>data[n]</code> 
+     * with <code>criteria[n]</code>.
+     * @return <code>boolean</code> indicating a match or not.
+     */
+    public boolean matchRecord(String[] data, String[] criteria) {
+        
+        int nullCriteria = 0;
+        int matches = 0;
+        
+        for (int i = 0; i < criteria.length; i++) {
+            String query = criteria[i];
+            String field = data[i];
+            // should send null from gui if textfield is empty string
+            if (query == null || query.equals("")) {
+                nullCriteria++;
+                continue;
+            }
+            else {
+                String escapedQuery = Pattern.quote(query);
+                // Pattern.CASE_INSENSITIVE assumes US-ASCII
+                Pattern pattern = Pattern.compile(escapedQuery, Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(field);
+                if (matcher.lookingAt()) {
+                    matches++;
+                }
+            }
+        }
+        
+        int fieldsToMatch = NUMBER_OF_FIELDS_IN_RECORD - nullCriteria;
+        
+        if (matches == fieldsToMatch && nullCriteria != NUMBER_OF_FIELDS_IN_RECORD) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Converts an <code>ArrayList<Integer></code> to an int array.
+     * @param list the ArrayList to convert.
+     * @return an <code>int</code> array.
+     */
     private int[] arrayListToArray(ArrayList<Integer> list) {
         int[] result = new int[list.size()];
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             result[i] = list.get(i);
         }
         return result;
@@ -322,54 +381,24 @@ public class DBAccessor {
      * @param filePosition the position of the record in the database file.
      * @return <code>int</code> record number of the file at the specified
      * position.
-     * @throws IOException
      */
     public int calculateRecordNumber(long filePosition) {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
     }
     
     /**
-     * @param recordFields array containing the fields of a record.
-     * @param criteria array containing the query criteria
-     * for each element in the record field array.  An attempt is made
-     * to match <code>recordFields[n]</code> with <code>criteria[n]</code>.
-     * @return
+     * Finds the first available position to write
+     * to in the file.  Accomplished by reading the 
+     * first byte of the records in the file 
+     * to determine whether they are marked as deleted.  
+     * If a deleted record is found, it's position in the file
+     * is returned.  If no deleted record is found,
+     * the position of the end of the file is
+     * returned.
+     * @return the first available position in which
+     * a record can be written.
+     * @throws IOException
      */
-    //SHOULD BE PRIVATE AFTER TESTING
-    public boolean matchRecord(String[] data, String[] criteria) {
-        
-        int nullCriteria = 0;
-        int matches = 0;
-        
-        for(int i = 0; i < criteria.length; i++) {
-            String query = criteria[i];
-            String field = data[i];
-            // should send null from gui if textfield is empty string
-            if (query == null || query.equals("")) {
-                nullCriteria++;
-                continue;
-            }
-            else {
-                String escapedQuery = Pattern.quote(query);
-                // Pattern.CASE_INSENSITIVE assumes US-ASCII
-                Pattern pattern = Pattern.compile(escapedQuery, Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(field);
-                if (matcher.lookingAt()) {
-                    matches++;
-                }
-            }
-        }
-        
-        int fieldsToMatch = NUMBER_OF_FIELDS_IN_RECORD - nullCriteria;
-        
-        if (matches == fieldsToMatch && nullCriteria != NUMBER_OF_FIELDS_IN_RECORD) {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    // PRIVATE AFTER TESTING
     public long firstAvailablePosition() throws IOException {
     	long filePosition = FILE_DATA_SECTION_OFFSET;
     	synchronized (database) {
