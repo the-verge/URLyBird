@@ -1,6 +1,5 @@
 package suncertify.db;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -33,43 +32,71 @@ public class Data implements DB {
     /**
      * The constructor takes the file path of the database as its only argument.
      * @param dbLocation
+     * @throws DBException if the <code>DBAccessor</code> instance 
+     * <code>database</code> cannot be instantiated. 
      */
     public Data(final String dbLocation) {
         database = new DBAccessor(dbLocation);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * @throws DBException if the read operation fails.
+     */
     @Override
     public String[] read(int recNo) throws RecordNotFoundException {
         return database.readRecord(recNo);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * @throws DBException if the update operation fails.
+     */
     @Override
     public void update(int recNo, String[] data, long lockCookie)
             throws RecordNotFoundException, SecurityException {
         database.updateRecord(recNo, data, lockCookie);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * @throws DBException if the delete operation fails.
+     */
     @Override
     public void delete(int recNo, long lockCookie)
             throws RecordNotFoundException, SecurityException {
         database.deleteRecord(recNo, lockCookie);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * @throws DBException if the find operation fails.
+     */
     @Override
     public int[] find(String[] criteria) {
         return database.find(criteria);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * @throws DBException if the create operation fails.
+     */
     @Override
     public int create(String[] data) throws DuplicateKeyException {
         return database.createRecord(data);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long lock(int recNo) throws RecordNotFoundException {
         return lockManager.lockRecord(recNo);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void unlock(int recNo, long cookie) throws RecordNotFoundException,
             SecurityException {

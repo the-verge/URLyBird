@@ -13,7 +13,7 @@ public interface DB {
      * element is a record value.
      * 
      * @param recNo the unique identifier of the record to read
-     * @return a String array representing the fields of the record
+     * @return a <code>String</code> array representing the fields of the record
      * @throws RecordNotFoundException if the record does not exist
      * in the database
      */

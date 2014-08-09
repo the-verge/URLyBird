@@ -218,7 +218,7 @@ public class DBAccessorTest {
     }
     
     @Test
-    public void retrieveAllRecordsAfterDeleteTest() {
+    public void retrieveAllRecordsAfterDeleteTest() throws IOException {
         ArrayList<String[]> allRecords;
         int total;
         

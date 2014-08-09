@@ -13,6 +13,11 @@ import java.util.regex.Pattern;
 /**
  * The DBAccessor class provides direct access to the underlying database file.
  * It uses a RandomAccessFile instance to read from and write to the file.
+ * The constructor and public methods of this class throw DBException which 
+ * extends RunTimeException. This exception wraps checked Exceptions such as 
+ * FileNotFoundException, IOException and UnsupportedEncodingException in order
+ * to deal with these while still maintaining compliance with the supplied DB.java 
+ * interface.
  * 
  * @author 
  */
@@ -72,6 +77,7 @@ public class DBAccessor {
      * Class constructor. All instances of the class share access
      * to the same database file.
      * @param dbLocation the path to the database file.
+     * @throws DBAccessException if the file cannot be found.
      */
     public DBAccessor(String dbLocation) {
         if (databaseLocation == null) {
@@ -85,7 +91,7 @@ public class DBAccessor {
         try {
             database = new RandomAccessFile(databaseLocation, "rw");
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new DBException("Database file not found", e);
         }
     }
     
@@ -95,37 +101,50 @@ public class DBAccessor {
      * @return a <code>String</code> array containing
      * the fields of the record.
      * @throws RecordNotFoundException 
+     * @throws DBException if an IOException is thrown when 
+     * trying to read from the database file.
      */
     public String[] readRecord(int recNo) throws RecordNotFoundException {
         log.entering("DBAccessor.java", "readRecord", recNo);
         final long position = findPositionInFile(recNo);
-        byte[] record = retrieveRecord(position);
-        
-        // WHAT IF RECORD NUMBER DOES NOT EXIST OR POSITION IN FILE > DATABASE LENGTH?
-        if (isDeletedRecord(record)) {
-            log.warning("Tried to retrieve deleted record: number " + recNo);
-            throw new RecordNotFoundException();
+        byte[] record;
+        String[] result;
+
+        try {
+            record = retrieveRecord(position);
+            // WHAT IF RECORD NUMBER DOES NOT EXIST OR POSITION IN FILE > DATABASE LENGTH?
+            if (isDeletedRecord(record)) {
+                log.warning("Tried to retrieve deleted record: number " + recNo);
+                throw new RecordNotFoundException();
+            }
+            result = recordToStringArray(record);
+        } catch (UnsupportedEncodingException e) {
+            throw new DBException("Could not decode data", e);
+        } catch (IOException e) {
+            throw new DBException("Could not retrieve record", e);
         }
         
-        String[] result = recordToStringArray(record);
         log.exiting("DBAccessor.java", "readRecord", result);
         
         return result;
     }
     
-    private byte[] retrieveRecord(long position) {
+    /**
+     * Retrieves a record from a specified position
+     * in the file.
+     * @param position the position of the record in the file.
+     * @return <code>byte[]</code> the bytes that constitute
+     * the record.
+     * @throws IOException 
+     */
+    private byte[] retrieveRecord(long position) throws IOException {
         // NEED TO THROW RecordNotFoundException HERE IF POSITION NOT VALID
         log.entering("DBAccessor.java", "retrieveRecord", position);
     	final byte[] record = new byte[Room.RECORD_LENGTH];
         
         synchronized (database) {
-            try {
-                database.seek(position);
-                database.readFully(record);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            database.seek(position);
+            database.readFully(record);
         }
         
         return record;
@@ -136,7 +155,10 @@ public class DBAccessor {
      * @param recNo the number of the record to update.
      * @param data <code>String</code> array containing the
      * fields of the record to update.
-     * @param lockCookie
+     * @param lockCookie the cookie that the record was
+     * locked with.
+     * @throws DBException if an IOException is thrown when
+     * trying to write to the database file.
      */
     public void updateRecord(int recNo, String[] data, long lockCookie) {
         final long position = findPositionInFile(recNo);
@@ -147,8 +169,7 @@ public class DBAccessor {
                 database.seek(position);
                 database.write(record);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new DBException("Could not update record", e);
             }
         }
     }
@@ -159,6 +180,8 @@ public class DBAccessor {
      * @param recNo the number of the record to delete.
      * @param lockCookie the cookie that the record was
      * locked with.
+     * @throws DBException if an IOException is thrown 
+     * when attempting to write to the database file.
      */
     public void deleteRecord(int recNo, long lockCookie) {
         log.entering("DBAccessor.java", "deleteRecord", recNo);
@@ -168,8 +191,7 @@ public class DBAccessor {
                 database.seek(position);
                 database.writeByte(DELETED_FLAG);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new DBException("Could not delete record", e);
             }
         }
     }
@@ -180,10 +202,17 @@ public class DBAccessor {
      * @param criteria the criteria for which to search.
      * @return <code>int[]</code> the record numbers that match the
      * criteria.
+     * @throws DBException if an IOException is thrown 
+     * when attempting to read from the database file.
      */
     public int[] find(String[] criteria) {
         ArrayList<Integer> matches = new ArrayList<Integer>();
-        ArrayList<String[]> allData = retrieveAllRecords();
+        ArrayList<String[]> allData;
+        try {
+            allData = retrieveAllRecords();
+        } catch (IOException e) {
+            throw new DBException("Could not retrieve records", e);
+        }
         
         for (int i = 0; i < allData.size(); i++) {
             String[] data = allData.get(i);
@@ -195,6 +224,36 @@ public class DBAccessor {
         }
         
         return arrayListToArray(matches);
+    }
+    
+    /**
+     * Retrieves <code>String</code> array representations
+     * of all records in the file.
+     * @return <code>ArrayList<String[]></code> containing
+     * the fields of all records.
+     * @throws IOException
+     */
+    public ArrayList<String[]> retrieveAllRecords() throws IOException {
+        log.entering("DBAccessor.java", "retrieveAllRecords");
+        
+        ArrayList<String[]> result = new ArrayList<String[]>();
+        long filePosition = FILE_DATA_SECTION_OFFSET;
+        
+        while (filePosition < database.length()) {
+            byte[] record = retrieveRecord(filePosition);
+            filePosition += Room.RECORD_LENGTH;
+            if (isDeletedRecord(record)) {
+                log.fine("Found deleted record at position " + filePosition);
+                continue;
+            }
+            else {
+                String[] data = recordToStringArray(record);
+                result.add(data);
+            }
+        }
+        log.exiting("DBAccessor.java", "retrieveAllRecords", result);
+        
+        return result;
     }
     
     /**
@@ -244,7 +303,8 @@ public class DBAccessor {
     }
     
     /**
-     * Converts an <code>ArrayList<Integer></code> to an int array.
+     * Converts an <code>ArrayList<Integer></code> to an 
+     * <code>int</code> array.
      * @param list the ArrayList to convert.
      * @return an <code>int</code> array.
      */
@@ -261,6 +321,8 @@ public class DBAccessor {
      * @param data <code>String</code> array containing the 
      * fields of the record to be created.
      * @return the number of the newly created record.
+     * @throws DBException if an IOException is thrown 
+     * when attempting to write to the database file.
      */
     public int createRecord(String[] data) {
         log.entering("DBAccessor.java", "createRecord", data);
@@ -273,40 +335,12 @@ public class DBAccessor {
                 database.seek(position);
                 database.write(record);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new DBException("Could not create record", e);
             }
         }
         log.exiting("DBAccessor.java", "createRecord", recordNumber);
         
         return recordNumber;
-    }
-    
-    public ArrayList<String[]> retrieveAllRecords() {
-        log.entering("DBAccessor.java", "retrieveAllRecords");
-        
-    	ArrayList<String[]> result = new ArrayList<String[]>();
-    	long filePosition = FILE_DATA_SECTION_OFFSET;
-        try {
-            while (filePosition < database.length()) {
-                byte[] record = retrieveRecord(filePosition);
-                filePosition += Room.RECORD_LENGTH;
-                if (isDeletedRecord(record)) {
-                    log.fine("Found deleted record at position " + filePosition);
-                    continue;
-                }
-                else {
-                    String[] data = recordToStringArray(record);
-                    result.add(data);
-                }
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        log.exiting("DBAccessor.java", "retrieveAllRecords", result);
-        
-    	return result;
     }
     
     /**
@@ -315,21 +349,17 @@ public class DBAccessor {
      * @param record <code>byte</code> array read from database file.
      * @return <code>String</code> array containing the fields of
      * the record.
+     * @throws UnsupportedEncodingException 
      */
-    private String[] recordToStringArray(byte[] record) {
+    private String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
         
         int offset = RECORD_DATA_SECTION_OFFSET;
         String[] data = new String[FIELD_LENGTHS_ARRAY.length];
+        String field;
         
         for (int i = 0; i < FIELD_LENGTHS_ARRAY.length; i++) {
             int fieldLength = FIELD_LENGTHS_ARRAY[i];
-            String field = "";
-            try {
-                field = new String(record, offset, fieldLength, "US-ASCII").trim();
-            } catch (UnsupportedEncodingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            field = new String(record, offset, fieldLength, "US-ASCII").trim();
             data[i] = field;
             offset += fieldLength;
         }
@@ -414,7 +444,13 @@ public class DBAccessor {
     	}
     }
     
-    
+    /**
+     * Checks if a record is marked as deleted by comparing
+     * the first byte of the record with the 
+     * <code>DELETED FLAG<code>
+     * @param record the byte representation of a record.
+     * @return boolean indicating deleted or not.
+     */
     private boolean isDeletedRecord(byte[] record) {
         return record[0] == DELETED_FLAG;
     }

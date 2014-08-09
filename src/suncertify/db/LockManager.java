@@ -10,6 +10,7 @@ import suncertify.db.SecurityException;
  * This is necessary when an attempt is made to
  * update or delete a record to ensure a record
  * is being edited by only one thread at a time.
+ * 
  * @author john
  *
  */
@@ -122,9 +123,10 @@ public class LockManager implements RecordLocker {
     }
     
     /**
+     * REMOVE AFTER TESTING
      * Gets the HashMap that maps locked record numbers
      * to the cookies they are locked with.
-     * @return
+     * @return 
      */
     public Map<Integer, Long> getLockMap() {
         return LOCKMAP;
