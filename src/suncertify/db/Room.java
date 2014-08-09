@@ -11,7 +11,7 @@ import java.util.logging.*;
 public class Room implements Serializable {
 
     /**
-     * Class version number for Room.java.
+     * The SUID.
      */
     private static final long serialVersionUID = 1441L;
     
