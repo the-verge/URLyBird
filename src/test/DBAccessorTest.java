@@ -39,7 +39,7 @@ public class DBAccessorTest {
     @AfterClass
     public static void resetDB() throws IOException, RecordNotFoundException {
         String[] resetData = {"Bed & Breakfast & Business", "Lendmarch", "6", "Y", "$170.00", "2005/03/10", ""};
-        accessor.updateRecord(30, resetData, 1L);
+        accessor.updateRecord(30, resetData);
         String[] data = accessor.readRecord(30);
         
         assertEquals("Bed & Breakfast & Business", data[0]);
@@ -97,11 +97,15 @@ public class DBAccessorTest {
     
     @Test
     public void insertRecordTest() throws IOException, RecordNotFoundException {
-    	accessor.deleteRecord(3, 1L);
+    	accessor.deleteRecord(3);
+    	assertEquals(1, accessor.getDeletedRecordsList().size());
+    	assertEquals(3, (int) accessor.getDeletedRecordsList().get(0));
+    	
         String[] data = {"Wynn's", "Dublin", "2", "N", "$120", "2014/07/29", "77777777"};
         
         int recordNumber = accessor.createRecord(data);
         assertEquals(3, recordNumber);
+        assertEquals(0, accessor.getDeletedRecordsList().size());
         
         String[] newRecord = accessor.readRecord(recordNumber);
         assertArrayEquals(data, newRecord);
@@ -110,7 +114,7 @@ public class DBAccessorTest {
     @Test
     public void updateRecordTest() throws RecordNotFoundException {
         String[] newData = {"The Mews", "Donegal", "4", "Y", "$250.54", "2014/07/21", "12345678"};
-        accessor.updateRecord(30, newData, 1L);
+        accessor.updateRecord(30, newData);
         
         String[] updatedRecord = accessor.readRecord(30);
         assertArrayEquals(newData, updatedRecord);
@@ -130,7 +134,7 @@ public class DBAccessorTest {
     @Test
     public void firstAvailablePositionTest() throws IOException {
     	long firstAvailablePosition = accessor.firstAvailablePosition();
-    	long recordPosition = accessor.findPositionInFile(32); //suspect
+    	long recordPosition = accessor.calculateFilePosition(32); //suspect
     	assertEquals(recordPosition, firstAvailablePosition);
     }
     
@@ -213,7 +217,10 @@ public class DBAccessorTest {
     
     @Test(expected=RecordNotFoundException.class)
     public void recordNotFoundExceptionTest() throws RecordNotFoundException {
-        accessor.deleteRecord(34, 1L);
+        assertEquals(0, accessor.getDeletedRecordsList().size());
+        accessor.deleteRecord(34);
+        assertEquals(1, accessor.getDeletedRecordsList().size());
+        assertEquals(34, (int) accessor.getDeletedRecordsList().get(0));
         accessor.readRecord(34);
     }
     
@@ -222,17 +229,17 @@ public class DBAccessorTest {
         ArrayList<String[]> allRecords;
         int total;
         
-        accessor.deleteRecord(31, 1L);
+        accessor.deleteRecord(31);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
         assertEquals(32, total);
         
-        accessor.deleteRecord(32, 1L);
+        accessor.deleteRecord(32);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
         assertEquals(31, total);
        
-        accessor.deleteRecord(33, 1L);
+        accessor.deleteRecord(33);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
         assertEquals(30, total);

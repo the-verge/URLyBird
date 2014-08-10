@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -13,10 +15,11 @@ import java.util.regex.Pattern;
 /**
  * The DBAccessor class provides direct access to the underlying database file.
  * It uses a RandomAccessFile instance to read from and write to the file.
- * The constructor and public methods of this class throw DBException which 
- * extends RunTimeException. This exception wraps checked Exceptions such as 
- * FileNotFoundException, IOException and UnsupportedEncodingException in order
- * to deal with these while still maintaining compliance with the supplied DB.java 
+ * The constructor and public methods of this class (excluding getters) throw 
+ * DBException which extends RunTimeException. This exception wraps checked 
+ * Exceptions such as FileNotFoundException, IOException and 
+ * UnsupportedEncodingException in order to deal with these while still 
+ * maintaining compliance with the supplied DB.java 
  * interface.
  * 
  * @author 
@@ -68,6 +71,9 @@ public class DBAccessor {
      */
     private RandomAccessFile database;
     
+    private static List<Integer> deletedRecordsList 
+                        = Collections.synchronizedList(new ArrayList<Integer>());
+    
     /**
      * Logger instance for DBAccessor.java.
      */
@@ -80,6 +86,7 @@ public class DBAccessor {
      * @throws DBAccessException if the file cannot be found.
      */
     public DBAccessor(String dbLocation) {
+        //WRONG 1ST TRY RENDERS THIS UNUSABLE
         if (databaseLocation == null) {
             databaseLocation = dbLocation;
         }
@@ -90,8 +97,11 @@ public class DBAccessor {
         }
         try {
             database = new RandomAccessFile(databaseLocation, "rw");
+            initialiseDeletedRecordsList();
         } catch (FileNotFoundException e) {
             throw new DBException("Database file not found", e);
+        } catch (IOException e) {
+            throw new DBException("Error reading file", e);
         }
     }
     
@@ -106,18 +116,18 @@ public class DBAccessor {
      */
     public String[] readRecord(int recNo) throws RecordNotFoundException {
         log.entering("DBAccessor.java", "readRecord", recNo);
-        final long position = findPositionInFile(recNo);
+        final long position = calculateFilePosition(recNo);
         byte[] record;
         String[] result;
-
+        
         try {
-            record = retrieveRecord(position);
-            // WHAT IF RECORD NUMBER DOES NOT EXIST OR POSITION IN FILE > DATABASE LENGTH?
-            if (isDeletedRecord(record)) {
-                log.warning("Tried to retrieve deleted record: number " + recNo);
-                throw new RecordNotFoundException();
+            if (!recordExists(recNo)) {
+                throw new RecordNotFoundException("Record number " + recNo + " does not exist");
             }
-            result = recordToStringArray(record);
+            else {
+                record = retrieveRecord(position);
+                result = recordToStringArray(record); 
+            }
         } catch (UnsupportedEncodingException e) {
             throw new DBException("Could not decode data", e);
         } catch (IOException e) {
@@ -138,8 +148,8 @@ public class DBAccessor {
      * @throws IOException 
      */
     private byte[] retrieveRecord(long position) throws IOException {
-        // NEED TO THROW RecordNotFoundException HERE IF POSITION NOT VALID
         log.entering("DBAccessor.java", "retrieveRecord", position);
+        
     	final byte[] record = new byte[Room.RECORD_LENGTH];
         
         synchronized (database) {
@@ -155,13 +165,11 @@ public class DBAccessor {
      * @param recNo the number of the record to update.
      * @param data <code>String</code> array containing the
      * fields of the record to update.
-     * @param lockCookie the cookie that the record was
-     * locked with.
      * @throws DBException if an IOException is thrown when
      * trying to write to the database file.
      */
-    public void updateRecord(int recNo, String[] data, long lockCookie) {
-        final long position = findPositionInFile(recNo);
+    public void updateRecord(int recNo, String[] data) {
+        final long position = calculateFilePosition(recNo);
         byte[] record = stringArrayToRecord(data);
         
         synchronized (database) {
@@ -178,14 +186,12 @@ public class DBAccessor {
      * Flags a record as being deleted by assigning the
      * first bye of the record a value of 0xFF.
      * @param recNo the number of the record to delete.
-     * @param lockCookie the cookie that the record was
-     * locked with.
      * @throws DBException if an IOException is thrown 
      * when attempting to write to the database file.
      */
-    public void deleteRecord(int recNo, long lockCookie) {
+    public void deleteRecord(int recNo) {
         log.entering("DBAccessor.java", "deleteRecord", recNo);
-        long position = findPositionInFile(recNo);
+        long position = calculateFilePosition(recNo);
         synchronized (database) {
             try {
                 database.seek(position);
@@ -193,6 +199,9 @@ public class DBAccessor {
             } catch (IOException e) {
                 throw new DBException("Could not delete record", e);
             }
+        }
+        synchronized(deletedRecordsList) {
+            deletedRecordsList.add(recNo);
         }
     }
     
@@ -240,15 +249,19 @@ public class DBAccessor {
         long filePosition = FILE_DATA_SECTION_OFFSET;
         
         while (filePosition < database.length()) {
-            byte[] record = retrieveRecord(filePosition);
-            filePosition += Room.RECORD_LENGTH;
-            if (isDeletedRecord(record)) {
+            
+            int recordNumber = calculateRecordNumber(filePosition);
+            
+            if (isDeletedRecord(recordNumber)) {
                 log.fine("Found deleted record at position " + filePosition);
+                filePosition += Room.RECORD_LENGTH;
                 continue;
             }
             else {
+                byte[] record = retrieveRecord(filePosition);
                 String[] data = recordToStringArray(record);
                 result.add(data);
+                filePosition += Room.RECORD_LENGTH;
             }
         }
         log.exiting("DBAccessor.java", "retrieveAllRecords", result);
@@ -359,6 +372,7 @@ public class DBAccessor {
         
         for (int i = 0; i < FIELD_LENGTHS_ARRAY.length; i++) {
             int fieldLength = FIELD_LENGTHS_ARRAY[i];
+            // POSSIBLE NPE
             field = new String(record, offset, fieldLength, "US-ASCII").trim();
             data[i] = field;
             offset += fieldLength;
@@ -401,8 +415,7 @@ public class DBAccessor {
      * @return the position in the file where the record
      * is stored.
      */
-    // PRIVATE AFTER TESTING
-    public long findPositionInFile(int recNo) {
+    public long calculateFilePosition(int recNo) {
         return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * Room.RECORD_LENGTH);
     }
     
@@ -416,47 +429,59 @@ public class DBAccessor {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
     }
     
-    /**
-     * Finds the first available position to write
-     * to in the file.  Accomplished by reading the 
-     * first byte of the records in the file 
-     * to determine whether they are marked as deleted.  
-     * If a deleted record is found, it's position in the file
-     * is returned.  If no deleted record is found,
-     * the position of the end of the file is
-     * returned.
-     * @return the first available position in which
-     * a record can be written.
-     * @throws IOException
-     */
     public long firstAvailablePosition() throws IOException {
-    	long filePosition = FILE_DATA_SECTION_OFFSET;
-    	synchronized (database) {
-    		while (filePosition < database.length()) {
-    			database.seek(filePosition);
-    			byte validRecord = database.readByte();
-    			if (validRecord == DELETED_FLAG) {
-    				return filePosition;
-    			}
-    			filePosition += Room.RECORD_LENGTH;
-    		}
-    		return database.length();
-    	}
+        // SYNCHRONIZATION PROBABLY SUPERFLUOUS HERE
+        synchronized (deletedRecordsList) {
+            if (deletedRecordsList.size() > 0) {
+                int recordNumber = deletedRecordsList.get(0);
+                // SHOULD ONLY REMOVE IF CREATE IS SUCCESSFUL
+                deletedRecordsList.remove(0);
+                return calculateFilePosition(recordNumber);
+            }
+            else {
+                return database.length();
+            }
+        }
     }
     
-    /**
-     * Checks if a record is marked as deleted by comparing
-     * the first byte of the record with the 
-     * <code>DELETED FLAG<code>
-     * @param record the byte representation of a record.
-     * @return boolean indicating deleted or not.
-     */
-    private boolean isDeletedRecord(byte[] record) {
-        return record[0] == DELETED_FLAG;
+    public boolean recordExists(int recNo) {
+        boolean recordExists = true;
+        long position = calculateFilePosition(recNo);
+        try {
+            recordExists = isValidFilePosition(position) && !isDeletedRecord(recNo);
+        } catch (IOException e) {
+            throw new DBException("Could not determine whether record number" + recNo + " exists", e);
+        }
+        return recordExists;
+    }
+    
+    public void initialiseDeletedRecordsList() throws IOException {
+        long filePosition = FILE_DATA_SECTION_OFFSET;
+        while (filePosition < database.length()) {
+            if(database.readByte() == DELETED_FLAG) {
+                int recordNumber = calculateRecordNumber(filePosition);
+                deletedRecordsList.add(recordNumber);
+            }
+            filePosition += Room.RECORD_LENGTH;
+        }
+    }
+    
+    private boolean isDeletedRecord(int recNo) {
+        // SYNCHRONIZED?
+        return deletedRecordsList.contains(recNo);
+    }
+    
+    private boolean isValidFilePosition(long position) throws IOException {
+        return (position < database.length()) && (position > 0);
     }
     
     public RandomAccessFile getDatabase() {
-        return this.database;
+        return database;
     }
+    
+    public List<Integer> getDeletedRecordsList() {
+        return deletedRecordsList;
+    }
+    
 
 }

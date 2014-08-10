@@ -55,7 +55,14 @@ public class Data implements DB {
     @Override
     public void update(int recNo, String[] data, long lockCookie)
             throws RecordNotFoundException, SecurityException {
-        database.updateRecord(recNo, data, lockCookie);
+        
+        if (isValidCookie(recNo, lockCookie)) {
+            database.updateRecord(recNo, data);
+        }
+        else {
+            throw new SecurityException("Attempt to update record " 
+                    + recNo + " with invalid lockCookie");
+        }
     }
     
     /**
@@ -65,7 +72,14 @@ public class Data implements DB {
     @Override
     public void delete(int recNo, long lockCookie)
             throws RecordNotFoundException, SecurityException {
-        database.deleteRecord(recNo, lockCookie);
+        
+        if (isValidCookie(recNo, lockCookie)) {
+            database.deleteRecord(recNo); 
+        }
+        else {
+            throw new SecurityException("Attempt to delete record " 
+                    + recNo + " with invalid lockCookie");
+        }
     }
     
     /**
@@ -91,6 +105,9 @@ public class Data implements DB {
      */
     @Override
     public long lock(int recNo) throws RecordNotFoundException {
+        if (!database.recordExists(recNo)) {
+            throw new RecordNotFoundException("Record number " + recNo + " does not exist");
+        }
         return lockManager.lockRecord(recNo);
     }
     
@@ -100,7 +117,22 @@ public class Data implements DB {
     @Override
     public void unlock(int recNo, long cookie) throws RecordNotFoundException,
             SecurityException {
-        lockManager.unlockRecord(recNo, cookie);
+        
+        if (isValidCookie(recNo, cookie)) {
+            lockManager.unlockRecord(recNo, cookie);
+        }
+        else {
+            throw new SecurityException("Attempt to unlock record " 
+                    + recNo + " with invalid lockCookie");
+        }
+    }
+    
+    private boolean isValidCookie(int recNo, long lockCookie) {
+        // POSSIBLE NPE TO HANDLE
+        if (lockManager.getLockMap().get(recNo) == lockCookie) {
+            return true;
+        }
+        return false;
     }
 
 }
