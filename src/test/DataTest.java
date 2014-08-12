@@ -1,22 +1,15 @@
 package test;
 
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import suncertify.db.DBException;
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 
 public class DataTest {
-
-    @Before
-    public void setUp() throws Exception {
-    }
     
-    @Test(expected=SecurityException.class)
+    @Test(expectedExceptions = SecurityException.class)
     public void securityTest() throws RecordNotFoundException, SecurityException {
         Data data = new Data("/Users/john/workspace/URLyBird/db-1x3.db");
         String[] updateData = {"Bed & Breakfast & Business", "Lendmarch", "6", "Y", "$170.00", "2005/03/10", ""};
@@ -25,7 +18,7 @@ public class DataTest {
         data.unlock(1, cookie);
     }
     
-    @Test(expected=RecordNotFoundException.class)
+    @Test(expectedExceptions = RecordNotFoundException.class)
     public void lockNonExistingRecordTest() throws RecordNotFoundException {
         Data data = new Data("/Users/john/workspace/URLyBird/db-1x3.db");
         data.lock(66);

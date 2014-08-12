@@ -1,30 +1,26 @@
 package test;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
+
+
 import suncertify.db.DBAccessor;
 import suncertify.db.RecordNotFoundException;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
-
-@FixMethodOrder(MethodSorters.JVM)
+//@FixMethodOrder(MethodSorters.JVM)
 public class DBAccessorTest {
 	
 	static final int FILE_DATA_SECTION_OFFSET = 56;
     
     static final int RECORD_LENGTH = 160;
     
-    static DBAccessor accessor = new DBAccessor("/Users/john/workspace/URLyBird/db-1x3.db");
+    static DBAccessor accessor = new DBAccessor("/home/ejhnhng/URLyBird/db-1x3.db");
     
     static RandomAccessFile database = accessor.getDatabase();
     
@@ -215,7 +211,7 @@ public class DBAccessorTest {
         }
     }
     
-    @Test(expected=RecordNotFoundException.class)
+    @Test(expectedExceptions = RecordNotFoundException.class)
     public void recordNotFoundExceptionTest() throws RecordNotFoundException {
         assertEquals(0, accessor.getDeletedRecordsList().size());
         accessor.deleteRecord(34);

@@ -1,10 +1,11 @@
 package test;
 
-import static org.junit.Assert.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
 
 import java.util.Map;
-
-import org.junit.Test;
 
 import suncertify.db.LockManager;
 import suncertify.db.SecurityException;
@@ -34,7 +35,7 @@ public class LockManagerTest {
         
     }
 
-    @Test(expected=SecurityException.class)
+    @Test(expectedExceptions = SecurityException.class)
     public void securityExceptionTest() throws SecurityException {
         manager.lockRecord(1);
         long illegalCookie = 11L;

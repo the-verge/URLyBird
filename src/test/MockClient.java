@@ -1,5 +1,9 @@
 package test;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
@@ -20,27 +24,36 @@ public class MockClient implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(Thread.currentThread().getName() + ": starting up....");
-        try {
-            lockCookie = data.lock(recNo);
-        } catch (RecordNotFoundException e) {
-            e.printStackTrace();
-        }
-        System.out.println(Thread.currentThread().getName() + ": doing some work.....");
-        long endTime = System.currentTimeMillis() + 5000;
-        while (System.currentTimeMillis() < endTime) {
-            
-        }
-        try {
-            data.unlock(recNo, lockCookie);
-        } catch (RecordNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        System.out.println(Thread.currentThread().getName() + ": finished....");
+        while (true) {
+			System.out.println(Thread.currentThread().getName()
+					+ ": starting up....");
+			try {
+				lockCookie = data.lock(recNo);
+			} catch (RecordNotFoundException e) {
+				try {
+					PrintStream out = new PrintStream(new FileOutputStream(
+							"~/logs/RecordNotFound.txt"));
+					out.print(Thread.currentThread().getName()
+							+ ": RecordNotFoundException - " + recNo + "\n");
+				} catch (FileNotFoundException f) {}
+			}
+			System.out.println(Thread.currentThread().getName()
+					+ ": doing some work.....");
+			long endTime = System.currentTimeMillis() + 2000;
+			while (System.currentTimeMillis() < endTime) {
+
+			}
+			try {
+				data.unlock(recNo, lockCookie);
+			} catch (RecordNotFoundException e) {
+				
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(Thread.currentThread().getName()
+					+ ": finished....");
+		}
     }
     
     
