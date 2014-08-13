@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -71,8 +72,10 @@ public class DBAccessor {
      */
     private RandomAccessFile database;
     
-    private static List<Integer> deletedRecordsList 
-                        = Collections.synchronizedList(new ArrayList<Integer>());
+    private static List<Integer> deletedRecordsList = new ArrayList<Integer>();
+    
+    private ReadWriteLock deletedRecordsLock = new ReentrantReadWriteLock();
+                       
     
     /**
      * Logger instance for DBAccessor.java.
@@ -347,13 +350,28 @@ public class DBAccessor {
                 recordNumber = calculateRecordNumber(position);
                 database.seek(position);
                 database.write(record);
+                deletedRecordsList.remove(0);
             } catch (IOException e) {
                 throw new DBException("Could not create record", e);
+            }
+            finally {
+            	this.deletedRecordsLock.writeLock().unlock();
             }
         }
         log.exiting("DBAccessor.java", "createRecord", recordNumber);
         
         return recordNumber;
+    }
+    
+    public long firstAvailablePosition() throws IOException {
+    	deletedRecordsLock.writeLock().lock();
+    	if (deletedRecordsList.size() > 0) {
+            int recordNumber = deletedRecordsList.get(0);
+            return calculateFilePosition(recordNumber);
+        }
+        else {
+            return database.length();
+        }
     }
     
     /**
@@ -429,21 +447,6 @@ public class DBAccessor {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
     }
     
-    public long firstAvailablePosition() throws IOException {
-        // SYNCHRONIZATION PROBABLY SUPERFLUOUS HERE
-        synchronized (deletedRecordsList) {
-            if (deletedRecordsList.size() > 0) {
-                int recordNumber = deletedRecordsList.get(0);
-                // SHOULD ONLY REMOVE IF CREATE IS SUCCESSFUL
-                deletedRecordsList.remove(0);
-                return calculateFilePosition(recordNumber);
-            }
-            else {
-                return database.length();
-            }
-        }
-    }
-    
     public boolean recordExists(int recNo) {
         boolean recordExists = true;
         long position = calculateFilePosition(recNo);
@@ -453,6 +456,34 @@ public class DBAccessor {
             throw new DBException("Could not determine whether record number" + recNo + " exists", e);
         }
         return recordExists;
+    }
+    
+    public boolean existing(int recNo) {
+    	long position = calculateFilePosition(recNo);
+        try {
+			if (!isValidFilePosition(position)) {
+				return false;
+			}
+		} catch (IOException e) {
+			throw new DBException("Could not determine whether record number" + recNo + " exists", e);
+		}
+        if (isDeletedRecord(recNo)) {
+        	return false;
+        }
+        return true;
+    }
+    
+    private boolean deletedRecord(int recNo) throws IOException {
+    	long position = calculateFilePosition(recNo);
+    	
+    	synchronized (database) {
+    		database.seek(position);
+    		byte flag = database.readByte();
+    		if (flag == DELETED_FLAG) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
     
     public void initialiseDeletedRecordsList() throws IOException {
