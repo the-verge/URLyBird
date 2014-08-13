@@ -77,7 +77,6 @@ public class DBAccessor {
      * of deleted records.
      */
     private static List<Integer> deletedRecordsList = new ArrayList<Integer>();
-    
     /**
      * Logger instance for DBAccessor.java.
      */
