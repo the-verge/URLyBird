@@ -10,10 +10,8 @@ import suncertify.db.DBAccessor;
 import suncertify.db.RecordNotFoundException;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -24,7 +22,7 @@ public class DBAccessorTest {
     
     static final int RECORD_LENGTH = 160;
     
-    static DBAccessor accessor = new DBAccessor("/Users/john/workspace/URLyBird/db-1x3.db");
+    static DBAccessor accessor = new DBAccessor("/Users/john/workspace/urlybird/db-1x3.db");
     
     static RandomAccessFile database = accessor.getDatabase();
     
