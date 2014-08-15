@@ -29,7 +29,7 @@ public class DBException extends RuntimeException {
      * that wraps another exception.
      * @param message the exception message.
      * @param throwable the <code>Throwable</code> to wrap in
-     * <code>DBException</code>.
+     * 		   <code>DBException</code>.
      */
     public DBException(String message, Throwable throwable) {
         super(message, throwable);

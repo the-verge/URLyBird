@@ -90,8 +90,8 @@ public class LockManager implements RecordLocker {
      * @param recNo the number of the record to be unlocked.
      * @param cookie the cookie that the record was locked with.
      * @throws SecurityException if the value of cookie parameter
-     * is not the same value as the cookie that the record was 
-     * locked with.
+     * 			is not the same value as the cookie that the record was 
+     * 			locked with.
      */
     public void unlockRecord(int recNo, long cookie) throws SecurityException {
         String threadName = Thread.currentThread().getName();

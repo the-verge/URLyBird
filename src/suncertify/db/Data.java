@@ -33,7 +33,7 @@ public class Data implements DB {
      * The constructor takes the file path of the database as its only argument.
      * @param dbLocation
      * @throws DBException if the <code>DBAccessor</code> instance 
-     * <code>database</code> cannot be instantiated. 
+     * 			<code>database</code> cannot be instantiated. 
      */
     public Data(final String dbLocation) {
         database = new DBAccessor(dbLocation);

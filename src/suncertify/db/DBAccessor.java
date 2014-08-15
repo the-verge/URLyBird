@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * DBException which extends RunTimeException. This exception wraps checked 
  * Exceptions such as FileNotFoundException, IOException and 
  * UnsupportedEncodingException in order to deal with these while still 
- * maintaining compliance with the supplied DB.java 
+ * maintaining <code>Datacompliance</code> with the supplied DB.java 
  * interface.
  * 
  * @author 
@@ -112,10 +112,11 @@ public class DBAccessor {
      * Reads a record from the database file.
      * @param recNo the record number to retrieve.
      * @return a <code>String</code> array containing
-     * the fields of the record.
-     * @throws RecordNotFoundException 
+     * 			the fields of the record.
+     * @throws RecordNotFoundException if the record doesn't
+     * 			exist in the database.
      * @throws DBException if an IOException is thrown when 
-     * trying to read from the database file.
+     * 			trying to read from the database file.
      */
     public String[] readRecord(int recNo) throws RecordNotFoundException {
         log.entering("DBAccessor.java", "readRecord", recNo);
@@ -147,8 +148,9 @@ public class DBAccessor {
      * in the file.
      * @param position the position of the record in the file.
      * @return <code>byte[]</code> the bytes that constitute
-     * the record.
-     * @throws IOException 
+     * 			the record.
+     * @throws IOException if there is an error reading from 
+     * 			the file.
      */
     private byte[] retrieveRecord(long position) throws IOException {
         log.entering("DBAccessor.java", "retrieveRecord", position);
@@ -167,9 +169,9 @@ public class DBAccessor {
      * Updates a record.
      * @param recNo the number of the record to update.
      * @param data <code>String</code> array containing the
-     * fields of the record to update.
+     * 		   fields of the record to update.
      * @throws DBException if an IOException is thrown when
-     * trying to write to the database file.
+     * 			trying to write to the database file.
      */
     public void updateRecord(int recNo, String[] data) {
         final long position = calculateFilePosition(recNo);
@@ -190,7 +192,7 @@ public class DBAccessor {
      * first bye of the record a value of 0xFF.
      * @param recNo the number of the record to delete.
      * @throws DBException if an IOException is thrown 
-     * when attempting to write to the database file.
+     * 			when attempting to write to the database file.
      */
     public void deleteRecord(int recNo) {
         log.entering("DBAccessor.java", "deleteRecord", recNo);
@@ -213,9 +215,9 @@ public class DBAccessor {
      * the supplied criteria. 
      * @param criteria the criteria for which to search.
      * @return <code>int[]</code> the record numbers that match the
-     * criteria.
+     * 			criteria.
      * @throws DBException if an IOException is thrown 
-     * when attempting to read from the database file.
+     * 			when attempting to read from the database file.
      */
     public int[] find(String[] criteria) {
         ArrayList<Integer> matches = new ArrayList<Integer>();
@@ -242,8 +244,9 @@ public class DBAccessor {
      * Retrieves <code>String</code> array representations
      * of all records in the file.
      * @return <code>ArrayList<String[]></code> containing
-     * the fields of all records.
-     * @throws IOException
+     * 			the fields of all records.
+     * @throws IOException if an error occurs when reading
+     * 			from the file.
      */
     public ArrayList<String[]> retrieveAllRecords() throws IOException {
         log.entering("DBAccessor.java", "retrieveAllRecords");
@@ -280,9 +283,9 @@ public class DBAccessor {
      * for all non-null criteria[n].
      * @param data array containing the fields of a record.
      * @param criteria array containing the query criteria
-     * for each element in the record field array.  An attempt is made
-     * to match the beginning of <code>data[n]</code> 
-     * with <code>criteria[n]</code>.
+     * 		   for each element in the record field array.  An attempt is made
+     * 		   to match the beginning of <code>data[n]</code> 
+     * 		   with <code>criteria[n]</code>.
      * @return <code>boolean</code> indicating a match or not.
      */
     public boolean matchRecord(String[] data, String[] criteria) {
@@ -338,7 +341,7 @@ public class DBAccessor {
      * fields of the record to be created.
      * @return the number of the newly created record.
      * @throws DBException if an IOException is thrown 
-     * when attempting to write to the database file.
+     * 			when attempting to write to the database file.
      */
     public int createRecord(String[] data) {
         log.entering("DBAccessor.java", "createRecord", data);
@@ -378,7 +381,7 @@ public class DBAccessor {
      * array read from the database file.
      * @param record <code>byte</code> array read from database file.
      * @return <code>String</code> array containing the fields of
-     * the record.
+     * 			the record.
      * @throws UnsupportedEncodingException 
      */
     private String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
@@ -401,7 +404,7 @@ public class DBAccessor {
      * Converts a <code>String</code> array containing record fields
      * to a <code>byte</code> array that can be written to file.
      * @param data <code>String</code> array containing the 
-     * fields of the record to be written to file.
+     * 		   fields of the record to be written to file.
      * @return a <code>byte</code> array that can be written to file.
      */
     private byte[] stringArrayToRecord(String[] data) {
@@ -430,7 +433,7 @@ public class DBAccessor {
      * Finds the position in the file for a given record number.
      * @param recNo the number of the record.
      * @return the position in the file where the record
-     * is stored.
+     * 			is stored.
      */
     public long calculateFilePosition(int recNo) {
         return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * Room.RECORD_LENGTH);
@@ -440,7 +443,7 @@ public class DBAccessor {
      * Calculates the record number from the position of a record in the file.
      * @param filePosition the position of the record in the database file.
      * @return <code>int</code> record number of the file at the specified
-     * position.
+     * 			position.
      */
     public int calculateRecordNumber(long filePosition) {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
