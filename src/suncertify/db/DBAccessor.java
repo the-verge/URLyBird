@@ -67,7 +67,7 @@ public class DBAccessor {
      * is used to directly read from and write to the 
      * database file.
      */
-    private RandomAccessFile database;
+    private RandomAccessFile database = null;
     
     /**
      * Logger instance for DBAccessor.java.
@@ -78,22 +78,21 @@ public class DBAccessor {
      * Class constructor. All instances of the class share access
      * to the same database file.
      * @param dbLocation the path to the database file.
-     * @throws DBAccessException if the file cannot be found.
+     * @throws DBException if the file cannot be found.
      */
     public DBAccessor(String dbLocation) {
-        //WRONG 1ST TRY RENDERS THIS UNUSABLE
-        if (databaseLocation == null) {
+        if (database == null) {
+            try {
+                database = new RandomAccessFile(dbLocation, "rw");
+            } catch (FileNotFoundException e) {
+                throw new DBException("Database file not found", e);
+            }
             databaseLocation = dbLocation;
         }
         else if (dbLocation != databaseLocation) {
             log.logp(Level.WARNING, "DBAccessor.java", "Constructor", 
                     "Ignored database file path "
                   + "- database location already initialised");
-        }
-        try {
-            database = new RandomAccessFile(databaseLocation, "rw");
-        } catch (FileNotFoundException e) {
-            throw new DBException("Database file not found", e);
         }
     }
     
@@ -431,7 +430,7 @@ public class DBAccessor {
      * Finds the position in the file for a given record number.
      * @param recNo the number of the record.
      * @return the position in the file where the record
-     * 			is stored.
+     * 		   is stored.
      */
     public long calculateFilePosition(int recNo) {
         return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * Room.RECORD_LENGTH);
@@ -447,6 +446,13 @@ public class DBAccessor {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
     }
     
+    /**
+     * Determines whether a given record number exists in the
+     * database file.
+     * @param recNo the number of the record.
+     * @return boolean indicating if the specified
+     *         record number exists in the database file.
+     */
     public boolean recordExists(int recNo) {
         long position = calculateFilePosition(recNo);
         try {
@@ -457,6 +463,14 @@ public class DBAccessor {
         }
     }
     
+    /**
+     * Determines whether a file is marked as deleted in the database file.
+     * @param recNo the number of the record.
+     * @return boolean indicating if the specified record
+     *         number is marked as deleted.
+     * @throws IOException if an error occurs when reading from
+     *         the file.
+     */
     private boolean markedAsDeleted(int recNo) throws IOException {
         long position = calculateFilePosition(recNo);
         synchronized (database) {
@@ -466,6 +480,15 @@ public class DBAccessor {
         }
     }
     
+    /**
+     * Determines if a specified file position exists.
+     * @param position the file position to test for
+     *        validity.
+     * @return boolean indicating if the specified position
+     *         is a valid file position.
+     * @throws IOException if an error occurs when reading
+     *         the database file.
+     */
     private boolean validFilePosition(long position) throws IOException {
         return (position < database.length()) && (position > 0);
     }
