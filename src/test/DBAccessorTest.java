@@ -96,14 +96,10 @@ public class DBAccessorTest {
     @Test
     public void insertRecordTest() throws IOException, RecordNotFoundException {
     	accessor.deleteRecord(3);
-    	assertEquals(1, accessor.getDeletedRecordsList().size());
-    	assertEquals(3, (int) accessor.getDeletedRecordsList().get(0));
-    	
         String[] data = {"Wynn's", "Dublin", "2", "N", "$120", "2014/07/29", "77777777"};
         
         int recordNumber = accessor.createRecord(data);
         assertEquals(3, recordNumber);
-        assertEquals(0, accessor.getDeletedRecordsList().size());
         
         String[] newRecord = accessor.readRecord(recordNumber);
         assertArrayEquals(data, newRecord);
@@ -213,15 +209,6 @@ public class DBAccessorTest {
         }
     }
     
-    @Test(expected=RecordNotFoundException.class)
-    public void recordNotFoundExceptionTest() throws RecordNotFoundException {
-        assertEquals(0, accessor.getDeletedRecordsList().size());
-        accessor.deleteRecord(34);
-        assertEquals(1, accessor.getDeletedRecordsList().size());
-        assertEquals(34, (int) accessor.getDeletedRecordsList().get(0));
-        accessor.readRecord(34);
-    }
-    
     @Test
     public void retrieveAllRecordsAfterDeleteTest() throws IOException {
         ArrayList<String[]> allRecords;
@@ -230,17 +217,17 @@ public class DBAccessorTest {
         accessor.deleteRecord(31);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
-        assertEquals(32, total);
+        assertEquals(33, total);
         
         accessor.deleteRecord(32);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
-        assertEquals(31, total);
+        assertEquals(32, total);
        
         accessor.deleteRecord(33);
         allRecords = accessor.retrieveAllRecords();
         total = allRecords.size();
-        assertEquals(30, total);
+        assertEquals(31, total);
         
     }
     
