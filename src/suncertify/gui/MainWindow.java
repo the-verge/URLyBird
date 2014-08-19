@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,6 +29,8 @@ public class MainWindow extends JFrame {
 	private RecordTableModel tableModel = new RecordTableModel();
 	
 	private JTable table = new JTable(tableModel);
+	
+	private Controller controller = new Controller();
     
     public static void main(String[] args) {
         new MainWindow();
@@ -61,6 +64,8 @@ public class MainWindow extends JFrame {
         GridBagConstraints sidebarConstraints = new GridBagConstraints();
         sidebarConstraints.gridx = 0;
         sidebarConstraints.gridy = 0;
+//        sidebarConstraints.weighty = 1.0;
+//        sidebarConstraints.gridheight = GridBagConstraints.REMAINDER;
         sidebarConstraints.fill = GridBagConstraints.VERTICAL;
         mainPanel.add(this.SideBarPanel(), sidebarConstraints);
         
@@ -87,6 +92,73 @@ public class MainWindow extends JFrame {
         this.setLocationRelativeTo(null);
         this.pack();
         this.setVisible(true);
+    }
+    
+    private class SideBarPanel extends JPanel {
+        
+        JLabel nameLabel;
+        
+        JTextField nameTextField;
+        
+        JLabel locationLabel;
+        
+        JTextField locationTextField;
+        
+        JButton searchButton;
+        
+        SideBarPanel() {
+            JPanel panel = new JPanel(new GridBagLayout());
+            panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            
+            GridBagConstraints nameLabelConstraints = new GridBagConstraints();
+            nameLabel = new JLabel("Name");
+            nameLabelConstraints.gridx = 0;
+            nameLabelConstraints.gridy = 1;
+            nameLabelConstraints.insets = new Insets(8, 8, 0, 0);
+            nameLabelConstraints.ipady = 4;
+            nameLabelConstraints.insets = new Insets(100, 5, 5, 5);
+            panel.add(nameLabel, nameLabelConstraints);
+            
+            GridBagConstraints nameFieldConstraints = new GridBagConstraints();
+            nameTextField = new JTextField(15);
+            nameFieldConstraints.gridx = 1;
+            nameFieldConstraints.gridy = 1;
+            nameFieldConstraints.insets = new Insets(100, 5, 5, 5);
+            panel.add(nameTextField, nameFieldConstraints);
+            
+            GridBagConstraints locationLabelConstraints = new GridBagConstraints();
+            locationLabel = new JLabel("Location");
+            locationLabelConstraints.gridx = 0;
+            locationLabelConstraints.gridy = 2;
+            panel.add(locationLabel, locationLabelConstraints);
+            
+            GridBagConstraints locationFieldConstraints = new GridBagConstraints();
+            locationTextField = new JTextField(15);
+            locationFieldConstraints.gridx = 1;
+            locationFieldConstraints.gridy = 2;
+            panel.add(locationTextField, locationFieldConstraints);
+            
+            GridBagConstraints searchButtonConstraints = new GridBagConstraints();
+            searchButton = new JButton("Search");
+            searchButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    controller.search();
+                }
+                
+            });
+            searchButtonConstraints.gridx = 1;
+            searchButtonConstraints.gridy = 3;
+            searchButtonConstraints.weighty = 1.0;
+            searchButtonConstraints.insets = new Insets(10, 5, 5, 5);
+            searchButtonConstraints.anchor = GridBagConstraints.SOUTHEAST;
+            panel.add(searchButton, searchButtonConstraints);
+            
+            this.add(panel);
+            this.setVisible(true);
+        }
+        
     }
     
     private JPanel SideBarPanel() {
@@ -123,6 +195,14 @@ public class MainWindow extends JFrame {
         
         GridBagConstraints searchButtonConstraints = new GridBagConstraints();
         JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.search();
+            }
+            
+        });
         searchButtonConstraints.gridx = 1;
         searchButtonConstraints.gridy = 3;
         searchButtonConstraints.weighty = 1.0;
@@ -156,6 +236,7 @@ public class MainWindow extends JFrame {
         
         GridBagConstraints customerFieldConstraints = new GridBagConstraints();
         JTextField customerIdTextField = new JTextField(8);
+        
         customerFieldConstraints.gridx = 1;
         customerFieldConstraints.gridy = 0;
         customerFieldConstraints.insets = new Insets(10, 0, 0, 25);
@@ -163,6 +244,15 @@ public class MainWindow extends JFrame {
         
         GridBagConstraints bookButtonConstraints = new GridBagConstraints();
         JButton bookButton = new JButton("Book");
+        customerIdTextField.addKeyListener(new BookingListener(customerIdTextField, bookButton));
+        bookButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.book();
+            }
+            
+        });
         bookButtonConstraints.gridx = 2;
         bookButtonConstraints.gridy = 0;
         bookButtonConstraints.insets = new Insets(10, 0, 0, 25);
@@ -170,6 +260,39 @@ public class MainWindow extends JFrame {
         panel.add(bookButton, bookButtonConstraints);
         
         return panel;
+    }
+    
+    private class BookingListener implements KeyListener {
+        
+        JTextField text;
+        
+        JButton button;
+        
+        BookingListener(JTextField text, JButton button) {
+            this.text = text;
+            this.button = button;
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if(this.text.getText().length() == 8) {
+                this.button.setEnabled(true);
+            }
+            else {
+                this.button.setEnabled(false);
+            }
+        }
+        
     }
     
 }
