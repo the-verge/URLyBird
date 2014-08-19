@@ -15,6 +15,14 @@ public class RecordTableModel extends AbstractTableModel {
     private String[] columnNames = {"Name", "Location", "Size", "Smoking", "Rate", "Date", "Owner"};
     
     private List<String[]> recordFieldList = new ArrayList<String[]>();
+    
+    public RecordTableModel() {
+    	
+    }
+    
+    public RecordTableModel(List<String[]> records) {
+    	this.recordFieldList = records;
+    }
 
     @Override
     public int getRowCount() {
@@ -45,6 +53,10 @@ public class RecordTableModel extends AbstractTableModel {
     
     public void addRecord(String[] fields) {
         recordFieldList.add(fields);
+    }
+    
+    public void setRecordFieldList(List<String[]> records) {
+    	this.recordFieldList = records;
     }
 
 }

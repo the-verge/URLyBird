@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * DBException which extends RunTimeException. This exception wraps checked 
  * Exceptions such as FileNotFoundException, IOException and 
  * UnsupportedEncodingException in order to deal with these while still 
- * maintaining <code>Datacompliance</code> with the supplied DB.java 
+ * maintaining <code>Data</code> compliance with the supplied DB.java 
  * interface.
  * 
  * @author 
@@ -217,6 +217,7 @@ public class DBAccessor {
             String[] data = allData.get(i);
             boolean match = this.matchRecord(data, criteria);
             int recordNumber = i + 1;
+            
             if (match) {
                 matches.add(recordNumber);
             }

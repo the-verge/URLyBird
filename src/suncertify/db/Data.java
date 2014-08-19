@@ -1,5 +1,7 @@
 package suncertify.db;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -98,6 +100,10 @@ public class Data implements DB {
     @Override
     public int create(String[] data) throws DuplicateKeyException {
         return database.createRecord(data);
+    }
+    
+    public ArrayList<String[]> findAll() throws IOException {
+    	return database.retrieveAllRecords();
     }
     
     /**
