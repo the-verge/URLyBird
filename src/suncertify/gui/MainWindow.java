@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,17 +23,20 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.MaskFormatter;
+
+import suncertify.db.DBException;
  
 
 public class MainWindow extends JFrame implements Observer {
 	
-	private BookingModel bookingModel;
+	private BusinessModel businessModel;
 	
 	private GUIController guiController = new GUIController();
 	
@@ -48,15 +49,15 @@ public class MainWindow extends JFrame implements Observer {
 	private JTextField locationTextField;
 	
 	private JTextField customerIdTextField;
+	
+	public static void main(String[] args) {
+		new MainWindow(new BusinessModel());
+	}
     
-    public static void main(String[] args) {
-        new MainWindow(new BookingModel());
-    }
-    
-    public MainWindow(BookingModel bookingModel) {
+    public MainWindow(BusinessModel businessModel) {
         super("URLyBird");
-        this.bookingModel = bookingModel;
-        bookingModel.addObserver(this);
+        this.businessModel = businessModel;
+        this.businessModel.addObserver(this);
         setUpGUI();
         setUpTable();
     }
@@ -199,12 +200,12 @@ public class MainWindow extends JFrame implements Observer {
     private void setUpTable() {
     	List<String[]> allData = null;
 		try {
-			allData = bookingModel.findAll();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			allData = businessModel.findAll();
+			tableModel.setRecordFieldList(allData);
+		} catch (DBException e) {
+//			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
-		tableModel.setRecordFieldList(allData);
     }
     
     private class QuitActionListener implements ActionListener {
@@ -261,22 +262,20 @@ public class MainWindow extends JFrame implements Observer {
 			
 			if (name.length() == 0 && location.length() == 0) {
 				try {
-					matches = bookingModel.findAll();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					matches = businessModel.findAll();
+				} catch (DBException e1) {
+					JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
 				}
 			}
 			else {
-				String[] criteria = new String[7];
+				String[] criteria = {null, null, null, null, null, null, null};
 				criteria[0] = name;
 				criteria[1] = location;
-				criteria[2] = null;
-				criteria[3] = null;
-				criteria[4] = null;
-				criteria[5] = null;
-				criteria[6] = null;
-				matches = bookingModel.search(criteria);
+				try {
+					matches = businessModel.search(criteria);
+				} catch (DBException e1) {
+					JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
+				}
 			}
 			
 			tableModel.setRecordFieldList(matches);

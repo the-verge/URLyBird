@@ -102,7 +102,11 @@ public class Data implements DB {
         return database.createRecord(data);
     }
     
-    public ArrayList<String[]> findAll() throws IOException {
+    /**
+     * Retrieves all records in the database.
+     * @return ArrayList<String[]>
+     */
+    public ArrayList<String[]> findAll() {
     	return database.retrieveAllRecords();
     }
     
