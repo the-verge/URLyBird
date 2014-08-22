@@ -207,11 +207,7 @@ public class DBAccessor {
     public int[] find(String[] criteria) {
         ArrayList<Integer> matches = new ArrayList<Integer>();
         ArrayList<String[]> allData;
-        try {
-            allData = retrieveAllRecords();
-        } catch (IOException e) {
-            throw new DBException("Could not retrieve records", e);
-        }
+        allData = retrieveAllRecords();
         
         for (int i = 0; i < allData.size(); i++) {
             String[] data = allData.get(i);
@@ -231,27 +227,31 @@ public class DBAccessor {
      * of all records in the file.
      * @return <code>ArrayList<String[]></code> containing
      * 			the fields of all records.
-     * @throws IOException if an error occurs when reading
-     * 		   from the file.
+     * @throws DBException if an IOException is thrown 
+     * 			when attempting to read from the database file.
      */
-    public ArrayList<String[]> retrieveAllRecords() throws IOException {
+    public ArrayList<String[]> retrieveAllRecords() {
         log.entering("DBAccessor.java", "retrieveAllRecords");
         
         ArrayList<String[]> result = new ArrayList<String[]>();
         long filePosition = FILE_DATA_SECTION_OFFSET;
         
-        while (filePosition < database.length()) {
-            byte[] record = retrieveRecord(filePosition);
-            filePosition += Room.RECORD_LENGTH;
-            if (isDeletedRecord(record)) {
-                log.fine("Found deleted record at position " + filePosition);
-                continue;
-            }
-            else {
-                String[] data = recordToStringArray(record);
-                result.add(data);
-            }
-        }
+        try {
+			while (filePosition < database.length()) {
+			    byte[] record = retrieveRecord(filePosition);
+			    filePosition += Room.RECORD_LENGTH;
+			    if (isDeletedRecord(record)) {
+			        log.fine("Found deleted record at position " + filePosition);
+			        continue;
+			    }
+			    else {
+			        String[] data = recordToStringArray(record);
+			        result.add(data);
+			    }
+			}
+		} catch (IOException e) {
+			throw new DBException("Could not retrieve records", e);
+		}
         log.exiting("DBAccessor.java", "retrieveAllRecords", result);
         
         return result;

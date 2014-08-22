@@ -1,4 +1,4 @@
-package test;
+package test.db;
 
 import suncertify.db.Data;
 
