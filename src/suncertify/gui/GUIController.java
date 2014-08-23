@@ -1,5 +1,7 @@
 package suncertify.gui;
 
+import suncertify.db.RecordNotFoundException;
+
 public class GUIController {
 	
 	private BusinessModel businessModel;
@@ -12,8 +14,8 @@ public class GUIController {
 		this.businessModel = businessModel;
 	}
     
-    public void book() {
-        System.out.println("Book");
+    public void book(Room room) throws RecordNotFoundException {
+        businessModel.book(room);
     }
     
     public void search() {

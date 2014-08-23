@@ -1,7 +1,9 @@
 package suncertify.gui;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observer;
 
 import suncertify.db.DBException;
@@ -13,14 +15,11 @@ public class BusinessModel {
 	
 	private static List<Observer> observers = new ArrayList<Observer>();
 	
-	private static List<String[]> allRecords = new ArrayList<String[]>();
-	
 	private Data dataAccess;
 	
 	protected BusinessModel() {
 		try {
-			this.dataAccess = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
-			allRecords = dataAccess.findAll();
+			this.dataAccess = new Data("/Users/john/workspace/urlybird/db-1x3.db");
 		} catch (DBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,22 +37,39 @@ public class BusinessModel {
 		}
 	}
 	
-	public void book(int recNo, String[] data) throws RecordNotFoundException, SecurityException {
-		long lockCookie = dataAccess.lock(recNo);
-		dataAccess.update(recNo, data, lockCookie);
-		dataAccess.unlock(recNo, lockCookie);
+	public void book(Room room) throws RecordNotFoundException {
+	    int recNo = room.getRecNo();
+	    String[] data = room.getData();
+	    
+		try {
+            long lockCookie = dataAccess.lock(recNo);
+            dataAccess.update(recNo, data, lockCookie);
+            dataAccess.unlock(recNo, lockCookie);
+        } catch (RecordNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+		fireModelChangeEvent();
 	}
 	
-	public List<String[]> search(String[] criteria) {
-		int[] matchingRecordNumbers = dataAccess.find(criteria);
-		List<String[]> matches = new ArrayList<String[]>();
-		for (int i = 0; i < matchingRecordNumbers.length; i++) {
-			int recordNumber = matchingRecordNumbers[i];
-			int correspondingListElement = recordNumber - 1;
-			matches.add(allRecords.get(correspondingListElement));
-		}
-		return matches;
-	}
+	public Map<Integer, Room> searchRooms(SearchCriteria criteria) throws RecordNotFoundException {
+	    
+        String[] searchCriteria = criteria.getCriteria();
+        int[] matchingRecordNumbers = dataAccess.find(searchCriteria);
+        Map<Integer, Room> roomMap = new LinkedHashMap<Integer, Room>();
+        
+        for (int i = 0; i < matchingRecordNumbers.length; i++) {
+            int recNo = matchingRecordNumbers[i];
+            String[] data = dataAccess.read(recNo);
+            Room room = new Room(recNo, data);
+            roomMap.put(i, room);
+        }
+        
+        return roomMap;
+    }
 	
 	public ArrayList<String[]> findAll() {
 		return dataAccess.findAll();

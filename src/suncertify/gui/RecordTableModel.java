@@ -1,7 +1,9 @@
 package suncertify.gui;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -11,22 +13,24 @@ public class RecordTableModel extends AbstractTableModel {
      * 
      */
     private static final long serialVersionUID = 1991L;
+    
+    private Map<Integer, Room> tableIndexToRoomMap = new LinkedHashMap<Integer, Room>();
 
     private String[] columnNames = {"Name", "Location", "Size", "Smoking", "Rate", "Date", "Owner"};
     
-    private List<String[]> recordFieldList = new ArrayList<String[]>();
+    private List<String[]> records = new ArrayList<String[]>();
     
     public RecordTableModel() {
     	
     }
     
     public RecordTableModel(List<String[]> records) {
-    	this.recordFieldList = records;
+    	this.records = records;
     }
 
     @Override
     public int getRowCount() {
-        return recordFieldList.size();
+        return records.size();
     }
 
     @Override
@@ -36,13 +40,13 @@ public class RecordTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        String[] row = recordFieldList.get(rowIndex);
+        String[] row = records.get(rowIndex);
         return row[columnIndex];
     }
     
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        Object[] row = recordFieldList.get(rowIndex);
+        Object[] row = records.get(rowIndex);
         row[columnIndex] = value;
     }
     
@@ -51,12 +55,32 @@ public class RecordTableModel extends AbstractTableModel {
         return columnNames[column];
     }
     
+    public Room getRoom(int rowIndex) {
+        return tableIndexToRoomMap.get(rowIndex);
+    }
+    
+    public void setTableIndexToRoomMap(Map<Integer, Room> map) {
+        tableIndexToRoomMap = map;
+        setRecords();
+    }
+    
+    public void setRecords() {
+        records.clear();
+        for (Map.Entry<Integer, Room> entry: tableIndexToRoomMap.entrySet()) {
+            Room room = entry.getValue();
+            String[] record = room.getData();
+            records.add(record);
+        }
+        this.fireTableDataChanged();
+
+    }
+    
     public void addRecord(String[] fields) {
-        recordFieldList.add(fields);
+        records.add(fields);
     }
     
     public void setRecordFieldList(List<String[]> records) {
-    	this.recordFieldList = records;
+    	this.records = records;
     }
 
 }

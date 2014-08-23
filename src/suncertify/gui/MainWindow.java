@@ -11,7 +11,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -32,6 +34,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.text.MaskFormatter;
 
 import suncertify.db.DBException;
+import suncertify.db.RecordNotFoundException;
  
 
 public class MainWindow extends JFrame implements Observer {
@@ -49,6 +52,10 @@ public class MainWindow extends JFrame implements Observer {
 	private JTextField locationTextField;
 	
 	private JTextField customerIdTextField;
+	
+	private JButton searchButton;
+	
+	private JButton bookButton;
 	
 	public static void main(String[] args) {
 		new MainWindow(new BusinessModel());
@@ -135,7 +142,7 @@ public class MainWindow extends JFrame implements Observer {
         locationFieldConstraints.gridy = 2;
         panel.add(locationTextField, locationFieldConstraints);
         
-        JButton searchButton = new JButton("Search");
+        this.searchButton = new JButton("Search");
         searchButton.addActionListener(new SearchButtonListener());
         GridBagConstraints searchButtonConstraints = new GridBagConstraints();
         searchButtonConstraints.gridx = 1;
@@ -183,7 +190,7 @@ public class MainWindow extends JFrame implements Observer {
         customerFieldConstraints.insets = new Insets(10, 0, 0, 25);
         panel.add(customerIdTextField, customerFieldConstraints);
         
-        JButton bookButton = new JButton("Book");
+        bookButton = new JButton("Book");
         bookButton.setEnabled(false);
         customerIdTextField.addKeyListener(new ButtonEnabler(customerIdTextField, bookButton, 8));
         bookButton.addActionListener(new BookButtonListener());
@@ -202,8 +209,8 @@ public class MainWindow extends JFrame implements Observer {
 		try {
 			allData = businessModel.findAll();
 			tableModel.setRecordFieldList(allData);
+			tableModel.fireTableDataChanged();
 		} catch (DBException e) {
-//			System.out.println(e.getMessage());
 			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
     }
@@ -255,48 +262,51 @@ public class MainWindow extends JFrame implements Observer {
     private class SearchButtonListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			String name = nameTextField.getText().trim();
-			String location = locationTextField.getText().trim();
-			List<String[]> matches = new ArrayList<String[]>();
-			
-			if (name.length() == 0 && location.length() == 0) {
-				try {
-					matches = businessModel.findAll();
-				} catch (DBException e1) {
-					JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
-				}
-			}
-			else {
-				String[] criteria = {null, null, null, null, null, null, null};
-				criteria[0] = name;
-				criteria[1] = location;
-				try {
-					matches = businessModel.search(criteria);
-				} catch (DBException e1) {
-					JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
-				}
-			}
-			
-			tableModel.setRecordFieldList(matches);
-			tableModel.fireTableDataChanged();
-		}
+        public void actionPerformed(ActionEvent e) {
+            String name = nameTextField.getText().trim();
+            String location = locationTextField.getText().trim();
+            Map<Integer, Room> matches = new LinkedHashMap<Integer, Room>();
+            
+            SearchCriteria criteria = new SearchCriteria();
+            criteria.setName(name);
+            criteria.setLocation(location);
+            try {
+                matches = businessModel.searchRooms(criteria);
+            } catch (DBException e1) {
+                JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
+            } catch (RecordNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            
+            tableModel.setTableIndexToRoomMap(matches);
+        }
     }
     
     private class BookButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			// CONTROLLER ACTION
-			guiController.book();
+		    int selectedRowIndex = table.getSelectedRow();
+	        String customerId = customerIdTextField.getText();
+		    Room room = tableModel.getRoom(selectedRowIndex);
+		    room.setOwner(customerId);
+		    
+		    try {
+                businessModel.book(room);
+            } catch (RecordNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+		    customerIdTextField.setText("");
+		    bookButton.setEnabled(false);
 		}
     }
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
-		
+		tableModel.fireTableDataChanged();
 	}
     
 }
