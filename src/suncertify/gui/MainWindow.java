@@ -10,9 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -43,7 +41,7 @@ public class MainWindow extends JFrame implements Observer {
 	
 	private GUIController guiController = new GUIController();
 	
-	private RecordTableModel tableModel = new RecordTableModel();
+	private RoomTableModel tableModel = new RoomTableModel();
 	
 	private JTable table = new JTable(tableModel);
 	
@@ -205,14 +203,18 @@ public class MainWindow extends JFrame implements Observer {
     }
     
     private void setUpTable() {
-    	List<String[]> allData = null;
+        Map<Integer, Room> allRooms = new LinkedHashMap<Integer, Room>();
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.matchAllRecords();
 		try {
-			allData = businessModel.findAll();
-			tableModel.setRecordFieldList(allData);
-			tableModel.fireTableDataChanged();
+		    allRooms = businessModel.searchRooms(criteria);
+		    tableModel.setRoomMap(allRooms);
 		} catch (DBException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage());
-		}
+		} catch (RecordNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
     private class QuitActionListener implements ActionListener {
@@ -266,10 +268,16 @@ public class MainWindow extends JFrame implements Observer {
             String name = nameTextField.getText().trim();
             String location = locationTextField.getText().trim();
             Map<Integer, Room> matches = new LinkedHashMap<Integer, Room>();
-            
             SearchCriteria criteria = new SearchCriteria();
-            criteria.setName(name);
-            criteria.setLocation(location);
+            
+            if (name.equals("") && location.equals("")) {
+                criteria.matchAllRecords();
+            }
+            else {
+                criteria.matchName(name)    
+                        .matchLocation(location);
+            }
+            
             try {
                 matches = businessModel.searchRooms(criteria);
             } catch (DBException e1) {
@@ -279,7 +287,7 @@ public class MainWindow extends JFrame implements Observer {
                 e1.printStackTrace();
             }
             
-            tableModel.setTableIndexToRoomMap(matches);
+            tableModel.setRoomMap(matches);
         }
     }
     

@@ -30,6 +30,47 @@ public class DBAccessor {
     private static final int NUMBER_OF_FIELDS_IN_RECORD = 7;
     
     /**
+     * The length in bytes of the name field.
+     */
+    private static final int NAME_LENGTH = 64;
+    
+    /**
+     * The length in bytes of the location field.
+     */
+    private static final int LOCATION_LENGTH = 64;
+    
+    /**
+     * The length in bytes of the size field.
+     */
+    private static final int SIZE_LENGTH = 4;
+    
+    /**
+     * The length in bytes of the smoking field.
+     */
+    private static final int SMOKING_LENGTH = 1;
+    
+    /**
+     * The length in bytes of the rate field.
+     */
+    private static final int RATE_LENGTH = 8;
+    
+    /**
+     * The length in bytes of the date field.
+     */
+    private static final int DATE_LENGTH = 10;
+    
+    /**
+     * The length in bytes of the owner field.
+     */
+    private static final int OWNER_LENGTH = 8;
+    
+    /**
+     * The length in bytes of the whole record,
+     * including the deleted flag.
+     */
+    private static final int RECORD_LENGTH = 160;
+    
+    /**
      * The number of bytes in a record before the data
      * section begins (the first byte contains the deleted
      * record flag).
@@ -51,8 +92,8 @@ public class DBAccessor {
      * An array that holds the lengths of the data fields of a 
      * record in the database file.
      */
-    private static final int[] FIELD_LENGTHS_ARRAY = {Room.NAME_LENGTH, Room.LOCATION_LENGTH, 
-        Room.SIZE_LENGTH, Room.SMOKING_LENGTH, Room.RATE_LENGTH, Room.DATE_LENGTH, Room.OWNER_LENGTH};
+    private static final int[] FIELD_LENGTHS_ARRAY = {NAME_LENGTH, LOCATION_LENGTH, 
+        SIZE_LENGTH, SMOKING_LENGTH, RATE_LENGTH, DATE_LENGTH, OWNER_LENGTH};
     
     /**
      * The location of the database that will be used by all
@@ -143,7 +184,7 @@ public class DBAccessor {
     private byte[] retrieveRecord(long position) throws IOException {
         log.entering("DBAccessor.java", "retrieveRecord", position);
         
-    	final byte[] record = new byte[Room.RECORD_LENGTH];
+    	final byte[] record = new byte[RECORD_LENGTH];
         
         synchronized (database) {
             database.seek(position);
@@ -239,7 +280,7 @@ public class DBAccessor {
         try {
 			while (filePosition < database.length()) {
 			    byte[] record = retrieveRecord(filePosition);
-			    filePosition += Room.RECORD_LENGTH;
+			    filePosition += RECORD_LENGTH;
 			    if (isDeletedRecord(record)) {
 			        log.fine("Found deleted record at position " + filePosition);
 			        continue;
@@ -283,7 +324,7 @@ public class DBAccessor {
             String query = criteria[i];
             String field = data[i];
             // should send null from gui if textfield is empty string
-            if (query == null || query.equals("")) {
+            if (query == null) {
                 nullCriteria++;
                 continue;
             }
@@ -369,7 +410,7 @@ public class DBAccessor {
             if (validRecord == DELETED_FLAG) {
                 return filePosition;
             }
-            filePosition += Room.RECORD_LENGTH;
+            filePosition += RECORD_LENGTH;
         }
         return database.length();
     }
@@ -406,7 +447,7 @@ public class DBAccessor {
      * @return a <code>byte</code> array that can be written to file.
      */
     private byte[] stringArrayToRecord(String[] data) {
-        byte[] emptyRecordByteArray = new byte[Room.RECORD_LENGTH];
+        byte[] emptyRecordByteArray = new byte[RECORD_LENGTH];
         String emptyRecordString = new String(emptyRecordByteArray);
         StringBuilder builder = new StringBuilder(emptyRecordString);
         //BYTES OR CHAR POSITION?
@@ -434,7 +475,7 @@ public class DBAccessor {
      * 		   is stored.
      */
     public long calculateFilePosition(int recNo) {
-        return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * Room.RECORD_LENGTH);
+        return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * RECORD_LENGTH);
     }
     
     /**
@@ -444,7 +485,7 @@ public class DBAccessor {
      * 			position.
      */
     public int calculateRecordNumber(long filePosition) {
-        return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / Room.RECORD_LENGTH + 1;
+        return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / RECORD_LENGTH + 1;
     }
     
     /**

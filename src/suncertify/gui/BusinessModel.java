@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 
+import suncertify.db.DB;
 import suncertify.db.DBException;
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
@@ -15,9 +16,9 @@ public class BusinessModel {
 	
 	private static List<Observer> observers = new ArrayList<Observer>();
 	
-	private Data dataAccess;
+	private DB dataAccess;
 	
-	protected BusinessModel() {
+	public BusinessModel() {
 		try {
 			this.dataAccess = new Data("/Users/john/workspace/urlybird/db-1x3.db");
 		} catch (DBException e) {
@@ -26,7 +27,7 @@ public class BusinessModel {
 		}
 	}
 	
-	protected void addObserver(Observer observer) {
+	public void addObserver(Observer observer) {
 		observers.add(observer);
 	}
 	
@@ -36,6 +37,22 @@ public class BusinessModel {
 			observer.update(null, null);
 		}
 	}
+	
+	public Map<Integer, Room> searchRooms(SearchCriteria criteria) throws RecordNotFoundException {
+        
+        String[] searchCriteria = criteria.getCriteria();
+        int[] matchingRecordNumbers = dataAccess.find(searchCriteria);
+        Map<Integer, Room> roomMap = new LinkedHashMap<Integer, Room>();
+        
+        for (int i = 0; i < matchingRecordNumbers.length; i++) {
+            int recNo = matchingRecordNumbers[i];
+            String[] data = dataAccess.read(recNo);
+            Room room = new Room(recNo, data);
+            roomMap.put(i, room);
+        }
+        
+        return roomMap;
+    }   
 	
 	public void book(Room room) throws RecordNotFoundException {
 	    int recNo = room.getRecNo();
@@ -55,23 +72,6 @@ public class BusinessModel {
 		fireModelChangeEvent();
 	}
 	
-	public Map<Integer, Room> searchRooms(SearchCriteria criteria) throws RecordNotFoundException {
-	    
-        String[] searchCriteria = criteria.getCriteria();
-        int[] matchingRecordNumbers = dataAccess.find(searchCriteria);
-        Map<Integer, Room> roomMap = new LinkedHashMap<Integer, Room>();
-        
-        for (int i = 0; i < matchingRecordNumbers.length; i++) {
-            int recNo = matchingRecordNumbers[i];
-            String[] data = dataAccess.read(recNo);
-            Room room = new Room(recNo, data);
-            roomMap.put(i, room);
-        }
-        
-        return roomMap;
-    }
 	
-	public ArrayList<String[]> findAll() {
-		return dataAccess.findAll();
-	}
+	
 }

@@ -22,7 +22,7 @@ public class DBAccessorTest {
     
     static final int RECORD_LENGTH = 160;
     
-    static DBAccessor accessor = new DBAccessor("/home/ejhnhng/URLyBird/db-1x3.db");
+    static DBAccessor accessor = new DBAccessor("/Users/john/workspace/urlybird/db-1x3.db");
     
     static RandomAccessFile database = accessor.getDatabase();
     
@@ -143,7 +143,7 @@ public class DBAccessorTest {
     @Test
     public void matchNullCriteriaTest() throws RecordNotFoundException {
         String[] record = accessor.readRecord(1);
-        String[] nullCriteria = {"", null, null, null, null, null, null};
+        String[] nullCriteria = {null, null, null, null, null, null, null};
         boolean match = accessor.matchRecord(record, nullCriteria);
         assertFalse(match);
     }

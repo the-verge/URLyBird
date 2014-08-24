@@ -8,33 +8,44 @@ public class SearchCriteria {
         return criteria;
     }
     
-    public void setName(String name) {
+    public SearchCriteria matchName(String name) {
         criteria[0] = name;
+        return this;
     }
 
-    public void setLocation(String location) {
+    public SearchCriteria matchLocation(String location) {
         criteria[1] = location;
+        return this;
     }
 
-    public void setSize(String size) {
+    public SearchCriteria matchSize(String size) {
         criteria[2] = size;
+        return this;
     }
 
-    public void setSmoking(String smoking) {
+    public SearchCriteria matchSmoking(String smoking) {
         criteria[3] = smoking;
+        return this;
     }
 
-    public void setRate(String rate) {
+    public SearchCriteria matchRate(String rate) {
         criteria[4] = rate;
+        return this;
     }
 
-    public void setDate(String date) {
+    public SearchCriteria matchDate(String date) {
         criteria[5] = date;
+        return this;
     }
 
-    public void setOwner(String owner) {
+    public SearchCriteria matchOwner(String owner) {
         criteria[6] = owner;
+        return this;
     }
 
-
+    public void matchAllRecords() {
+        for (int i = 0; i < criteria.length; i++) {
+            criteria[i] = "";
+        }
+    }
 }
