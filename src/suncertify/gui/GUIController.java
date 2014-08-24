@@ -4,22 +4,22 @@ import suncertify.db.RecordNotFoundException;
 
 public class GUIController {
 	
-	private BusinessModel businessModel;
+	private BusinessModel model;
 	
-	public GUIController() {
-		
+	private MainWindow view;
+	
+	public GUIController(BusinessModel model, MainWindow view) {
+	    this.model = model;
+	    this.view = view;
+	    view.addUserGestureListener(this);
 	}
 	
-	public GUIController(BusinessModel businessModel) {
-		this.businessModel = businessModel;
-	}
-    
     public void book(Room room) throws RecordNotFoundException {
-        businessModel.book(room);
+        model.book(room);
     }
     
-    public void search() {
-        System.out.println("Search");
+    public void search(SearchCriteria criteria) {
+        
     }
 
 }

@@ -37,9 +37,14 @@ import suncertify.db.RecordNotFoundException;
 
 public class MainWindow extends JFrame implements Observer {
 	
-	private BusinessModel businessModel;
-	
-	private GUIController guiController = new GUIController();
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1441L;
+
+    private BusinessModel model;
+    
+    private GUIController controller;
 	
 	private RoomTableModel tableModel = new RoomTableModel();
 	
@@ -55,16 +60,22 @@ public class MainWindow extends JFrame implements Observer {
 	
 	private JButton bookButton;
 	
-	public static void main(String[] args) {
-		new MainWindow(new BusinessModel());
-	}
-    
-    public MainWindow(BusinessModel businessModel) {
+    protected MainWindow(BusinessModel businessModel) {
         super("URLyBird");
-        this.businessModel = businessModel;
-        this.businessModel.addObserver(this);
+        this.model = businessModel;
+        this.model.addObserver(this);
         setUpGUI();
         setUpTable();
+    }
+    
+    protected void addUserGestureListener(GUIController controller) {
+        this.controller = controller;
+    }
+    
+    @Override
+    public void update(Observable arg0, Object arg1) {
+        // TODO Auto-generated method stub
+        tableModel.fireTableDataChanged();
     }
     
     private void setUpGUI() {
@@ -207,7 +218,7 @@ public class MainWindow extends JFrame implements Observer {
         SearchCriteria criteria = new SearchCriteria();
         criteria.matchAllRecords();
 		try {
-		    allRooms = businessModel.searchRooms(criteria);
+		    allRooms = model.searchRooms(criteria);
 		    tableModel.setRoomMap(allRooms);
 		} catch (DBException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage());
@@ -279,7 +290,7 @@ public class MainWindow extends JFrame implements Observer {
             }
             
             try {
-                matches = businessModel.searchRooms(criteria);
+                matches = model.searchRooms(criteria);
             } catch (DBException e1) {
                 JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
             } catch (RecordNotFoundException e1) {
@@ -301,20 +312,17 @@ public class MainWindow extends JFrame implements Observer {
 		    room.setOwner(customerId);
 		    
 		    try {
-                businessModel.book(room);
-            } catch (RecordNotFoundException e1) {
+                controller.book(room);
+            } catch (DBException e1) {
+                JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
+            }
+		    catch (RecordNotFoundException e2) {
                 // TODO Auto-generated catch block
-                e1.printStackTrace();
+                e2.printStackTrace();
             }
 		    customerIdTextField.setText("");
 		    bookButton.setEnabled(false);
 		}
     }
-
-	@Override
-	public void update(Observable arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		tableModel.fireTableDataChanged();
-	}
-    
+	
 }
