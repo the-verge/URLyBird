@@ -31,7 +31,6 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.MaskFormatter;
 
-import suncertify.db.ApplicationMode;
 import suncertify.db.DBException;
 import suncertify.db.RecordNotFoundException;
  

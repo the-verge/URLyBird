@@ -24,8 +24,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.MaskFormatter;
 
-import suncertify.db.ApplicationMode;
-
 /**
  * ALL OF THIS CONTENT SHOULD BE IN A DIALOG!!
  * @author john
