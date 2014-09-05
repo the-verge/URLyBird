@@ -5,27 +5,37 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.MaskFormatter;
+
+import suncertify.db.ApplicationMode;
 
 /**
  * ALL OF THIS CONTENT SHOULD BE IN A DIALOG!!
  * @author john
  *
  */
-public class ConnectionDialog extends JFrame {
+public class ConnectionDialog extends JDialog {
     
-    private JDialog dialog;
+    private static final int LOWEST_VALID_PORT = 1025;
+    
+    private static final int HIGHEST_VALID_PORT = 65535;
     
     private JLabel locationLabel = new JLabel("Database location");
     
@@ -36,7 +46,7 @@ public class ConnectionDialog extends JFrame {
     private JTextField locationTextField = new JTextField();
     
     // should be formatted text field
-    private JTextField portTextField = new JTextField();
+    private JTextField portTextField;
     
     private JButton connectButton = new JButton("Connect");
     
@@ -46,37 +56,63 @@ public class ConnectionDialog extends JFrame {
     
     private JFileChooser chooser = new JFileChooser(".");
     
-    private String connectionType;
+    private ApplicationMode connectionType;
     
     private String databaseLocation;
     
     private int port;
     
-    public static void main(String[] args) {
-        new ConnectionDialog("network");
-        new ConnectionDialog("alone");
-    }
-    
-    protected ConnectionDialog(String type) {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    protected ConnectionDialog(ApplicationMode type) {
+        this.addWindowListener(new WindowAdapter() {
+            // windowClosed doesn't work on OS X
+            @Override
+            public void windowClosing(WindowEvent e) { 
+                System.exit(0);
+            }
+        });
+
+        browseButton.addActionListener(new BrowseButtonListener());
+        exitButton.addActionListener(new ExitButtonListener());
+        connectButton.addActionListener(new ConnectButtonListener());
+        connectButton.setEnabled(false);
+        
+        DocumentListener listener = new ConnectButtonEnabler();
+        locationTextField.getDocument().addDocumentListener(listener);
+        initialisePortTextField();
+        portTextField.getDocument().addDocumentListener(listener);
+        
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         
-        if (type == "alone") {
+        connectionType = type;
+
+        if (type == ApplicationMode.STANDALONE_CLIENT) {
             this.setTitle("Connect to a local database");
             mainPanel.add(StandAlonePanel());
         }
-        else if (type == "network") {
+        else if (type == ApplicationMode.NETWORK_CLIENT) {
             this.setTitle("Connect to a remote database");
             mainPanel.add(NetworkClientPanel());
         }
         
+        this.setModal(true);
         this.add(mainPanel);
         this.pack();
         this.setLocationRelativeTo(null);
-        this.setVisible(true);
         this.setMinimumSize(this.getSize());
         this.setResizable(false);
+        this.setVisible(true);
+    }
+    
+    private void initialisePortTextField() {
+        MaskFormatter fiveDigits = null;
+        try {
+            fiveDigits = new MaskFormatter("#####");
+            portTextField = new JFormattedTextField(fiveDigits);
+        } catch (ParseException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
     
     private JPanel StandAlonePanel() {
@@ -100,7 +136,6 @@ public class ConnectionDialog extends JFrame {
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 0;
-        browseButton.addActionListener(new BrowseButtonListener());
         panel.add(browseButton, c);
         
         c = new GridBagConstraints();
@@ -114,7 +149,6 @@ public class ConnectionDialog extends JFrame {
         c.gridx = 3;
         c.gridy = 1;
         c.insets = new Insets(10, 0, 5, 0);
-
         panel.add(connectButton, c);
         
         return panel;
@@ -148,7 +182,7 @@ public class ConnectionDialog extends JFrame {
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 1;
-        portTextField.setColumns(8);
+        portTextField.setColumns(7);
         c.anchor = GridBagConstraints.WEST;
         panel.add(portTextField, c);
         
@@ -182,16 +216,90 @@ public class ConnectionDialog extends JFrame {
                 try {
                     databaseLocation = file.getCanonicalPath();
                     locationTextField.setText(databaseLocation);
+                    connectButton.setEnabled(true);
                 } catch (IOException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
              }
         }
-        
     }
     
-    protected String getConnectionType() {
+    private class ExitButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0);
+        }
+    }
+    
+    private class ConnectButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //TODO
+            System.out.println(locationTextField.getText());
+            ConnectionDialog.this.dispose();
+        }
+    }
+    
+    private class ConnectButtonEnabler implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            check();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            check();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            check();
+        }
+        
+        public void check() {
+            String location = locationTextField.getText().trim();
+            String port = portTextField.getText().trim();
+            
+            if (connectionType == ApplicationMode.STANDALONE_CLIENT) {
+                if (location.length() > 4) {
+                    connectButton.setEnabled(true);
+                }
+                else {
+                    connectButton.setEnabled(false);
+                }
+            }
+            else if (connectionType == ApplicationMode.NETWORK_CLIENT) {
+                if (location.length() > 4 && validPort(port)) {
+                    connectButton.setEnabled(true);
+                }
+                else {
+                    connectButton.setEnabled(false);
+                }
+            }
+        }
+    }
+    
+    
+    private boolean validPort(String portNumber) {
+            int port = 0;
+            try {
+                port = Integer.parseInt(portNumber);
+            } catch (NumberFormatException e) {
+                // LOG EXCEPTION
+            }
+            if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
+                this.port = port;
+                return true;
+            }        
+        
+        return false;
+    }
+    
+    protected ApplicationMode getConnectionType() {
         return connectionType;
     }
     
