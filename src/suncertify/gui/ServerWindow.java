@@ -13,38 +13,37 @@ import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.MaskFormatter;
 
-/**
- * @author john
- *
- */
-public class ConnectionDialog extends JDialog {
+
+public class ServerWindow extends JFrame {
     
     private static final int LOWEST_VALID_PORT = 1025;
     
     private static final int HIGHEST_VALID_PORT = 65535;
     
+    private static final int MINIMUM_LOCATION_LENGTH = 6;
+    
     private JLabel locationLabel = new JLabel("Database location");
     
     private JLabel portLabel = new JLabel("Port");
-    
-    private JLabel hostLabel = new JLabel("Hostname");
     
     private JTextField locationTextField = new JTextField();
     
     private JTextField portTextField;
     
-    private JButton connectButton = new JButton("Connect");
+    private JButton startButton = new JButton("Start Server");
     
     private JButton exitButton = new JButton("Exit");
     
@@ -52,29 +51,21 @@ public class ConnectionDialog extends JDialog {
     
     private JFileChooser chooser = new JFileChooser(".");
     
-    private ApplicationMode connectionType;
-    
     private String databaseLocation;
     
     private int port;
     
-    protected ConnectionDialog(ApplicationMode type) {
-        connectionType = type;
+    public static void main(String[] args) {
+        new ServerWindow();
+    }
+    
+    protected ServerWindow() {
+        super("URLyBird Server");
         addListeners();
-        
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        mainPanel.add(serverPanel());
         
-        if (type == ApplicationMode.STANDALONE_CLIENT) {
-            this.setTitle("Connect to a local database");
-            mainPanel.add(standAlonePanel());
-        }
-        else if (type == ApplicationMode.NETWORK_CLIENT) {
-            this.setTitle("Connect to a remote database");
-            mainPanel.add(networkClientPanel());
-        }
-        
-        this.setModal(true);
         this.add(mainPanel);
         this.pack();
         this.setLocationRelativeTo(null);
@@ -91,13 +82,13 @@ public class ConnectionDialog extends JDialog {
                 System.exit(0);
             }
         });
-
+        
         browseButton.addActionListener(new BrowseButtonListener());
         exitButton.addActionListener(new ExitButtonListener());
-        connectButton.addActionListener(new ConnectButtonListener());
-        connectButton.setEnabled(false);
+        startButton.addActionListener(new StartButtonListener());
+        startButton.setEnabled(false);
         
-        DocumentListener listener = new ConnectButtonEnabler();
+        DocumentListener listener = new StartButtonEnabler();
         locationTextField.getDocument().addDocumentListener(listener);
         initialisePortTextField();
         portTextField.getDocument().addDocumentListener(listener);
@@ -113,8 +104,8 @@ public class ConnectionDialog extends JDialog {
             e1.printStackTrace();
         }
     }
-    
-    private JPanel standAlonePanel() {
+        
+    private JPanel serverPanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c;
@@ -135,41 +126,8 @@ public class ConnectionDialog extends JDialog {
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 0;
-        panel.add(browseButton, c);
-        
-        c = new GridBagConstraints();
-        c.gridx = 2;
-        c.gridy = 1;
-        c.insets = new Insets(10, 0, 5, 0);
-        c.anchor = GridBagConstraints.EAST;
-        panel.add(exitButton, c);
-        
-        c = new GridBagConstraints();
-        c.gridx = 3;
-        c.gridy = 1;
-        c.insets = new Insets(10, 0, 5, 0);
-        panel.add(connectButton, c);
-        
-        return panel;
-    }
-    
-    private JPanel networkClientPanel() {
-        
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints c;
-        
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.ipadx = 15;
-        panel.add(hostLabel, c);
-        
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 0;
         c.gridwidth = 2;
-        locationTextField.setColumns(25);
-        panel.add(locationTextField, c);
+        panel.add(browseButton, c);
         
         c = new GridBagConstraints();
         c.gridx = 0;
@@ -186,7 +144,7 @@ public class ConnectionDialog extends JDialog {
         panel.add(portTextField, c);
         
         c = new GridBagConstraints();
-        c.gridx = 1;
+        c.gridx = 2;
         c.gridy = 2;
         c.insets = new Insets(10, 0, 5, 0);
         c.anchor = GridBagConstraints.EAST;
@@ -194,18 +152,19 @@ public class ConnectionDialog extends JDialog {
         panel.add(exitButton, c);
         
         c = new GridBagConstraints();
-        c.gridx = 2;
+        c.gridx = 3;
         c.gridy = 2;
         c.insets = new Insets(10, 0, 5, 0);
         c.anchor = GridBagConstraints.EAST;
-        panel.add(connectButton, c);
+        c.weightx = 1.0;
+        panel.add(startButton, c);
         
         return panel;
     }
     
     private class BrowseButtonListener implements ActionListener {
         
-        ConnectionDialog parent = ConnectionDialog.this;
+        ServerWindow parent = ServerWindow.this;
         
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -215,7 +174,7 @@ public class ConnectionDialog extends JDialog {
                 try {
                     databaseLocation = file.getCanonicalPath();
                     locationTextField.setText(databaseLocation);
-                    connectButton.setEnabled(true);
+                    startButton.setEnabled(true);
                 } catch (IOException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -232,17 +191,16 @@ public class ConnectionDialog extends JDialog {
         }
     }
     
-    private class ConnectButtonListener implements ActionListener {
+    private class StartButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
             System.out.println(locationTextField.getText());
-            ConnectionDialog.this.dispose();
         }
     }
     
-    private class ConnectButtonEnabler implements DocumentListener {
+    private class StartButtonEnabler implements DocumentListener {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -263,21 +221,11 @@ public class ConnectionDialog extends JDialog {
             String location = locationTextField.getText().trim();
             String port = portTextField.getText().trim();
             
-            if (connectionType == ApplicationMode.STANDALONE_CLIENT) {
-                if (location.length() > 4) {
-                    connectButton.setEnabled(true);
-                }
-                else {
-                    connectButton.setEnabled(false);
-                }
+            if (location.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
+                startButton.setEnabled(true);
             }
-            else if (connectionType == ApplicationMode.NETWORK_CLIENT) {
-                if (location.length() > 4 && validPort(port)) {
-                    connectButton.setEnabled(true);
-                }
-                else {
-                    connectButton.setEnabled(false);
-                }
+            else {
+                startButton.setEnabled(false);
             }
         }
     }
@@ -298,10 +246,6 @@ public class ConnectionDialog extends JDialog {
         return false;
     }
     
-    protected ApplicationMode getConnectionType() {
-        return connectionType;
-    }
-    
     protected String getDatabaseLocation() {
         return databaseLocation;
     }
@@ -311,3 +255,4 @@ public class ConnectionDialog extends JDialog {
     }
 
 }
+

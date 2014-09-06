@@ -18,11 +18,9 @@ public class RoomTableModel extends AbstractTableModel {
 
     private String[] columnNames = {"Name", "Location", "Size", "Smoking", "Rate", "Date", "Owner"};
     
-    private List<String[]> records = new ArrayList<String[]>();
-    
     @Override
     public int getRowCount() {
-        return records.size();
+        return roomMap.size();
     }
 
     @Override
@@ -32,13 +30,15 @@ public class RoomTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        String[] row = records.get(rowIndex);
+        Room room = roomMap.get(rowIndex);
+        String[] row = room.getData();
         return row[columnIndex];
     }
     
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        Object[] row = records.get(rowIndex);
+        Room room = roomMap.get(rowIndex);
+        Object[] row = room.getData();
         row[columnIndex] = value;
     }
     
@@ -53,16 +53,6 @@ public class RoomTableModel extends AbstractTableModel {
     
     public void setRoomMap(Map<Integer, Room> map) {
         roomMap = map;
-        setRecords();
-    }
-    
-    public void setRecords() {
-        records.clear();
-        for (Map.Entry<Integer, Room> entry: roomMap.entrySet()) {
-            Room room = entry.getValue();
-            String[] record = room.getData();
-            records.add(record);
-        }
         this.fireTableDataChanged();
     }
     
