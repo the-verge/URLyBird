@@ -18,9 +18,9 @@ public class BusinessModel {
 	
 	private DB dataAccess;
 	
-	public BusinessModel() {
+	public BusinessModel(String dbLocation) {
 		try {
-			this.dataAccess = new Data("/Users/john/workspace/urlybird/db-1x3.db");
+			this.dataAccess = new Data(dbLocation);
 		} catch (DBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

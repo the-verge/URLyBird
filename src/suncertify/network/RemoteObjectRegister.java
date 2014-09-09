@@ -27,9 +27,10 @@ public class RemoteObjectRegister {
         Registry registry = LocateRegistry.getRegistry(hostname, port);
         registry.rebind("Data", remoteObject);
     }
-
+    
+    // needs to take param from ServerWindow 
     public static void main(String[] args) throws RemoteException {
-        registerObject("/Users/john/workspace/URLyBird/db-1x3.db");
+        registerObject("/home/ejhnhng/URLyBird/db-1x3.db");
     }
 
 }

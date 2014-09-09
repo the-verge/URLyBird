@@ -62,7 +62,6 @@ public class MainWindow extends JFrame implements Observer {
 	
     protected MainWindow(BusinessModel businessModel) {
         super("URLyBird");
-        ConnectionDialog dialog = new ConnectionDialog(ApplicationMode.STANDALONE_CLIENT);
         this.model = businessModel;
         this.model.addObserver(this);
         setUpGUI();

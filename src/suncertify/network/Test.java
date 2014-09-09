@@ -14,7 +14,7 @@ public class Test {
         DataRemoteAdapter data = (DataRemoteAdapter) Naming.lookup("rmi://127.0.0.1/Data"); // for localhost
         long cookie = data.lock(1);
         System.out.println(cookie);
-        //data.unlock(1, cookie);
+        data.unlock(1, cookie);
     }
 
 }
