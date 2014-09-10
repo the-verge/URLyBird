@@ -2,7 +2,7 @@ package suncertify.gui;
 
 import javax.swing.JOptionPane;
 
-import connection.DatabaseConnection;
+import suncertify.connection.DatabaseConnection;
 import suncertify.db.DB;
 import suncertify.db.DBException;
 

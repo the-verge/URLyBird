@@ -1,4 +1,4 @@
-package connection;
+package suncertify.connection;
 
 import suncertify.db.DB;
 import suncertify.db.Data;
