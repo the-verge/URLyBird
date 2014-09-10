@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.gui.Room;
 import suncertify.gui.BusinessModel;
@@ -20,7 +21,8 @@ public class BusinessModelTest {
 
     @Test
     public void searchAllRoomsTest() throws RecordNotFoundException {
-        BusinessModel model = new BusinessModel();
+    	Data data = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
+        BusinessModel model = new BusinessModel(data);
         SearchCriteria criteria = new SearchCriteria();
         criteria.matchAllRecords();
         Map<Integer, Room> matches = model.searchRooms(criteria);
@@ -29,12 +31,12 @@ public class BusinessModelTest {
     
     @Test
     public void searchRoomsTest() throws RecordNotFoundException {
-        BusinessModel model = new BusinessModel();
+    	Data data = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
+        BusinessModel model = new BusinessModel(data);
         SearchCriteria criteria = new SearchCriteria();
         criteria.matchName("dew");
         Map<Integer, Room> matches = model.searchRooms(criteria);
         assertEquals(3, matches.size());
-        int count = 0;
         criteria.matchName("w");
         matches = model.searchRooms(criteria);
         assertEquals(1, matches.size());

@@ -18,13 +18,8 @@ public class BusinessModel {
 	
 	private DB dataAccess;
 	
-	public BusinessModel(String dbLocation) {
-		try {
-			this.dataAccess = new Data(dbLocation);
-		} catch (DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public BusinessModel(DB dataAccess) {
+		this.dataAccess = dataAccess;
 	}
 	
 	public void addObserver(Observer observer) {

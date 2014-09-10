@@ -222,6 +222,8 @@ public class MainWindow extends JFrame implements Observer {
 		    tableModel.setRoomMap(allRooms);
 		} catch (DBException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage());
+			// what to do here ?
+			System.exit(1);
 		} catch (RecordNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

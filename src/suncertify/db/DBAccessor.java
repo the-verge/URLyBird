@@ -126,7 +126,7 @@ public class DBAccessor {
             try {
                 database = new RandomAccessFile(dbLocation, "rw");
             } catch (FileNotFoundException e) {
-                throw new DBException("Database file not found", e);
+                throw new DBException("Could not open " + dbLocation, e);
             }
             databaseLocation = dbLocation;
         }

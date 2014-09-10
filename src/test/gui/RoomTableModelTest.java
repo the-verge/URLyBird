@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.gui.BusinessModel;
 import suncertify.gui.Room;
@@ -22,7 +23,8 @@ public class RoomTableModelTest {
 
     @Test
     public void getValueAtTest() throws RecordNotFoundException {
-        BusinessModel model = new BusinessModel();
+    	Data data = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
+        BusinessModel model = new BusinessModel(data);
         SearchCriteria criteria = new SearchCriteria();
         RoomTableModel tableModel = new RoomTableModel();
         

@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 
 import javax.swing.BorderFactory;
@@ -24,6 +22,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.MaskFormatter;
 
+
 /**
  * @author john
  *
@@ -33,6 +32,8 @@ public class ConnectionDialog extends JDialog {
     private static final int LOWEST_VALID_PORT = 1025;
     
     private static final int HIGHEST_VALID_PORT = 65535;
+    
+    private static final int MINIMIUM_DATABASE_LOCATION_LENGTH = 6;
     
     private JLabel locationLabel = new JLabel("Database location");
     
@@ -130,6 +131,7 @@ public class ConnectionDialog extends JDialog {
         c.gridy = 0;
         c.gridwidth = 2;
         locationTextField.setColumns(40);
+        locationTextField.setEditable(false);
         panel.add(locationTextField, c);
         
         c = new GridBagConstraints();
@@ -169,6 +171,7 @@ public class ConnectionDialog extends JDialog {
         c.gridy = 0;
         c.gridwidth = 2;
         locationTextField.setColumns(25);
+        locationTextField.setEditable(true);
         panel.add(locationTextField, c);
         
         c = new GridBagConstraints();
@@ -209,18 +212,12 @@ public class ConnectionDialog extends JDialog {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            int returnVal = parent.chooser.showOpenDialog(parent);
+            int returnVal = parent.chooser.showDialog(parent, "Select");
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
-                try {
-                    databaseLocation = file.getCanonicalPath();
-                    locationTextField.setText(databaseLocation);
-                    connectButton.setEnabled(true);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-             }
+            	 databaseLocation = chooser.getSelectedFile().getAbsolutePath();
+                 locationTextField.setText(databaseLocation);
+                 connectButton.setEnabled(true);
+            }
         }
     }
     
@@ -236,8 +233,6 @@ public class ConnectionDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //TODO
-            System.out.println(locationTextField.getText());
             ConnectionDialog.this.dispose();
         }
     }
@@ -264,7 +259,7 @@ public class ConnectionDialog extends JDialog {
             String port = portTextField.getText().trim();
             
             if (connectionType == ApplicationMode.STANDALONE_CLIENT) {
-                if (location.length() > 4) {
+                if (location.length() > MINIMIUM_DATABASE_LOCATION_LENGTH) {
                     connectButton.setEnabled(true);
                 }
                 else {
@@ -272,7 +267,7 @@ public class ConnectionDialog extends JDialog {
                 }
             }
             else if (connectionType == ApplicationMode.NETWORK_CLIENT) {
-                if (location.length() > 4 && validPort(port)) {
+                if (location.length() > MINIMIUM_DATABASE_LOCATION_LENGTH && validPort(port)) {
                     connectButton.setEnabled(true);
                 }
                 else {
