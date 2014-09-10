@@ -33,7 +33,7 @@ public class ConnectionDialog extends JDialog {
     
     private static final int HIGHEST_VALID_PORT = 65535;
     
-    private static final int MINIMIUM_DATABASE_LOCATION_LENGTH = 6;
+    private static final int MINIMUM_LOCATION_LENGTH = 4;
     
     private JLabel locationLabel = new JLabel("Database location");
     
@@ -259,7 +259,7 @@ public class ConnectionDialog extends JDialog {
             String port = portTextField.getText().trim();
             
             if (connectionType == ApplicationMode.STANDALONE_CLIENT) {
-                if (location.length() > MINIMIUM_DATABASE_LOCATION_LENGTH) {
+                if (location.length() > MINIMUM_LOCATION_LENGTH) {
                     connectButton.setEnabled(true);
                 }
                 else {
@@ -267,7 +267,7 @@ public class ConnectionDialog extends JDialog {
                 }
             }
             else if (connectionType == ApplicationMode.NETWORK_CLIENT) {
-                if (location.length() > MINIMIUM_DATABASE_LOCATION_LENGTH && validPort(port)) {
+                if (location.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
                     connectButton.setEnabled(true);
                 }
                 else {

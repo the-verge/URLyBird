@@ -27,7 +27,10 @@ public class Application {
 				showServerWindow();
 			}
 			else {
-				// error
+				JOptionPane.showMessageDialog(null, "Valid arguments are:\n\n1: server,\n2: alone, \n3: leave blank.", 
+						"Invalid arguments", JOptionPane.ERROR_MESSAGE);
+				
+				System.exit(1);
 			}
 		}
 	}

@@ -1,30 +1,22 @@
 package suncertify.gui;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.MaskFormatter;
 
 
 public class ServerWindow extends JFrame {
@@ -33,7 +25,7 @@ public class ServerWindow extends JFrame {
     
     private static final int HIGHEST_VALID_PORT = 65535;
     
-    private static final int MINIMUM_LOCATION_LENGTH = 6;
+    private static final int MINIMUM_LOCATION_LENGTH = 4;
     
     private JLabel locationLabel = new JLabel("Database location");
     
@@ -41,11 +33,11 @@ public class ServerWindow extends JFrame {
     
     private JTextField locationTextField = new JTextField();
     
-    private JTextField portTextField;
+    private JTextField portTextField = new JTextField();
     
-    private JButton startButton = new JButton("Start Server");
+    private JButton startButton = new JButton("Start");
     
-    private JButton exitButton = new JButton("Exit");
+    private JButton stopButton = new JButton("Stop");
     
     private JButton browseButton = new JButton(" Browse ");
     
@@ -55,12 +47,9 @@ public class ServerWindow extends JFrame {
     
     private int port;
     
-    public static void main(String[] args) {
-        new ServerWindow();
-    }
-    
     protected ServerWindow() {
         super("URLyBird Server");
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         addListeners();
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -75,36 +64,17 @@ public class ServerWindow extends JFrame {
     }
     
     private void addListeners() {
-        
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) { 
-                System.exit(0);
-            }
-        });
-        
+               
         browseButton.addActionListener(new BrowseButtonListener());
-        exitButton.addActionListener(new ExitButtonListener());
+        stopButton.addActionListener(new StopButtonListener());
         startButton.addActionListener(new StartButtonListener());
         startButton.setEnabled(false);
         
         DocumentListener listener = new StartButtonEnabler();
         locationTextField.getDocument().addDocumentListener(listener);
-        initialisePortTextField();
         portTextField.getDocument().addDocumentListener(listener);
     }
     
-    private void initialisePortTextField() {
-        MaskFormatter fiveDigits = null;
-        try {
-            fiveDigits = new MaskFormatter("#####");
-            portTextField = new JFormattedTextField(fiveDigits);
-        } catch (ParseException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-    }
-        
     private JPanel serverPanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -121,6 +91,7 @@ public class ServerWindow extends JFrame {
         c.gridy = 0;
         c.gridwidth = 2;
         locationTextField.setColumns(40);
+        locationTextField.setEditable(false);
         panel.add(locationTextField, c);
         
         c = new GridBagConstraints();
@@ -149,7 +120,7 @@ public class ServerWindow extends JFrame {
         c.insets = new Insets(10, 0, 5, 0);
         c.anchor = GridBagConstraints.EAST;
         c.weightx = 1.0;
-        panel.add(exitButton, c);
+        panel.add(stopButton, c);
         
         c = new GridBagConstraints();
         c.gridx = 3;
@@ -168,26 +139,19 @@ public class ServerWindow extends JFrame {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            int returnVal = parent.chooser.showOpenDialog(parent);
+        	int returnVal = parent.chooser.showDialog(parent, "Select");
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
-                try {
-                    databaseLocation = file.getCanonicalPath();
-                    locationTextField.setText(databaseLocation);
-                    startButton.setEnabled(true);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-             }
+            	 databaseLocation = chooser.getSelectedFile().getAbsolutePath();
+                 locationTextField.setText(databaseLocation);
+            }
         }
     }
     
-    private class ExitButtonListener implements ActionListener {
+    private class StopButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.exit(0);
+            System.out.println("Stopping server...");
         }
     }
     
@@ -196,7 +160,7 @@ public class ServerWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             //TODO
-            System.out.println(locationTextField.getText());
+            System.out.println("Location: " + databaseLocation + "\nPort: " + port);
         }
     }
     
@@ -232,21 +196,22 @@ public class ServerWindow extends JFrame {
     
     
     private boolean validPort(String portNumber) {
-            int port = 0;
-            try {
-                port = Integer.parseInt(portNumber);
-            } catch (NumberFormatException e) {
-                // LOG EXCEPTION
-            }
-            if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
-                this.port = port;
-                return true;
-            }        
-        
+        int port = 0;
+        try {
+            port = Integer.parseInt(portNumber);
+        } catch (NumberFormatException e) {
+            // LOG EXCEPTION
+        }
+        if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
+            this.port = port;
+            portTextField.setBorder(BorderFactory.createEmptyBorder());
+            return true;
+        }        
+        portTextField.setBorder(BorderFactory.createLineBorder(Color.RED));
         return false;
     }
     
-    protected String getDatabaseLocation() {
+    public String getDatabaseLocation() {
         return databaseLocation;
     }
     
