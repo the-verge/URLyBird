@@ -1,15 +1,21 @@
 package suncertify.network;
 
 import java.net.BindException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
-public class ServerSetup {
+public class Server {
+	
+	private static Registry rmiRegistry;
 	
 	public static void startServer(String dbLocation, int port) {
 		try {
-			LocateRegistry.createRegistry(port);
+			rmiRegistry = LocateRegistry.createRegistry(port);
 			registerObject(dbLocation, port);
 			System.out.println("RMI registry running on port " + port);
 		} 
@@ -31,8 +37,16 @@ public class ServerSetup {
 		registry.rebind("Data", remoteObject);
     }
 	
-	public static void unregisterObject() {
-		
+	public static void stopServer(int port) {
+		try {
+			if (rmiRegistry != null) {
+				//Naming.unbind("rmi://127.0.0.1/Data");
+			    UnicastRemoteObject.unexportObject(rmiRegistry, true);
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

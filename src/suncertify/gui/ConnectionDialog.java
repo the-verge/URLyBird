@@ -1,5 +1,6 @@
 package suncertify.gui;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -43,7 +44,7 @@ public class ConnectionDialog extends JDialog {
     
     private JTextField locationTextField = new JTextField();
     
-    private JTextField portTextField;
+    private JTextField portTextField = new JTextField();
     
     private JButton connectButton = new JButton("Connect");
     
@@ -100,19 +101,7 @@ public class ConnectionDialog extends JDialog {
         
         DocumentListener listener = new ConnectButtonEnabler();
         locationTextField.getDocument().addDocumentListener(listener);
-        initialisePortTextField();
         portTextField.getDocument().addDocumentListener(listener);
-    }
-    
-    private void initialisePortTextField() {
-        MaskFormatter fiveDigits = null;
-        try {
-            fiveDigits = new MaskFormatter("#####");
-            portTextField = new JFormattedTextField(fiveDigits);
-        } catch (ParseException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
     }
     
     private JPanel standAlonePanel() {
@@ -233,6 +222,7 @@ public class ConnectionDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+        	databaseLocation = locationTextField.getText();
             ConnectionDialog.this.dispose();
         }
     }
@@ -279,25 +269,26 @@ public class ConnectionDialog extends JDialog {
     
     
     private boolean validPort(String portNumber) {
-            int port = 0;
-            try {
-                port = Integer.parseInt(portNumber);
-            } catch (NumberFormatException e) {
-                // LOG EXCEPTION
-            }
-            if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
-                this.port = port;
-                return true;
-            }        
-        
+        int port = 0;
+        try {
+            port = Integer.parseInt(portNumber);
+        } catch (NumberFormatException e) {
+            // LOG EXCEPTION
+        }
+        if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
+            this.port = port;
+            portTextField.setBorder(BorderFactory.createEmptyBorder());
+            return true;
+        }        
+        portTextField.setBorder(BorderFactory.createLineBorder(Color.RED));
         return false;
     }
     
-    protected ApplicationMode getConnectionType() {
+    public ApplicationMode getConnectionType() {
         return connectionType;
     }
     
-    protected String getDatabaseLocation() {
+    public String getDatabaseLocation() {
         return databaseLocation;
     }
     

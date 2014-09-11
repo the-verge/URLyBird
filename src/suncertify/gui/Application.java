@@ -36,6 +36,7 @@ public class Application {
 	}
 	
 	private void showConnectionDialog(ApplicationMode mode) {
+		
 		ConnectionDialog dialog = new ConnectionDialog(mode);
 		String dbLocation = dialog.getDatabaseLocation();
 		int port = dialog.getPort();
@@ -43,7 +44,7 @@ public class Application {
 		if (mode == ApplicationMode.STANDALONE_CLIENT) {
 			createLocalConnection(dbLocation);
 		}
-		else if (mode == ApplicationMode.STANDALONE_CLIENT){
+		else if (mode == ApplicationMode.NETWORK_CLIENT) {
 			createRemoteConnection(dbLocation, port);
 		}
 	}

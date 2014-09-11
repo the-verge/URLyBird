@@ -18,7 +18,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import suncertify.network.ServerSetup;
+import suncertify.network.Server;
 
 
 public class ServerWindow extends JFrame {
@@ -39,7 +39,7 @@ public class ServerWindow extends JFrame {
     
     private JButton startButton = new JButton("Start");
     
-    private JButton stopButton = new JButton("Stop");
+    private JButton exitButton = new JButton("Exit");
     
     private JButton browseButton = new JButton(" Browse ");
     
@@ -68,7 +68,8 @@ public class ServerWindow extends JFrame {
     private void addListeners() {
                
         browseButton.addActionListener(new BrowseButtonListener());
-        stopButton.addActionListener(new StopButtonListener());
+        exitButton.addActionListener(new ExitButtonListener());
+        exitButton.setEnabled(false);
         startButton.addActionListener(new StartButtonListener());
         startButton.setEnabled(false);
         
@@ -122,7 +123,7 @@ public class ServerWindow extends JFrame {
         c.insets = new Insets(10, 0, 5, 0);
         c.anchor = GridBagConstraints.EAST;
         c.weightx = 1.0;
-        panel.add(stopButton, c);
+        panel.add(exitButton, c);
         
         c = new GridBagConstraints();
         c.gridx = 3;
@@ -149,14 +150,6 @@ public class ServerWindow extends JFrame {
         }
     }
     
-    private class StopButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Stopping server...");
-        }
-    }
-    
     private class StartButtonListener implements ActionListener {
 
         @Override
@@ -164,10 +157,24 @@ public class ServerWindow extends JFrame {
             //TODO
             System.out.println("Location: " + databaseLocation + "\nPort: " + port);
             // Not sure where to throw and catch for RemoteExceptions etc
-            ServerSetup.startServer(databaseLocation, port);
+            Server.startServer(databaseLocation, port);
             startButton.setEnabled(false);
+            exitButton.setEnabled(true);
             portTextField.setEditable(false);
             browseButton.setEnabled(false);
+        }
+    }
+    
+    private class ExitButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Stopping server...");
+//            Server.stopServer(port);
+//            startButton.setEnabled(true);
+//            browseButton.setEnabled(true);
+//            portTextField.setEditable(true);
+            System.exit(0);
         }
     }
     
