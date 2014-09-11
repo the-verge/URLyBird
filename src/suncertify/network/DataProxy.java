@@ -55,7 +55,7 @@ public class DataProxy implements DB {
 	public int[] find(String[] criteria) {
 		int[] result = null;
 		try {
-			database.find(criteria);
+			result = database.find(criteria);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
