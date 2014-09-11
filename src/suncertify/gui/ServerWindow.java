@@ -18,6 +18,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import suncertify.network.ServerSetup;
+
 
 public class ServerWindow extends JFrame {
     
@@ -161,6 +163,11 @@ public class ServerWindow extends JFrame {
         public void actionPerformed(ActionEvent e) {
             //TODO
             System.out.println("Location: " + databaseLocation + "\nPort: " + port);
+            // Not sure where to throw and catch for RemoteExceptions etc
+            ServerSetup.startServer(databaseLocation, port);
+            startButton.setEnabled(false);
+            portTextField.setEditable(false);
+            browseButton.setEnabled(false);
         }
     }
     

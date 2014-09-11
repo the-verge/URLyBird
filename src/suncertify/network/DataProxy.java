@@ -11,13 +11,8 @@ public class DataProxy implements DB {
 	
 	private DataRemoteAdapter database;
 	
-	public DataProxy(String dbLocation) {
-		try {
-			database = new DataRemoteAdapterImpl(dbLocation);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public DataProxy(DataRemoteAdapter database) {
+		this.database = database;
 	}
 	
 	// WHAT ABOUT IOExceptions / DBExceptions ?

@@ -15,6 +15,7 @@ public class Test {
         long cookie = data.lock(1);
         System.out.println(cookie);
         data.unlock(1, cookie);
+        System.out.println("main method finished");
     }
 
 }
