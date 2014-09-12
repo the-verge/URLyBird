@@ -18,6 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import suncertify.network.NetworkException;
 import suncertify.network.Server;
@@ -45,6 +47,8 @@ public class ServerWindow extends JFrame {
     private JButton browseButton = new JButton(" Browse ");
     
     private JFileChooser chooser = new JFileChooser(".");
+    
+    private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
     private String databaseLocation;
     
@@ -83,6 +87,7 @@ public class ServerWindow extends JFrame {
         
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c;
+        chooser.setFileFilter(filter);
         
         c = new GridBagConstraints();
         c.gridx = 0;

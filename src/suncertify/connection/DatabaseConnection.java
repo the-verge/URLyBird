@@ -26,9 +26,8 @@ public class DatabaseConnection {
 			data = new DataProxy(remote);
 		} catch (UnknownHostException e) {
 			throw new NetworkException("Cannot resolve host " + hostname, e);
-		}
-		catch (MalformedURLException | RemoteException | NotBoundException e) {
-			throw new NetworkException("Network error " + hostname, e);
+		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+			throw new NetworkException("Network error:\nCheck hostname and port", e);
 		} 
 		return data;
 	}

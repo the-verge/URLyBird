@@ -12,6 +12,12 @@ import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 
+/**
+ * ALL METHODS IN THIS CLASS THROW NETWORK EXCEPTION
+ * IF THE DB IS AN INSTANCE OF DataProxy
+ * @author ejhnhng
+ *
+ */
 public class BusinessModel {
 	
 	private static List<Observer> observers = new ArrayList<Observer>();

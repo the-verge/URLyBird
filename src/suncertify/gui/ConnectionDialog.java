@@ -21,6 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
 
 
@@ -53,6 +55,8 @@ public class ConnectionDialog extends JDialog {
     private JButton browseButton = new JButton(" Browse ");
     
     private JFileChooser chooser = new JFileChooser(".");
+    
+    private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
     private ApplicationMode connectionType;
     
@@ -108,6 +112,7 @@ public class ConnectionDialog extends JDialog {
         
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c;
+        chooser.setFileFilter(filter);
         
         c = new GridBagConstraints();
         c.gridx = 0;
