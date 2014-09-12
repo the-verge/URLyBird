@@ -62,6 +62,8 @@ public class ConnectionDialog extends JDialog {
     
     private String databaseLocation;
     
+    private String hostname;
+    
     private int port;
     
     protected ConnectionDialog(ApplicationMode type) {
@@ -227,7 +229,9 @@ public class ConnectionDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-        	databaseLocation = locationTextField.getText();
+        	if (connectionType == ApplicationMode.NETWORK_CLIENT) {
+        		hostname = locationTextField.getText();
+        	}
             ConnectionDialog.this.dispose();
         }
     }
@@ -295,6 +299,10 @@ public class ConnectionDialog extends JDialog {
     
     public String getDatabaseLocation() {
         return databaseLocation;
+    }
+    
+    public String getHostname() {
+    	return hostname;
     }
     
     public int getPort() {

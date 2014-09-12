@@ -40,13 +40,14 @@ public class Application {
 		
 		ConnectionDialog dialog = new ConnectionDialog(mode);
 		String dbLocation = dialog.getDatabaseLocation();
+		String hostname = dialog.getHostname();
 		int port = dialog.getPort();
 		
 		if (mode == ApplicationMode.STANDALONE_CLIENT) {
 			createLocalConnection(dbLocation);
 		}
 		else if (mode == ApplicationMode.NETWORK_CLIENT) {
-			createRemoteConnection(dbLocation, port);
+			createRemoteConnection(hostname, port);
 		}
 	}
 	
