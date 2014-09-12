@@ -22,8 +22,7 @@ public class DataProxy implements DB {
 		try {
 			result = database.read(recNo);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException("Network error", e);
 		}
 		return result;
 	}
@@ -35,8 +34,7 @@ public class DataProxy implements DB {
 		try {
 			database.update(recNo, data, lockCookie);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException("Network error", e);
 		}
 	}
 
@@ -46,8 +44,7 @@ public class DataProxy implements DB {
 		try {
 			database.delete(recNo, lockCookie);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException("Network error", e);
 		}
 	}
 
@@ -57,8 +54,7 @@ public class DataProxy implements DB {
 		try {
 			result = database.find(criteria);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException("Network error", e);
 		}
 		return result;
 	}
@@ -69,8 +65,7 @@ public class DataProxy implements DB {
 		try {
 			recNo = database.create(data);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException("Network error", e);
 		}
 		return recNo;
 	}
@@ -81,9 +76,8 @@ public class DataProxy implements DB {
 		try {
 			lockCookie = database.lock(recNo);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			throw new NetworkException("Network error", e);
+		} 
 		return lockCookie;
 	}
 
@@ -94,8 +88,7 @@ public class DataProxy implements DB {
 		try {
 			database.unlock(recNo, cookie);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException("Network error", e);
 		}
 	}
 	

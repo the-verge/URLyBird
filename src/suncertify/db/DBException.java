@@ -6,7 +6,7 @@ package suncertify.db;
  * UnsupportedEncodingException which result from operations in the 
  * DBAccessor and LockManager classes. It extends RuntimeException 
  * (which is not a checked exception) in order to maintain compliance
- * with supplied DB.java interface.
+ * with supplied DB interface.
  * @author john
  *
  */
