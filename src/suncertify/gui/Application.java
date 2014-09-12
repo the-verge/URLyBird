@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 import suncertify.connection.DatabaseConnection;
 import suncertify.db.DB;
 import suncertify.db.DBException;
+import suncertify.network.NetworkException;
 
 public class Application {
 	
@@ -67,8 +68,14 @@ public class Application {
 	}
 	
 	private void createRemoteConnection(String hostname, int port) {
-		DB dataAccess = DatabaseConnection.getRemoteConnection(hostname, port);
-		createClientGUI(dataAccess);
+		try {
+			DB dataAccess = DatabaseConnection.getRemoteConnection(hostname, port);
+			createClientGUI(dataAccess);
+		} catch (NetworkException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), 
+					"Could not connect to server", JOptionPane.ERROR_MESSAGE);
+			// MAYBE SHOULD LEAVE DIALOG OPEN
+		}
 	}
 	
 	private void createClientGUI(DB dataAccess) {

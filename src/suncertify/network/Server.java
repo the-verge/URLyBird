@@ -1,9 +1,6 @@
 package suncertify.network;
 
 import java.net.BindException;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -22,11 +19,16 @@ public class Server {
 		catch (RemoteException e) {
 			Throwable cause = e.getCause();
 			if (cause instanceof BindException) {
-				// Port is already in use
-				System.out.println(e.getCause());
+				/**
+				 * Throw NetworkException here to remove need to 
+				 * have explicit exception handling in the ServerWindow GUI.
+				 * The GUI would be tied to an RMI implementation if we
+				 * handle RemoteException in the GUI.
+				 */
+				throw new NetworkException("Port " + port + " is already in use", e);
 			}
 			else {
-				// Generic error message and log exception
+				throw new NetworkException("Network error", e);
 			}
 		}
 	}
@@ -37,10 +39,13 @@ public class Server {
 		registry.rebind("Data", remoteObject);
     }
 	
+	/**
+	 * PERHAPS REMOVE THIS
+	 * @param port
+	 */
 	public static void stopServer(int port) {
 		try {
 			if (rmiRegistry != null) {
-				//Naming.unbind("rmi://127.0.0.1/Data");
 			    UnicastRemoteObject.unexportObject(rmiRegistry, true);
 			}
 		} catch (RemoteException e) {

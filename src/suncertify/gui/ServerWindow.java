@@ -12,14 +12,15 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import suncertify.network.NetworkException;
 import suncertify.network.Server;
-
 
 public class ServerWindow extends JFrame {
     
@@ -154,14 +155,17 @@ public class ServerWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //TODO
-            System.out.println("Location: " + databaseLocation + "\nPort: " + port);
-            // Not sure where to throw and catch for RemoteExceptions etc
-            Server.startServer(databaseLocation, port);
-            startButton.setEnabled(false);
-            exitButton.setEnabled(true);
-            portTextField.setEditable(false);
-            browseButton.setEnabled(false);
+            try {
+				Server.startServer(databaseLocation, port);
+				startButton.setEnabled(false);
+		        exitButton.setEnabled(true);
+		        portTextField.setEditable(false);
+		        browseButton.setEnabled(false);
+		        ServerWindow.this.setTitle("URLyBird Server - Running...");
+			} catch (NetworkException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(), 
+						"Could not start server", JOptionPane.ERROR_MESSAGE);
+			}
         }
     }
     
