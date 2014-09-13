@@ -1,4 +1,4 @@
-package suncertify.network;
+package test.network;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -7,8 +7,9 @@ import java.rmi.RemoteException;
 
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
+import suncertify.network.DataRemoteAdapter;
 
-public class Test {
+public class ConnectionTest {
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, RecordNotFoundException, SecurityException {
         DataRemoteAdapter data = (DataRemoteAdapter) Naming.lookup("rmi://127.0.0.1:1099/Data"); // for localhost
