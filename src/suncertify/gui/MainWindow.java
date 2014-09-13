@@ -60,7 +60,7 @@ public class MainWindow extends JFrame implements Observer {
 	
 	private JButton bookButton;
 	
-    protected MainWindow(BusinessModel businessModel) {
+    public MainWindow(BusinessModel businessModel) {
         super("URLyBird");
         this.model = businessModel;
         this.model.addObserver(this);

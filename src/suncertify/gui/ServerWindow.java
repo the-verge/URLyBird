@@ -54,7 +54,7 @@ public class ServerWindow extends JFrame {
     
     private int port;
     
-    protected ServerWindow() {
+    public ServerWindow() {
         super("URLyBird Server");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         addListeners();

@@ -1,4 +1,4 @@
-package suncertify.gui;
+package suncertify.application;
 
 public enum ApplicationMode {
     STANDALONE_CLIENT,

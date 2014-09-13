@@ -8,13 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -23,8 +21,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.MaskFormatter;
 
+import suncertify.application.ApplicationMode;
+import suncertify.application.Configuration;
 
 /**
  * @author john
@@ -46,6 +45,8 @@ public class ConnectionDialog extends JDialog {
     
     private JTextField locationTextField = new JTextField();
     
+    private JTextField hostnameTextField = new JTextField();
+    
     private JTextField portTextField = new JTextField();
     
     private JButton connectButton = new JButton("Connect");
@@ -60,13 +61,13 @@ public class ConnectionDialog extends JDialog {
     
     private ApplicationMode connectionType;
     
-    private String databaseLocation;
+    private String databaseLocation = "";
     
-    private String hostname;
+    private String hostname = "";
     
     private int port;
     
-    protected ConnectionDialog(ApplicationMode type) {
+    public ConnectionDialog(ApplicationMode type, Configuration config) {
         connectionType = type;
         addListeners();
         
@@ -81,7 +82,8 @@ public class ConnectionDialog extends JDialog {
             this.setTitle("Connect to a remote database");
             mainPanel.add(networkClientPanel());
         }
-        
+        loadConfigurationData(config);
+
         this.setModal(true);
         this.add(mainPanel);
         this.pack();
@@ -89,6 +91,25 @@ public class ConnectionDialog extends JDialog {
         this.setMinimumSize(this.getSize());
         this.setResizable(false);
         this.setVisible(true);
+    }
+    
+    private void loadConfigurationData(Configuration config) {
+        String location = config.getDatabaseLocation();
+        String host = config.getHostname();
+        String portNumber = config.getPort();
+        
+        if (location != null) {
+            databaseLocation = location;
+            locationTextField.setText(databaseLocation);
+        }
+        if (host != null) {
+            hostname = host;
+            hostnameTextField.setText(hostname);
+        }
+        if (portNumber != null) {
+            port = Integer.parseInt(portNumber); // number format exception
+            portTextField.setText(portNumber);
+        }
     }
     
     private void addListeners() {
@@ -107,6 +128,7 @@ public class ConnectionDialog extends JDialog {
         
         DocumentListener listener = new ConnectButtonEnabler();
         locationTextField.getDocument().addDocumentListener(listener);
+        hostnameTextField.getDocument().addDocumentListener(listener);
         portTextField.getDocument().addDocumentListener(listener);
     }
     
@@ -166,9 +188,8 @@ public class ConnectionDialog extends JDialog {
         c.gridx = 1;
         c.gridy = 0;
         c.gridwidth = 2;
-        locationTextField.setColumns(25);
-        locationTextField.setEditable(true);
-        panel.add(locationTextField, c);
+        hostnameTextField.setColumns(25);
+        panel.add(hostnameTextField, c);
         
         c = new GridBagConstraints();
         c.gridx = 0;
@@ -230,7 +251,7 @@ public class ConnectionDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
         	if (connectionType == ApplicationMode.NETWORK_CLIENT) {
-        		hostname = locationTextField.getText();
+        		hostname = hostnameTextField.getText();
         	}
             ConnectionDialog.this.dispose();
         }
@@ -255,6 +276,7 @@ public class ConnectionDialog extends JDialog {
         
         public void check() {
             String location = locationTextField.getText().trim();
+            String host = hostnameTextField.getText().trim();
             String port = portTextField.getText().trim();
             
             if (connectionType == ApplicationMode.STANDALONE_CLIENT) {
@@ -266,7 +288,7 @@ public class ConnectionDialog extends JDialog {
                 }
             }
             else if (connectionType == ApplicationMode.NETWORK_CLIENT) {
-                if (location.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
+                if (host.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
                     connectButton.setEnabled(true);
                 }
                 else {

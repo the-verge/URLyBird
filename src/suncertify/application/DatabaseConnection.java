@@ -1,4 +1,4 @@
-package suncertify.connection;
+package suncertify.application;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
