@@ -5,7 +5,7 @@ public class ConfigurationException extends Exception {
     /**
      * The SUID.
      */
-    private static final long serialVersionUID = 2222;
+    private static final long serialVersionUID = 1111L;
 
     /**
      * Construct a new <code>ConfigurationException</code>.

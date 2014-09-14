@@ -26,6 +26,11 @@ import suncertify.network.Server;
 
 public class ServerWindow extends JFrame {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1991L;
+
     private static final int LOWEST_VALID_PORT = 1025;
     
     private static final int HIGHEST_VALID_PORT = 65535;

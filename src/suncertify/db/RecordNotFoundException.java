@@ -11,7 +11,7 @@ public class RecordNotFoundException extends Exception {
     /**
      * The SUID.
      */
-    private static final long serialVersionUID = 1661L;
+    private static final long serialVersionUID = 1441L;
 
     /**
      * Construct a new <code>RecordNotFoundException</code>.

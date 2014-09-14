@@ -12,7 +12,7 @@ public class RoomTableModel extends AbstractTableModel {
     /**
      * 
      */
-    private static final long serialVersionUID = 1991L;
+    private static final long serialVersionUID = 1881L;
     
     private Map<Integer, Room> roomMap = new LinkedHashMap<Integer, Room>();
 

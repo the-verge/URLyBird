@@ -15,7 +15,7 @@ public class DBException extends RuntimeException {
     /**
      * The SUID.
      */
-    private static final long serialVersionUID = 1991L;
+    private static final long serialVersionUID = 1221L;
 
     /**
      * Construct a new <code>DBException</code>.

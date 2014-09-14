@@ -12,7 +12,7 @@ public class DuplicateKeyException extends Exception {
     /**
      * The SUID.
      */
-    private static final long serialVersionUID = 1551L;
+    private static final long serialVersionUID = 1331L;
 
     /**
      * Construct a new <code>DuplicateKeyException</code>.

@@ -12,7 +12,7 @@ public class SecurityException extends Exception {
     /**
      * The SUID.
      */
-    private static final long serialVersionUID = 1881L;
+    private static final long serialVersionUID = 1551L;
 
     /**
      * Construct a new <code>SecurityException</code>.

@@ -14,7 +14,7 @@ public class NetworkException extends RuntimeException {
     /**
      * The SUID.
      */
-    private static final long serialVersionUID = 2112;
+    private static final long serialVersionUID = 2001L;
 
     /**
      * Construct a new <code>NetworkException</code>.

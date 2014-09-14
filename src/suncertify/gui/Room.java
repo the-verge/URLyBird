@@ -1,6 +1,5 @@
 package suncertify.gui;
 
-import java.io.Serializable;
 import java.util.logging.*;
 
 /**
@@ -8,13 +7,8 @@ import java.util.logging.*;
  * @author 
  *
  */
-public class Room implements Serializable {
+public class Room {
 
-    /**
-     * The SUID.
-     */
-    private static final long serialVersionUID = 1441L;
-    
     private int recNo;
     
     private String[] data;
@@ -64,9 +58,4 @@ public class Room implements Serializable {
         data[6] = owner;
     }
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-    
-    
 }

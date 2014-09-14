@@ -40,7 +40,7 @@ public class MainWindow extends JFrame implements Observer {
 	/**
      * 
      */
-    private static final long serialVersionUID = 1441L;
+    private static final long serialVersionUID = 1771L;
 
     private BusinessModel model;
     
