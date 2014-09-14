@@ -38,7 +38,7 @@ public class LockManager implements RecordLocker {
     /**
      * Logger instance for the LockManager class.
      */
-    private final Logger log = Logger.getLogger("LockManager.java");
+    private final Logger log = Logger.getLogger(LockManager.class.getName());
     
     /**
      * Locks a record by adding the record's number to the LOCKMAP

@@ -26,11 +26,6 @@ public class Data implements DB {
     private static DBAccessor database;
     
     /**
-     * Logger instance for Data.java.
-     */
-    private Logger log = Logger.getLogger("Data.java");
-    
-    /**
      * The constructor takes the file path of the database as its only argument.
      * @param dbLocation
      * @throws DBException if the <code>DBAccessor</code> instance 

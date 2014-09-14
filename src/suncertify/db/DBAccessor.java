@@ -113,7 +113,7 @@ public class DBAccessor {
     /**
      * Logger instance for DBAccessor.java.
      */
-    private Logger log = Logger.getLogger("DBAccessor.java");
+    private Logger log = Logger.getLogger(DBAccessor.class.getName());
     
     /**
      * Class constructor. All instances of the class share access
