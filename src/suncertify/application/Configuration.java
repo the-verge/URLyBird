@@ -8,8 +8,11 @@ public class Configuration {
     
     private String port;
     
-    public Configuration(String databaseLocation, String hostname, String port) {
+    public Configuration(String databaseLocation) {
         this.databaseLocation = databaseLocation;
+    }
+    
+    public Configuration(String hostname, String port) {
         this.hostname = hostname;
         this.port = port;
     }

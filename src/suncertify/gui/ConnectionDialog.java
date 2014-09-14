@@ -59,7 +59,7 @@ public class ConnectionDialog extends JDialog {
     
     private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
-    private ApplicationMode connectionType;
+    private ApplicationMode mode;
     
     private String databaseLocation = "";
     
@@ -67,22 +67,25 @@ public class ConnectionDialog extends JDialog {
     
     private int port;
     
-    public ConnectionDialog(ApplicationMode type, Configuration config) {
-        connectionType = type;
+    public ConnectionDialog(ApplicationMode mode, Configuration config) {
+        this.mode = mode;
         addListeners();
         
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         
-        if (type == ApplicationMode.STANDALONE_CLIENT) {
+        if (mode == ApplicationMode.STANDALONE_CLIENT) {
             this.setTitle("Connect to a local database");
             mainPanel.add(standAlonePanel());
         }
-        else if (type == ApplicationMode.NETWORK_CLIENT) {
+        else if (mode == ApplicationMode.NETWORK_CLIENT) {
             this.setTitle("Connect to a remote database");
             mainPanel.add(networkClientPanel());
         }
-        loadConfigurationData(config);
+        
+        if (config != null) {
+            loadConfigurationData(config);
+        }
 
         this.setModal(true);
         this.add(mainPanel);
@@ -94,21 +97,27 @@ public class ConnectionDialog extends JDialog {
     }
     
     private void loadConfigurationData(Configuration config) {
-        String location = config.getDatabaseLocation();
-        String host = config.getHostname();
-        String portNumber = config.getPort();
-        
-        if (location != null) {
-            databaseLocation = location;
-            locationTextField.setText(databaseLocation);
+       
+        if (mode == ApplicationMode.STANDALONE_CLIENT) {
+            String location = config.getDatabaseLocation();
+            
+            if (location != null) {
+                databaseLocation = location;
+                locationTextField.setText(databaseLocation);
+            }
         }
-        if (host != null) {
-            hostname = host;
-            hostnameTextField.setText(hostname);
-        }
-        if (portNumber != null) {
-            port = Integer.parseInt(portNumber); // number format exception
-            portTextField.setText(portNumber);
+        else if (mode == ApplicationMode.NETWORK_CLIENT) {
+            String host = config.getHostname();
+            String portNumber = config.getPort();
+            
+            if (host != null) {
+                hostname = host;
+                hostnameTextField.setText(hostname);
+            }
+            if (portNumber != null) {
+                port = Integer.parseInt(portNumber); // number format exception
+                portTextField.setText(portNumber);
+            }
         }
     }
     
@@ -250,7 +259,7 @@ public class ConnectionDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-        	if (connectionType == ApplicationMode.NETWORK_CLIENT) {
+        	if (mode == ApplicationMode.NETWORK_CLIENT) {
         		hostname = hostnameTextField.getText();
         	}
             ConnectionDialog.this.dispose();
@@ -279,7 +288,7 @@ public class ConnectionDialog extends JDialog {
             String host = hostnameTextField.getText().trim();
             String port = portTextField.getText().trim();
             
-            if (connectionType == ApplicationMode.STANDALONE_CLIENT) {
+            if (mode == ApplicationMode.STANDALONE_CLIENT) {
                 if (location.length() > MINIMUM_LOCATION_LENGTH) {
                     connectButton.setEnabled(true);
                 }
@@ -287,7 +296,7 @@ public class ConnectionDialog extends JDialog {
                     connectButton.setEnabled(false);
                 }
             }
-            else if (connectionType == ApplicationMode.NETWORK_CLIENT) {
+            else if (mode == ApplicationMode.NETWORK_CLIENT) {
                 if (host.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
                     connectButton.setEnabled(true);
                 }
@@ -313,10 +322,6 @@ public class ConnectionDialog extends JDialog {
         }        
         portTextField.setBorder(BorderFactory.createLineBorder(Color.RED));
         return false;
-    }
-    
-    public ApplicationMode getConnectionType() {
-        return connectionType;
     }
     
     public String getDatabaseLocation() {

@@ -13,6 +13,8 @@ import suncertify.network.NetworkException;
 
 public class Application {
     
+    private ApplicationMode mode;
+    
     private String databaseLocation;
     
     private String hostname;
@@ -47,8 +49,15 @@ public class Application {
 	}
 	
 	private void showConnectionDialog(ApplicationMode mode) {
-		Configuration config = PropertiesAccess.getConfiguration();
-	    ConnectionDialog dialog = new ConnectionDialog(mode, config);
+	    this.mode = mode;
+		Configuration config = null;
+        try {
+            config = PropertiesAccessor.getConfiguration(mode);
+        } catch (ConfigurationException e) {
+            JOptionPane.showMessageDialog(null, "Error reading configuration data.\nPlease enter details manually.", 
+                    "Could not load previous configuration", JOptionPane.ERROR_MESSAGE);
+        }
+        ConnectionDialog dialog = new ConnectionDialog(mode, config);
 	    
 		databaseLocation = dialog.getDatabaseLocation();
 		hostname = dialog.getHostname();
@@ -98,9 +107,19 @@ public class Application {
 	}
 	
 	private void saveConfiguration() {
-	    String portNumber = Integer.toString(port);
-	    Configuration config = new Configuration(databaseLocation, hostname, portNumber);
-	    PropertiesAccess.saveConfiguration(config);
+	    Configuration config = null;
+	    if (mode == ApplicationMode.STANDALONE_CLIENT) {
+	        config = new Configuration(databaseLocation);
+	    }
+	    else if (mode == ApplicationMode.NETWORK_CLIENT) {
+	        String portNumber = Integer.toString(port);
+	        config = new Configuration(hostname, portNumber);
+	    }
+	    try {
+            PropertiesAccessor.saveConfiguration(config, mode);
+        } catch (ConfigurationException e) {
+            //LOG EXCEPTION - Can't really do anything about this
+        }
 	}
 
 }
