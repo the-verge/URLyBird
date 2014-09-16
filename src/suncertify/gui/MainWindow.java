@@ -91,26 +91,28 @@ public class MainWindow extends JFrame implements Observer {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         
-        GridBagConstraints sidebarConstraints = new GridBagConstraints();
-        sidebarConstraints.gridx = 0;
-        sidebarConstraints.gridy = 0;
-        sidebarConstraints.fill = GridBagConstraints.VERTICAL;
-        mainPanel.add(this.SideBarPanel(), sidebarConstraints);
+        GridBagConstraints c;
         
-        GridBagConstraints tablePanelConstraints = new GridBagConstraints();
-        tablePanelConstraints.gridx = 1;
-        tablePanelConstraints.gridy = 0;
-        tablePanelConstraints.weightx = 1.0;
-        tablePanelConstraints.weighty = 1.0;
-        tablePanelConstraints.fill = GridBagConstraints.BOTH;
-        mainPanel.add(this.TablePanel(), tablePanelConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.VERTICAL;
+        mainPanel.add(this.SideBarPanel(), c);
         
-        GridBagConstraints bookPanelConstraints = new GridBagConstraints();
-        bookPanelConstraints.gridx = 1;
-        bookPanelConstraints.ipadx = 4;
-        bookPanelConstraints.ipady = 10;
-        bookPanelConstraints.anchor = GridBagConstraints.EAST;
-        mainPanel.add(this.BookPanel(), bookPanelConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.fill = GridBagConstraints.BOTH;
+        mainPanel.add(this.TablePanel(), c);
+        
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.ipadx = 4;
+        c.ipady = 10;
+        c.anchor = GridBagConstraints.EAST;
+        mainPanel.add(this.BookPanel(), c);
         
         this.add(mainPanel);
         this.setMinimumSize(new Dimension(750, 575));
@@ -122,44 +124,46 @@ public class MainWindow extends JFrame implements Observer {
     private JPanel SideBarPanel() {
     	JPanel panel = new JPanel(new GridBagLayout());
     	panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+    	
+    	GridBagConstraints c;
         
         JLabel nameLabel = new JLabel("Name");
-        GridBagConstraints nameLabelConstraints = new GridBagConstraints();
-        nameLabelConstraints.gridx = 0;
-        nameLabelConstraints.gridy = 1;
-        nameLabelConstraints.insets = new Insets(8, 8, 0, 0);
-        nameLabelConstraints.ipady = 4;
-        nameLabelConstraints.insets = new Insets(100, 5, 5, 5);
-        panel.add(nameLabel, nameLabelConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.insets = new Insets(8, 8, 0, 0);
+        c.ipady = 4;
+        c.insets = new Insets(100, 5, 5, 5);
+        panel.add(nameLabel, c);
         
         this.nameTextField = new JTextField(15);
-        GridBagConstraints nameFieldConstraints = new GridBagConstraints();
-        nameFieldConstraints.gridx = 1;
-        nameFieldConstraints.gridy = 1;
-        nameFieldConstraints.insets = new Insets(100, 5, 5, 5);
-        panel.add(nameTextField, nameFieldConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 1;
+        c.insets = new Insets(100, 5, 5, 5);
+        panel.add(nameTextField, c);
         
         JLabel locationLabel = new JLabel("Location");
-        GridBagConstraints locationLabelConstraints = new GridBagConstraints();
-        locationLabelConstraints.gridx = 0;
-        locationLabelConstraints.gridy = 2;
-        panel.add(locationLabel, locationLabelConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 2;
+        panel.add(locationLabel, c);
         
         this.locationTextField = new JTextField(15);
-        GridBagConstraints locationFieldConstraints = new GridBagConstraints();
-        locationFieldConstraints.gridx = 1;
-        locationFieldConstraints.gridy = 2;
-        panel.add(locationTextField, locationFieldConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 2;
+        panel.add(locationTextField, c);
         
         this.searchButton = new JButton("Search");
         searchButton.addActionListener(new SearchButtonListener());
-        GridBagConstraints searchButtonConstraints = new GridBagConstraints();
-        searchButtonConstraints.gridx = 1;
-        searchButtonConstraints.gridy = 3;
-        searchButtonConstraints.weighty = 1.0;
-        searchButtonConstraints.insets = new Insets(10, 5, 5, 5);
-        searchButtonConstraints.anchor = GridBagConstraints.NORTHEAST;
-        panel.add(searchButton, searchButtonConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 3;
+        c.weighty = 1.0;
+        c.insets = new Insets(10, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHEAST;
+        panel.add(searchButton, c);
         
         return panel;
     }
@@ -177,12 +181,14 @@ public class MainWindow extends JFrame implements Observer {
     	
     	JPanel panel = new JPanel(new GridBagLayout());
     	
+    	GridBagConstraints c;
+    	
     	JLabel customerIdLabel = new JLabel("Customer ID:");
-    	GridBagConstraints customerLabelConstraints = new GridBagConstraints();
-    	customerLabelConstraints.gridx = 0;
-    	customerLabelConstraints.gridy = 0;
-    	customerLabelConstraints.insets = new Insets(10, 0, 0, 15);
-        panel.add(customerIdLabel, customerLabelConstraints);
+    	c = new GridBagConstraints();
+    	c.gridx = 0;
+    	c.gridy = 0;
+    	c.insets = new Insets(10, 0, 0, 15);
+        panel.add(customerIdLabel, c);
         
         MaskFormatter eightDigits = null;
 		try {
@@ -193,22 +199,22 @@ public class MainWindow extends JFrame implements Observer {
 			e1.printStackTrace();
 		}
 		customerIdTextField.setColumns(10);
-		GridBagConstraints customerFieldConstraints = new GridBagConstraints();
-        customerFieldConstraints.gridx = 1;
-        customerFieldConstraints.gridy = 0;
-        customerFieldConstraints.insets = new Insets(10, 0, 0, 25);
-        panel.add(customerIdTextField, customerFieldConstraints);
+		c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 0;
+        c.insets = new Insets(10, 0, 0, 25);
+        panel.add(customerIdTextField, c);
         
         bookButton = new JButton("Book");
         bookButton.setEnabled(false);
         customerIdTextField.addKeyListener(new ButtonEnabler(customerIdTextField, bookButton, 8));
         bookButton.addActionListener(new BookButtonListener());
-        GridBagConstraints bookButtonConstraints = new GridBagConstraints();
-        bookButtonConstraints.gridx = 2;
-        bookButtonConstraints.gridy = 0;
-        bookButtonConstraints.insets = new Insets(10, 0, 0, 25);
-        bookButtonConstraints.anchor = GridBagConstraints.SOUTHEAST;
-        panel.add(bookButton, bookButtonConstraints);
+        c = new GridBagConstraints();
+        c.gridx = 2;
+        c.gridy = 0;
+        c.insets = new Insets(10, 0, 0, 25);
+        c.anchor = GridBagConstraints.SOUTHEAST;
+        panel.add(bookButton, c);
         
         return panel;
     }
