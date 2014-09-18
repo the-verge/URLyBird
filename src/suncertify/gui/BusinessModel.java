@@ -59,20 +59,34 @@ public class BusinessModel {
 	    int recNo = room.getRecNo();
 	    String[] data = room.getData();
 	    
-		try {
-            long lockCookie = dataAccess.lock(recNo);
-            dataAccess.update(recNo, data, lockCookie);
-            dataAccess.unlock(recNo, lockCookie);
-        } catch (RecordNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+	    if (alreadyBooked(recNo)) {
+	    	throw new RecordNotFoundException();
+	    }
+	    else {
+	    	try {
+	            long lockCookie = dataAccess.lock(recNo);
+	            dataAccess.update(recNo, data, lockCookie);
+	            dataAccess.unlock(recNo, lockCookie);
+	        } catch (RecordNotFoundException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        } catch (SecurityException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+		
 		fireModelChangeEvent();
 	}
 	
+	private boolean alreadyBooked(int recNo) throws RecordNotFoundException {
+		String[] roomData = dataAccess.read(recNo);
+		String owner = roomData[6];
+		if (owner.equals("")) {
+			return false;
+		}
+		return true;
+	}
 	
 	
 }

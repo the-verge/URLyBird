@@ -311,7 +311,9 @@ public class MainWindow extends JFrame implements Observer {
     }
     
     private class BookButtonListener implements ActionListener {
-
+    	
+    	MainWindow parent = MainWindow.this;
+    	
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    int selectedRowIndex = table.getSelectedRow();
@@ -325,8 +327,9 @@ public class MainWindow extends JFrame implements Observer {
                 JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
             }
 		    catch (RecordNotFoundException e2) {
-                // TODO Auto-generated catch block
-                e2.printStackTrace();
+		    	setUpTable();
+		    	 JOptionPane.showMessageDialog(parent, "Sorry, this room is no longer available", 
+		                    "Room already booked", JOptionPane.ERROR_MESSAGE);
             }
 		    customerIdTextField.setText("");
 		    bookButton.setEnabled(false);
