@@ -27,7 +27,7 @@ public class Data implements DB {
     
     /**
      * The constructor takes the file path of the database as its only argument.
-     * @param dbLocation
+     * @param dbLocation the path to the database file.
      * @throws DBException if the <code>DBAccessor</code> instance 
      * 			<code>database</code> cannot be instantiated. 
      */

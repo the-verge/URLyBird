@@ -2,11 +2,11 @@ package suncertify.db;
 
 /**
  * This exception is implemented to handle exceptions
- * such as FileNotFoundException, IOException and
- * UnsupportedEncodingException which result from operations in the 
- * DBAccessor and LockManager classes. It extends RuntimeException 
- * (which is not a checked exception) in order to maintain compliance
- * with supplied DB interface.
+ * such as <code>FileNotFoundException</code>, <code>IOException</code> and
+ * <code>UnsupportedEncodingException</code> which result from operations in the 
+ * <code>DBAccessor</code> and <code>LockManager</code> classes. It extends 
+ * <code>RuntimeException</code> (which is not a checked exception) in order 
+ * to maintain compliance with supplied <code>DB</code> interface.
  * @author john
  *
  */

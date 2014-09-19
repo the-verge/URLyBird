@@ -1,5 +1,11 @@
 package suncertify.application;
 
+/**
+ * This exception is used to wrap <code>IOException</code> if it is thrown
+ * from the private methods in the <code>PropertiesAccessor</code> class.
+ * @author john
+ *
+ */
 public class ConfigurationException extends Exception {
     
     /**
@@ -19,7 +25,7 @@ public class ConfigurationException extends Exception {
      * that wraps another exception.
      * @param message the exception message.
      * @param throwable the <code>Throwable</code> to wrap in
-     *         <code>DBException</code>.
+     *         <code>ConfigurationException</code>.
      */
     public ConfigurationException(String message, Throwable throwable) {
         super(message, throwable);
