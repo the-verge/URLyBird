@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -332,7 +331,6 @@ public class MainWindow extends JFrame implements Observer {
 		    try {
                 model.book(room);
             } catch (RecordNotFoundException ex) {
-                refreshTable();
                 ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
                             "Room already booked");
             } catch (SecurityException ex) {
@@ -342,6 +340,8 @@ public class MainWindow extends JFrame implements Observer {
                 ErrorDialog.showDialog(parent, "Could not complete booking", "Database error");
             } catch (NetworkException ex) {
                 ErrorDialog.showDialog(parent, "Could not complete booking", "Network error");
+            } finally {
+                refreshTable();
             }
 		    
 		    customerIdTextField.setText("");
