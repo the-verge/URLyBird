@@ -12,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
@@ -172,9 +171,9 @@ public class ServerWindow extends JFrame {
 		        portTextField.setEditable(false);
 		        browseButton.setEnabled(false);
 		        ServerWindow.this.setTitle("URLyBird Server - Running...");
-			} catch (NetworkException e1) {
-				JOptionPane.showMessageDialog(null, e1.getMessage(), 
-						"Could not start server", JOptionPane.ERROR_MESSAGE);
+			} catch (NetworkException ex) {
+				ErrorDialog.showDialog(null, ex.getMessage(), "Could not start server");
+				System.exit(1);
 			}
         }
     }
@@ -184,10 +183,6 @@ public class ServerWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println("Stopping server...");
-//            Server.stopServer(port);
-//            startButton.setEnabled(true);
-//            browseButton.setEnabled(true);
-//            portTextField.setEditable(true);
             System.exit(0);
         }
     }

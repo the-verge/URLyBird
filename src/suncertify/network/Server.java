@@ -8,27 +8,26 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Server {
 	
-	private static Registry rmiRegistry;
-	
 	public static void startServer(String dbLocation, int port) {
 		try {
-			rmiRegistry = LocateRegistry.createRegistry(port);
+			LocateRegistry.createRegistry(port);
 			registerObject(dbLocation, port);
 			System.out.println("RMI registry running on port " + port);
+
 		} 
 		catch (RemoteException e) {
 			Throwable cause = e.getCause();
 			if (cause instanceof BindException) {
 				/**
 				 * Throw NetworkException here to remove need to 
-				 * have explicit exception handling in the ServerWindow GUI.
+				 * have explicit handling of RemoteExceptionin the ServerWindow GUI.
 				 * The GUI would be tied to an RMI implementation if we
 				 * handle RemoteException in the GUI.
 				 */
 				throw new NetworkException("Port " + port + " is already in use", e);
 			}
 			else {
-				throw new NetworkException("Network error", e);
+				throw new NetworkException("Server error", e);
 			}
 		}
 	}
@@ -39,19 +38,4 @@ public class Server {
 		registry.rebind("Data", remoteObject);
     }
 	
-	/**
-	 * PERHAPS REMOVE THIS
-	 * @param port
-	 */
-	public static void stopServer(int port) {
-		try {
-			if (rmiRegistry != null) {
-			    UnicastRemoteObject.unexportObject(rmiRegistry, true);
-			}
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 }
