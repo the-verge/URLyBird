@@ -6,7 +6,6 @@ import suncertify.db.DB;
 import suncertify.db.DBException;
 import suncertify.gui.BusinessModel;
 import suncertify.gui.ConnectionDialog;
-import suncertify.gui.GUIController;
 import suncertify.gui.MainWindow;
 import suncertify.gui.ServerWindow;
 import suncertify.network.NetworkException;
@@ -164,8 +163,7 @@ public class Application {
 	 */
 	private void createClientGUI(DB dataAccess) {
 		BusinessModel model = new BusinessModel(dataAccess);
-	    MainWindow view = new MainWindow(model);
-	    GUIController controller = new GUIController(model, view);
+	    new MainWindow(model);
 	}
 	
 	/**

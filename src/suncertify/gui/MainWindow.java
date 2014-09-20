@@ -44,8 +44,6 @@ public class MainWindow extends JFrame implements Observer {
 
     private BusinessModel model;
     
-    private GUIController controller;
-	
 	private RoomTableModel tableModel = new RoomTableModel();
 	
 	private JTable table = new JTable(tableModel);
@@ -66,10 +64,6 @@ public class MainWindow extends JFrame implements Observer {
         this.model.addObserver(this);
         setUpGUI();
         setUpTable();
-    }
-    
-    protected void addUserGestureListener(GUIController controller) {
-        this.controller = controller;
     }
     
     @Override
@@ -322,7 +316,7 @@ public class MainWindow extends JFrame implements Observer {
 		    room.setOwner(customerId);
 		    
 		    try {
-                controller.book(room);
+                model.book(room);
             } catch (DBException e1) {
                 JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
             }
