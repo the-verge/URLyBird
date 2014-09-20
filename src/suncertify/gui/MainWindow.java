@@ -33,6 +33,8 @@ import javax.swing.text.MaskFormatter;
 
 import suncertify.db.DBException;
 import suncertify.db.RecordNotFoundException;
+import suncertify.db.SecurityException;
+import suncertify.network.NetworkException;
  
 
 public class MainWindow extends JFrame implements Observer {
@@ -41,8 +43,12 @@ public class MainWindow extends JFrame implements Observer {
      * 
      */
     private static final long serialVersionUID = 1771L;
+    
+    private static final String EIGHT_DIGITS_MASK = "########";
 
     private BusinessModel model;
+    
+    private SearchCriteria lastSearch = null;
     
 	private RoomTableModel tableModel = new RoomTableModel();
 	
@@ -63,7 +69,7 @@ public class MainWindow extends JFrame implements Observer {
         this.model = businessModel;
         this.model.addObserver(this);
         setUpGUI();
-        setUpTable();
+        refreshTable();
     }
     
     @Override
@@ -186,11 +192,15 @@ public class MainWindow extends JFrame implements Observer {
         
         MaskFormatter eightDigits = null;
 		try {
-			eightDigits = new MaskFormatter("########");
+			eightDigits = new MaskFormatter(EIGHT_DIGITS_MASK);
 			this.customerIdTextField = new JFormattedTextField(eightDigits);
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			/**
+			 * While catch blocks that swallow exceptions are a bad idea
+			 * in this case I feel that it is acceptable given that the
+			 * mask to be used is a pre-defined hard coded constant.  As
+			 * a result ParseException should never be thrown. 
+			 */
 		}
 		customerIdTextField.setColumns(10);
 		c = new GridBagConstraints();
@@ -213,20 +223,23 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
     
-    private void setUpTable() {
-        Map<Integer, Room> allRooms = new LinkedHashMap<Integer, Room>();
-        SearchCriteria criteria = new SearchCriteria();
-        criteria.matchAllRecords();
+    private void refreshTable() {
+        Map<Integer, Room> rooms = new LinkedHashMap<Integer, Room>();
+        SearchCriteria criteria;
+        if (lastSearch == null) {
+            criteria = new SearchCriteria();
+            criteria.matchAllRecords();
+        }
+        else {
+            criteria = lastSearch;
+        }
 		try {
-		    allRooms = model.searchRooms(criteria);
-		    tableModel.setRoomMap(allRooms);
+		    rooms = model.searchRooms(criteria);
+		    tableModel.setRoomMap(rooms);
 		} catch (DBException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			// what to do here ?
-			System.exit(1);
-		} catch (RecordNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            ErrorDialog.showDialog(this, "Cannot show the latest bookings", "Database error");
+        } catch (NetworkException e) {
+            ErrorDialog.showDialog(this, "Cannot show the latest bookings", "Network error");
         }
     }
     
@@ -275,7 +288,9 @@ public class MainWindow extends JFrame implements Observer {
     }
     
     private class SearchButtonListener implements ActionListener {
-
+        
+        MainWindow parent = MainWindow.this;
+        
 		@Override
         public void actionPerformed(ActionEvent e) {
             String name = nameTextField.getText().trim();
@@ -293,13 +308,12 @@ public class MainWindow extends JFrame implements Observer {
             
             try {
                 matches = model.searchRooms(criteria);
-            } catch (DBException e1) {
-                JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
-            } catch (RecordNotFoundException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (DBException ex) {
+                ErrorDialog.showDialog(parent, "Could not retrieve data", "Database error");
+            } catch (NetworkException ex) {
+                ErrorDialog.showDialog(parent, "Could not retrieve data", "Network error");
             }
-            
+            lastSearch = criteria;
             tableModel.setRoomMap(matches);
         }
     }
@@ -317,14 +331,19 @@ public class MainWindow extends JFrame implements Observer {
 		    
 		    try {
                 model.book(room);
-            } catch (DBException e1) {
-                JOptionPane.showMessageDialog(MainWindow.this, e1.getMessage());
+            } catch (RecordNotFoundException ex) {
+                refreshTable();
+                ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
+                            "Room already booked");
+            } catch (SecurityException ex) {
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            } catch (DBException ex) {
+                ErrorDialog.showDialog(parent, "Could not complete booking", "Database error");
+            } catch (NetworkException ex) {
+                ErrorDialog.showDialog(parent, "Could not complete booking", "Network error");
             }
-		    catch (RecordNotFoundException e2) {
-		    	setUpTable();
-		    	 JOptionPane.showMessageDialog(parent, "Sorry, this room is no longer available", 
-		                    "Room already booked", JOptionPane.ERROR_MESSAGE);
-            }
+		    
 		    customerIdTextField.setText("");
 		    bookButton.setEnabled(false);
 		}

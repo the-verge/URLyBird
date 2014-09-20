@@ -1,26 +1,21 @@
 package suncertify.gui;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 
 import suncertify.db.DB;
-import suncertify.db.DBException;
-import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 
 /**
- * ALL METHODS IN THIS CLASS THROW NETWORK EXCEPTION
- * IF THE DB IS AN INSTANCE OF DataProxy
- * @author ejhnhng
+ * 
+ * @author john
  *
  */
 public class BusinessModel {
 	
-	private static List<Observer> observers = new ArrayList<Observer>();
+	private Observer observer;
 	
 	private DB dataAccess;
 	
@@ -29,17 +24,15 @@ public class BusinessModel {
 	}
 	
 	public void addObserver(Observer observer) {
-		observers.add(observer);
+		this.observer = observer;
 	}
 	
 	public void fireModelChangeEvent() {
-		for (Observer observer: observers) {
-			// change params after
-			observer.update(null, null);
-		}
+	    // INVESTIGATE
+		observer.update(null, null);
 	}
 	
-	public Map<Integer, Room> searchRooms(SearchCriteria criteria) throws RecordNotFoundException {
+	public Map<Integer, Room> searchRooms(SearchCriteria criteria) {
         
         String[] searchCriteria = criteria.getCriteria();
         int[] matchingRecordNumbers = dataAccess.find(searchCriteria);
@@ -47,15 +40,29 @@ public class BusinessModel {
         
         for (int i = 0; i < matchingRecordNumbers.length; i++) {
             int recNo = matchingRecordNumbers[i];
-            String[] data = dataAccess.read(recNo);
-            Room room = new Room(recNo, data);
-            roomMap.put(i, room);
+            String[] data = null;
+            try {
+                data = dataAccess.read(recNo);
+                Room room = new Room(recNo, data);
+                roomMap.put(i, room);
+            } catch (RecordNotFoundException e) {
+                /*
+                 * RecordNotFoundException will be thrown by the DB.read(int recNo)
+                 * method if the record is marked as deleted. It is possible that
+                 * another client that uses Data.java has deleted a record number 
+                 * that matched the search criteria before this method invokes the 
+                 * DB.read(int recNo) method.  We don't want to display deleted 
+                 * records, so the exception is caught here and the loop continue.
+                 * Only non deleted records will be passed to the Room constructor.
+                 */
+                continue;
+            }
         }
         
         return roomMap;
     }   
 	
-	public void book(Room room) throws RecordNotFoundException {
+	public void book(Room room) throws RecordNotFoundException, SecurityException {
 	    int recNo = room.getRecNo();
 	    String[] data = room.getData();
 	    
@@ -63,19 +70,19 @@ public class BusinessModel {
 	    	throw new RecordNotFoundException();
 	    }
 	    else {
-	    	try {
-	            long lockCookie = dataAccess.lock(recNo);
-	            dataAccess.update(recNo, data, lockCookie);
-	            dataAccess.unlock(recNo, lockCookie);
-	        } catch (RecordNotFoundException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	        } catch (SecurityException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	        }
+	        long lockCookie = dataAccess.lock(recNo);
+            try {
+                dataAccess.update(recNo, data, lockCookie);
+            } catch (SecurityException e) {
+                throw new SecurityException("Could not complete booking");
+            }
+            try {
+                dataAccess.unlock(recNo, lockCookie);
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 	    }
-		
 		fireModelChangeEvent();
 	}
 	

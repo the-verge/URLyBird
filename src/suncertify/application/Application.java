@@ -1,11 +1,11 @@
 package suncertify.application;
 
-import javax.swing.JOptionPane;
 
 import suncertify.db.DB;
 import suncertify.db.DBException;
 import suncertify.gui.BusinessModel;
 import suncertify.gui.ConnectionDialog;
+import suncertify.gui.ErrorDialog;
 import suncertify.gui.MainWindow;
 import suncertify.gui.ServerWindow;
 import suncertify.network.NetworkException;
@@ -55,6 +55,8 @@ public class Application {
 	 * Examines the supplied command line arguments and
 	 * decides whether a client <code>ConnectionDialog</code>
 	 * or <code>ServerWindow</code> is to be displayed.
+	 * If more than one argument is supplied only the first
+	 * is taken into account.
 	 * @param args the command line arguments supplied by the user
      *        to indicate which mode should be run.
 	 */
@@ -64,7 +66,6 @@ public class Application {
 			showConnectionDialog(ApplicationMode.NETWORK_CLIENT);
 		}
 		else {
-			// only take into account 1st arg
 			String mode = args[0].trim();
 			if (mode.equalsIgnoreCase("alone")) {
 				showConnectionDialog(ApplicationMode.STANDALONE_CLIENT);
@@ -73,9 +74,8 @@ public class Application {
 				showServerWindow();
 			}
 			else {
-				JOptionPane.showMessageDialog(null, "Valid arguments are:\n\n1: server,\n2: alone, \n3: leave blank.", 
-						"Invalid arguments", JOptionPane.ERROR_MESSAGE);
-				
+				ErrorDialog.showDialog(null, "Valid arguments are:\n\n1: server,\n2: alone, \n3: leave blank.", 
+				                        "Invalid arguments");
 				System.exit(1);
 			}
 		}
@@ -94,8 +94,8 @@ public class Application {
         try {
             config = PropertiesAccessor.getConfiguration(mode);
         } catch (ConfigurationException e) {
-            JOptionPane.showMessageDialog(null, "Error reading configuration data.\nPlease enter details manually.", 
-                    "Could not load previous configuration", JOptionPane.ERROR_MESSAGE);
+            ErrorDialog.showDialog(null, "Error reading configuration data.\nPlease enter details manually.", 
+                    "Could not load previous configuration");
         }
         ConnectionDialog dialog = new ConnectionDialog(mode, config);
 	    
@@ -128,10 +128,9 @@ public class Application {
 		try {
 			dataAccess = DatabaseConnection.getLocalConnection(dbLocation);
 			createClientGUI(dataAccess);
-		    saveConfiguration(); // investigate
+		    saveConfiguration();
 		} catch (DBException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), 
-					"Connection error", JOptionPane.ERROR_MESSAGE);
+			ErrorDialog.showDialog(null, e.getMessage(), "Connection error");
 			//System.exit(1);
 		}
 	}
@@ -150,8 +149,7 @@ public class Application {
 			createClientGUI(dataAccess);
 		    saveConfiguration();
 		} catch (DBException | NetworkException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), 
-					"Could not connect to server", JOptionPane.ERROR_MESSAGE);
+			ErrorDialog.showDialog(null, e.getMessage(), "Could not connect to server");
 			// MAYBE SHOULD LEAVE DIALOG OPEN
 		}
 	}
