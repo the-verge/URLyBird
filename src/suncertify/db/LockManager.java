@@ -1,8 +1,13 @@
 package suncertify.db;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
+
 import suncertify.db.SecurityException;
 
 /**
@@ -40,6 +45,10 @@ public class LockManager implements RecordLocker {
      */
     private final Logger log = Logger.getLogger(LockManager.class.getName());
     
+    private static Timer timer = new Timer(true);
+    
+    private static List<Long> timedOutLocks = new ArrayList<Long>();
+    
     /**
      * Locks a record by adding the record's number to the LOCKMAP
      * HashMap as key, with the generated cookie as value.  If a 
@@ -59,7 +68,6 @@ public class LockManager implements RecordLocker {
         synchronized (MUTEX) {
             while (LOCKMAP.containsKey(recNo)) {
                 System.out.println(threadName + ": Record number " + recNo + " is locked.  waiting...");
-                System.out.println(threadName + ": STATE: " + Thread.currentThread().getState());
                 try {
                     MUTEX.wait();
                 } catch (InterruptedException e) {
@@ -74,6 +82,8 @@ public class LockManager implements RecordLocker {
                      + threadName + " cookie: " + cookie);
             
             LOCKMAP.put(recNo, cookie);
+            TimeoutTask timeout = new TimeoutTask(recNo, cookie);
+            timer.schedule(timeout, 5000);
             log.fine("Total number of locks: " + LOCKMAP.size());
             System.out.println(threadName + ": Locked record number " + recNo);
             log.exiting("LockManger.java", "lockRecord",
@@ -100,15 +110,18 @@ public class LockManager implements RecordLocker {
                       new Object[]{threadName, recNo, cookie});
         
         synchronized (MUTEX) {
-            if (LOCKMAP.get(recNo) == cookie) {
+            if (timedOutLocks.contains(cookie) || LOCKMAP.get(recNo) == null) {
+                System.out.println(threadName + " " + recNo + " LOCK HAS ALREADY TIMED OUT");
+            }
+            else if (LOCKMAP.get(recNo) == cookie) {
                 System.out.println(threadName + ": Unlocking record number " + recNo);
                 LOCKMAP.remove(recNo);
                 MUTEX.notifyAll();
                 System.out.println(threadName + ": Notifying threads that record number " + recNo + " is unlocked");
             }
             else {
-                log.warning("An illegal attempt was made to unlock record number " + recNo);
-                throw new SecurityException();
+                log.warning(threadName + ": An illegal attempt was made to unlock record number " + recNo);
+                //throw new SecurityException();
             }
         }
     }
@@ -130,6 +143,35 @@ public class LockManager implements RecordLocker {
      */
     public Map<Integer, Long> getLockMap() {
         return LOCKMAP;
+    }
+    
+    private class TimeoutTask extends TimerTask {
+        
+        int recNo;
+        
+        long lockCookie;
+        
+        TimeoutTask(int recNo, long cookie) {
+            this.recNo = recNo;
+            this.lockCookie = cookie;
+        }
+        
+        @Override
+        public void run() {
+            Long cookie = LOCKMAP.get(recNo);
+            
+            if (cookie != null && cookie == lockCookie) {
+                try {
+                    unlockRecord(recNo, cookie);
+                } catch (SecurityException e) {
+                    // TODO Auto-generated catch block
+                    //e.printStackTrace();
+                }
+                timedOutLocks.add(cookie);
+                System.out.println("REMOVED " + recNo + " FROM MAP AND NOTIFIED ALL THREADS.....");
+            }
+        }
+
     }
 
 }

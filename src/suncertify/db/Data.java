@@ -18,7 +18,7 @@ public class Data implements DB {
      * The static LockManager instance takes care of record 
      * locking and unlocking.
      */
-    private static LockManager lockManager = new LockManager();
+    private static RecordLocker lockManager = new LockManager();
     
     /**
      * The static DBAccessor instance manages access to the database.
@@ -122,18 +122,21 @@ public class Data implements DB {
     public void unlock(int recNo, long cookie) throws RecordNotFoundException,
             SecurityException {
         
-        if (isValidCookie(recNo, cookie)) {
-            lockManager.unlockRecord(recNo, cookie);
-        }
-        else {
-            throw new SecurityException("Attempt to unlock record " 
-                    + recNo + " with invalid lockCookie");
-        }
+        lockManager.unlockRecord(recNo, cookie);
+//        if (isValidCookie(recNo, cookie)) {
+//            lockManager.unlockRecord(recNo, cookie);
+//        }
+//        else {
+//            throw new SecurityException("Attempt to unlock record " 
+//                    + recNo + " with invalid lockCookie");
+//        }
     }
     
     private boolean isValidCookie(int recNo, long lockCookie) {
         // POSSIBLE NPE TO HANDLE
-        if (lockManager.getLockMap().get(recNo) == lockCookie) {
+        Long cookie = lockManager.getLockMap().get(recNo);
+        
+        if (cookie != null && cookie == lockCookie) {
             return true;
         }
         return false;
