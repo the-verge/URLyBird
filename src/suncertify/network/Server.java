@@ -6,8 +6,23 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * The <code>Server</code> class starts RMI registry
+ * programmatically and registers an instance of 
+ * <code>DataRemoteAdapterImpl</code>, binding the
+ * <code>DataRemoteAdapterImpl</code> to the name
+ * "Data" in the registry.
+ * @author john
+ *
+ */
 public class Server {
 	
+    /**
+     * Starts RMI registry and registers <code>DataRemoteAdapterImpl</code>.
+     * @param dbLocation the location of the database on the database server
+     *        machine.
+     * @param port the port on which to run RMI registry.
+     */
 	public static void startServer(String dbLocation, int port) {
 		try {
 			LocateRegistry.createRegistry(port);
@@ -32,6 +47,13 @@ public class Server {
 		}
 	}
 	
+	/**
+	 * Exports <code>DataRemoteAdapterImpl</code> to an RMI registry.
+	 * @param dbLocation the location of the database on the database server
+     *        machine.
+	 * @param port the port on which RMI registry is running.
+	 * @throws RemoteException if a networking error occurs.
+	 */
 	private static void registerObject(String dbLocation, int port) throws RemoteException {
 		DataRemoteAdapterImpl remoteObject = new DataRemoteAdapterImpl(dbLocation);
 		Registry registry = LocateRegistry.getRegistry(port);

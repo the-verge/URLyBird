@@ -32,11 +32,6 @@ public class DataRemoteAdapterImpl extends UnicastRemoteObject
     private DB database;
     
     /**
-     * Logger for <code>DataRemoteImpl</code>.
-     */
-    private transient Logger log = Logger.getLogger("DataRemoteImpl.java");
-    
-    /**
      * Class constructor.
      * @param dbLocation the path to the database file.
      * @throws RemoteException if a network error occurs.

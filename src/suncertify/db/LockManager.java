@@ -123,10 +123,9 @@ public class LockManager implements RecordLocker {
     }
     
     /**
-     * REMOVE AFTER TESTING
      * Gets the HashMap that maps locked record numbers
      * to the cookies they are locked with.
-     * @return 
+     * @return LOCKMAP
      */
     public Map<Integer, Long> getLockMap() {
         return LOCKMAP;
