@@ -1,5 +1,7 @@
 package suncertify.gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -28,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.text.MaskFormatter;
 
 import suncertify.db.DBException;
@@ -67,6 +70,8 @@ public class MainWindow extends JFrame implements Observer {
         super("URLyBird");
         this.model = businessModel;
         this.model.addObserver(this);
+        this.createStripedTable();
+        table.setSelectionBackground(Color.decode("#8AA37B"));
         setUpGUI();
         refreshTable();
     }
@@ -75,6 +80,25 @@ public class MainWindow extends JFrame implements Observer {
     public void update(Observable arg0, Object arg1) {
         // TODO Auto-generated method stub
         tableModel.fireTableDataChanged();
+    }
+    
+    private void createStripedTable() {
+        
+        table = new JTable(tableModel) {
+            
+            private static final long serialVersionUID = 2442L;
+
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component comp = super.prepareRenderer(renderer, row, column);
+                if (!isRowSelected(row)) {
+                    comp.setBackground(getBackground());
+                    if(row % 2 == 0) {
+                        comp.setBackground(Color.decode("#E0EEEE"));
+                    }
+                }
+                return comp;
+            }
+        };
     }
     
     private void setUpGUI() {
@@ -218,7 +242,7 @@ public class MainWindow extends JFrame implements Observer {
         c.insets = new Insets(10, 0, 0, 25);
         c.anchor = GridBagConstraints.SOUTHEAST;
         panel.add(bookButton, c);
-        
+
         return panel;
     }
     
