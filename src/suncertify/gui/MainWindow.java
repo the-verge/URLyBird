@@ -358,8 +358,7 @@ public class MainWindow extends JFrame implements Observer {
                 ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
                             "Room already booked");
             } catch (SecurityException ex) {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
+                ErrorDialog.showDialog(parent, "Could not complete booking", "Error");
             } catch (DBException ex) {
                 ErrorDialog.showDialog(parent, "Could not complete booking", "Database error");
             } catch (NetworkException ex) {

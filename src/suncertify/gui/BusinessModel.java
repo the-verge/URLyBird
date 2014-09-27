@@ -52,7 +52,7 @@ public class BusinessModel {
                  * another client that uses Data.java has deleted a record number 
                  * that matched the search criteria before this method invokes the 
                  * DB.read(int recNo) method.  We don't want to display deleted 
-                 * records, so the exception is caught here and the loop continue.
+                 * records, so the exception is caught here and the loop continues.
                  * Only non deleted records will be passed to the Room constructor.
                  */
                 continue;
@@ -74,13 +74,19 @@ public class BusinessModel {
             try {
                 dataAccess.update(recNo, data, lockCookie);
             } catch (SecurityException e) {
-                throw new SecurityException("Could not complete booking");
+                throw new SecurityException();
             }
             try {
                 dataAccess.unlock(recNo, lockCookie);
             } catch (SecurityException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                /**
+                 * Nothing of use can be displayed to the
+                 * client if for some reason a SecurityException
+                 * is thrown when unlocking a record.  Given the 
+                 * locking mechanism that is in place, 
+                 * SecurityException should never be thrown,
+                 * but it is handled here by not doing anything.
+                 */
             }
 	    }
 		fireModelChangeEvent();
