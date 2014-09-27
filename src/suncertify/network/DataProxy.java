@@ -25,7 +25,6 @@ public class DataProxy implements DB {
 		this.database = database;
 	}
 	
-	// WHAT ABOUT IOExceptions / DBExceptions ?
 	/**
 	 * {@inheritDoc}
 	 * @throws DBException if the read operation fails.

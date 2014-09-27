@@ -4,7 +4,7 @@ import java.net.BindException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
+
 
 /**
  * The <code>Server</code> class starts RMI registry
@@ -22,6 +22,8 @@ public class Server {
      * @param dbLocation the location of the database on the database server
      *        machine.
      * @param port the port on which to run RMI registry.
+     * @throws DBException if a problem occurs registering
+     *         a remote object in the RMI registry.
      */
 	public static void startServer(String dbLocation, int port) {
 		try {
@@ -35,9 +37,9 @@ public class Server {
 			if (cause instanceof BindException) {
 				/**
 				 * Throw NetworkException here to remove need to 
-				 * have explicit handling of RemoteExceptionin the ServerWindow GUI.
-				 * The GUI would be tied to an RMI implementation if we
-				 * handle RemoteException in the GUI.
+				 * have explicit handling of RemoteException in the
+				 * ServerWindow GUI. The GUI would be tied to an RMI 
+				 * implementation if we handle RemoteException in the GUI.
 				 */
 				throw new NetworkException("Port " + port + " is already in use", e);
 			}
@@ -53,6 +55,8 @@ public class Server {
      *        machine.
 	 * @param port the port on which RMI registry is running.
 	 * @throws RemoteException if a networking error occurs.
+	 * @throws DBException if the <code>DataRemoteAdapterImpl<code>
+     *         instance <code>remoteObject</code> cannot be created.
 	 */
 	private static void registerObject(String dbLocation, int port) throws RemoteException {
 		DataRemoteAdapterImpl remoteObject = new DataRemoteAdapterImpl(dbLocation);

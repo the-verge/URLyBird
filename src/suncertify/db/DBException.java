@@ -28,6 +28,15 @@ public class DBException extends RuntimeException {
      * Construct a new <code>DBException</code> with message,
      * that wraps another exception.
      * @param message the exception message.
+     */
+    public DBException(String message) {
+        super(message);
+    }
+    
+    /**
+     * Construct a new <code>DBException</code> with message,
+     * that wraps another exception.
+     * @param message the exception message.
      * @param throwable the <code>Throwable</code> to wrap in
      * 		   <code>DBException</code>.
      */

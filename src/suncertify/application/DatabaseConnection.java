@@ -38,8 +38,6 @@ public class DatabaseConnection {
      *        machine on which the database server is located.
      * @param port the port that the server application
      *        is running on.
-     * @throws DBException if the <code>DataRemoteAdapter</code> instance 
-     *         cannot be instantiated. 
      * @throws NetworkException if networking errors occur. 
 	 * @return a <code>DataProxy</code> instance.
 	 */

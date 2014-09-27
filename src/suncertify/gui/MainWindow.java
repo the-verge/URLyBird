@@ -54,7 +54,7 @@ public class MainWindow extends JFrame implements Observer {
     
 	private RoomTableModel tableModel = new RoomTableModel();
 	
-	private JTable table = new JTable(tableModel);
+	private JTable table;
 	
 	private JTextField nameTextField;
 	
