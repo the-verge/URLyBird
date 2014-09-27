@@ -132,7 +132,6 @@ public class Data implements DB {
     }
     
     private boolean isValidCookie(int recNo, long lockCookie) {
-        // POSSIBLE NPE TO HANDLE
         Long cookie = lockManager.getLockMap().get(recNo);
         
         if (cookie != null && cookie == lockCookie) {

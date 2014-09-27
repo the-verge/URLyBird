@@ -8,6 +8,18 @@ import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 
+/**
+ * <code>DataProxy</code> adapts an instance of 
+ * <code>DataRemoteAdapterImpl</code>.  It implements
+ * the <code>DB</code> interface.  This adaption allows
+ * the GUI layer to accept a remote object of type <code>DB</code>.
+ * The GUI layer is therefore not concerned about whether
+ * the database connection is local, or provided by a
+ * remote database server application.
+ * 
+ * @author john
+ *
+ */
 public class DataProxy implements DB {
 	
     /**
