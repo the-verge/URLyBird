@@ -1,6 +1,7 @@
 package suncertify.gui;
 
 import java.awt.Container;
+
 import javax.swing.JOptionPane;
 
 public class ErrorDialog {

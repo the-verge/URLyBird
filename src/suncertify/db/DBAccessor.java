@@ -233,7 +233,7 @@ public class DBAccessor {
      * first bye of the record a value of 0xFF.
      * @param recNo the number of the record to delete.
      * @throws DBException if an IOException is thrown 
-     * 			when attempting to write to the database file.
+     * 		   when attempting to write to the database file.
      */
     public void deleteRecord(int recNo) {
         log.entering("DBAccessor.java", "deleteRecord", recNo);

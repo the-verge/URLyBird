@@ -68,6 +68,10 @@ public class Data implements DB {
     public void delete(int recNo, long lockCookie)
             throws RecordNotFoundException, SecurityException {
         
+        if (!database.recordExists(recNo)) {
+            throw new RecordNotFoundException("Record number " + recNo + " does not exist");
+        }
+        
         if (isValidCookie(recNo, lockCookie)) {
             database.deleteRecord(recNo); 
         }

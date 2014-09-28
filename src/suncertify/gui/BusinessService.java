@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.Observer;
 
 import suncertify.db.DB;
+import suncertify.db.DBException;
+import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
+import suncertify.network.NetworkException;
 
 /**
  * 
@@ -62,7 +65,7 @@ public class BusinessService {
         return roomMap;
     }   
 	
-	public void book(Room room) throws RecordNotFoundException, SecurityException {
+	public void bookRoom(Room room) throws RecordNotFoundException, SecurityException {
 	    int recNo = room.getRecNo();
 	    String[] data = room.getData();
 	    
@@ -71,21 +74,38 @@ public class BusinessService {
 	    }
 	    else {
 	        long lockCookie = dataAccess.lock(recNo);
+	        
+	        /**
+	         * Exceptions are caught and re-thrown here
+	         * to convey to a user that the booking was 
+	         * unsuccessful.  Given that both the update
+	         * and unlock methods potentially throw the
+	         * same exceptions, placing both methods in
+	         * the same try-catch block would not allow
+	         * us to make a distinction between failure
+	         * in making the booking and failure
+	         * in unlocking the record after a successful
+	         * update operation.
+	         */
             try {
                 dataAccess.update(recNo, data, lockCookie);
             } catch (SecurityException e) {
-                throw new SecurityException();
+                throw e;
+            } catch (DBException e) {
+                throw e;
+            } catch (NetworkException e) {
+                throw e;
             }
+            
             try {
                 dataAccess.unlock(recNo, lockCookie);
-            } catch (SecurityException e) {
+            } catch (Exception e) {
                 /**
-                 * Nothing of use can be displayed to the
-                 * client if for some reason a SecurityException
-                 * is thrown when unlocking a record.  Given the 
-                 * locking mechanism that is in place, 
-                 * SecurityException should never be thrown,
-                 * but it is handled here by not doing anything.
+                 * Nothing of use can be conveyed to the
+                 * user if for some reason an Exception
+                 * is thrown when unlocking a record. As
+                 * such the exception is handled here by
+                 * not doing anything.
                  */
             }
 	    }
@@ -100,6 +120,52 @@ public class BusinessService {
 		}
 		return true;
 	}
+	
+	public void deleteRoom(Room room) throws RecordNotFoundException, SecurityException {
+        int recNo = room.getRecNo();
+        
+        long lockCookie = dataAccess.lock(recNo);
+        
+        /**
+         * Exceptions are caught and re-thrown here
+         * to convey to a user that the booking was 
+         * unsuccessful.  Given that both the delete
+         * and unlock methods potentially throw the
+         * same exceptions, placing both methods in
+         * the same try-catch block would not allow
+         * us to make a distinction between failure
+         * in deleting the record and failure
+         * in unlocking the record after a successful
+         * delete operation.
+         */
+        try {
+            dataAccess.delete(recNo, lockCookie);
+        } catch (SecurityException e) {
+            throw e;
+        } catch (DBException e) {
+            throw e;
+        } catch (NetworkException e) {
+            throw e;
+        }
+        
+        try {
+            dataAccess.unlock(recNo, lockCookie);
+        } catch (Exception e) {
+            /**
+             * Nothing of use can be conveyed to the
+             * user if for some reason an Exception
+             * is thrown when unlocking a record. As
+             * such the exception is handled here by
+             * not doing anything.
+             */
+        }
+        
+        fireModelChangeEvent();
+    }
+	
+	public void createRoom(String[] data) throws DuplicateKeyException {
+        dataAccess.create(data);
+    }
 	
 	
 }

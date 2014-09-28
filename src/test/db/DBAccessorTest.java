@@ -1,19 +1,22 @@
 package test.db;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-
-import suncertify.db.DBAccessor;
-import suncertify.db.RecordNotFoundException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import suncertify.db.DBAccessor;
+import suncertify.db.RecordNotFoundException;
 
 @FixMethodOrder(MethodSorters.JVM)
 public class DBAccessorTest {

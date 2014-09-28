@@ -353,7 +353,7 @@ public class MainWindow extends JFrame implements Observer {
 		    room.setOwner(customerId);
 		    
 		    try {
-		        service.book(room);
+		        service.bookRoom(room);
             } catch (RecordNotFoundException ex) {
                 ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
                             "Room already booked");

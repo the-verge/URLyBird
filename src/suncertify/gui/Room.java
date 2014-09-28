@@ -1,7 +1,5 @@
 package suncertify.gui;
 
-import java.util.logging.*;
-
 /**
  * Class that represents a hotel room.
  * @author 

@@ -6,7 +6,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import suncertify.db.DBException;

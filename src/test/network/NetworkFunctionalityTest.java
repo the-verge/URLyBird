@@ -1,6 +1,6 @@
 package test.network;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

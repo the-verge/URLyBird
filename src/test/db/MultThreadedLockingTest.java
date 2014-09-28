@@ -1,7 +1,7 @@
 package test.db;
 
-import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;

@@ -1,6 +1,6 @@
 package test.gui;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
-import suncertify.gui.Room;
 import suncertify.gui.BusinessService;
+import suncertify.gui.Room;
 import suncertify.gui.SearchCriteria;
 
 public class BusinessModelTest {
