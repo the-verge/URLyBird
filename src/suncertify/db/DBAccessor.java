@@ -1,5 +1,6 @@
 package suncertify.db;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -119,12 +120,23 @@ public class DBAccessor {
      * Class constructor. All instances of the class share access
      * to the same database file.
      * @param dbLocation the path to the database file.
-     * @throws DBException if the file cannot be found.
+     * @throws DBException if the <code>RandomAccessFile<code>
+     *         instance cannot be created.
      */
     public DBAccessor(String dbLocation) {
         if (database == null) {
             try {
-                database = new RandomAccessFile(dbLocation, "rw");
+                File file = new File(dbLocation);
+                /**
+                 * Don't want RandomAccessFile to try to create
+                 * the file on disk if it doesn't exist.
+                 */
+                if (file.exists() && !file.isDirectory()) {
+                    database = new RandomAccessFile(file, "rw");
+                }
+                else {
+                    throw new DBException("Could not open " + dbLocation);
+                }
             } catch (FileNotFoundException e) {
                 throw new DBException("Could not open " + dbLocation, e);
             }
@@ -494,6 +506,8 @@ public class DBAccessor {
      * @param recNo the number of the record.
      * @return boolean indicating if the specified
      *         record number exists in the database file.
+     * @throws DBException if an IOException is thrown 
+     *         when attempting to read from the database file.
      */
     public boolean recordExists(int recNo) {
         long position = calculateFilePosition(recNo);

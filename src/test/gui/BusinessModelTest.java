@@ -10,7 +10,7 @@ import org.junit.Test;
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
 import suncertify.gui.Room;
-import suncertify.gui.BusinessModel;
+import suncertify.gui.BusinessService;
 import suncertify.gui.SearchCriteria;
 
 public class BusinessModelTest {
@@ -22,7 +22,7 @@ public class BusinessModelTest {
     @Test
     public void searchAllRoomsTest() throws RecordNotFoundException {
     	Data data = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
-        BusinessModel model = new BusinessModel(data);
+        BusinessService model = new BusinessService(data);
         SearchCriteria criteria = new SearchCriteria();
         criteria.matchAllRecords();
         Map<Integer, Room> matches = model.searchRooms(criteria);
@@ -32,7 +32,7 @@ public class BusinessModelTest {
     @Test
     public void searchRoomsTest() throws RecordNotFoundException {
     	Data data = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
-        BusinessModel model = new BusinessModel(data);
+        BusinessService model = new BusinessService(data);
         SearchCriteria criteria = new SearchCriteria();
         criteria.matchName("dew");
         Map<Integer, Room> matches = model.searchRooms(criteria);

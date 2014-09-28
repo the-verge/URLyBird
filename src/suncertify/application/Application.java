@@ -3,7 +3,7 @@ package suncertify.application;
 
 import suncertify.db.DB;
 import suncertify.db.DBException;
-import suncertify.gui.BusinessModel;
+import suncertify.gui.BusinessService;
 import suncertify.gui.ConnectionDialog;
 import suncertify.gui.ErrorDialog;
 import suncertify.gui.MainWindow;
@@ -131,7 +131,7 @@ public class Application {
 		    saveConfiguration();
 		} catch (DBException e) {
 			ErrorDialog.showDialog(null, e.getMessage(), "Connection error");
-			//System.exit(1);
+			System.exit(1);
 		}
 	}
 	
@@ -150,7 +150,7 @@ public class Application {
 		    saveConfiguration();
 		} catch (DBException | NetworkException e) {
 			ErrorDialog.showDialog(null, e.getMessage(), "Could not connect to server");
-			// MAYBE SHOULD LEAVE DIALOG OPEN
+			System.exit(1);
 		}
 	}
 	
@@ -160,8 +160,8 @@ public class Application {
 	 *        may be local or remote.
 	 */
 	private void createClientGUI(DB dataAccess) {
-		BusinessModel model = new BusinessModel(dataAccess);
-	    new MainWindow(model);
+		BusinessService service = new BusinessService(dataAccess);
+	    new MainWindow(service);
 	}
 	
 	/**
@@ -180,7 +180,11 @@ public class Application {
 	    try {
             PropertiesAccessor.saveConfiguration(config, mode);
         } catch (ConfigurationException e) {
-            //LOG EXCEPTION - Can't really do anything about this
+            /**
+             * Given that this is a non fatal error, in that normal
+             * user functions of the application are still available,
+             * execution continues.
+             */
         }
 	}
 

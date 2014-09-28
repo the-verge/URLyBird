@@ -1,5 +1,7 @@
 package suncertify.gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -28,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.text.MaskFormatter;
 
 import suncertify.db.DBException;
@@ -45,13 +48,13 @@ public class MainWindow extends JFrame implements Observer {
     
     private static final String EIGHT_DIGITS_MASK = "########";
 
-    private BusinessModel model;
+    private BusinessService service;
     
     private SearchCriteria lastSearch = null;
     
 	private RoomTableModel tableModel = new RoomTableModel();
 	
-	private JTable table = new JTable(tableModel);
+	private JTable table;
 	
 	private JTextField nameTextField;
 	
@@ -63,10 +66,12 @@ public class MainWindow extends JFrame implements Observer {
 	
 	private JButton bookButton;
 	
-    public MainWindow(BusinessModel businessModel) {
+    public MainWindow(BusinessService businessService) {
         super("URLyBird");
-        this.model = businessModel;
-        this.model.addObserver(this);
+        this.service = businessService;
+        this.service.addObserver(this);
+        this.createStripedTable();
+        table.setSelectionBackground(Color.decode("#8AA37B"));
         setUpGUI();
         refreshTable();
     }
@@ -75,6 +80,25 @@ public class MainWindow extends JFrame implements Observer {
     public void update(Observable arg0, Object arg1) {
         // TODO Auto-generated method stub
         tableModel.fireTableDataChanged();
+    }
+    
+    private void createStripedTable() {
+        
+        table = new JTable(tableModel) {
+            
+            private static final long serialVersionUID = 2442L;
+
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component comp = super.prepareRenderer(renderer, row, column);
+                if (!isRowSelected(row)) {
+                    comp.setBackground(getBackground());
+                    if(row % 2 == 0) {
+                        comp.setBackground(Color.decode("#E0EEEE"));
+                    }
+                }
+                return comp;
+            }
+        };
     }
     
     private void setUpGUI() {
@@ -218,7 +242,7 @@ public class MainWindow extends JFrame implements Observer {
         c.insets = new Insets(10, 0, 0, 25);
         c.anchor = GridBagConstraints.SOUTHEAST;
         panel.add(bookButton, c);
-        
+
         return panel;
     }
     
@@ -233,7 +257,7 @@ public class MainWindow extends JFrame implements Observer {
             criteria = lastSearch;
         }
 		try {
-		    rooms = model.searchRooms(criteria);
+		    rooms = service.searchRooms(criteria);
 		    tableModel.setRoomMap(rooms);
 		} catch (DBException e) {
             ErrorDialog.showDialog(this, "Cannot show the latest bookings", "Database error");
@@ -306,7 +330,7 @@ public class MainWindow extends JFrame implements Observer {
             }
             
             try {
-                matches = model.searchRooms(criteria);
+                matches = service.searchRooms(criteria);
             } catch (DBException ex) {
                 ErrorDialog.showDialog(parent, "Could not retrieve data", "Database error");
             } catch (NetworkException ex) {
@@ -329,13 +353,12 @@ public class MainWindow extends JFrame implements Observer {
 		    room.setOwner(customerId);
 		    
 		    try {
-                model.book(room);
+		        service.book(room);
             } catch (RecordNotFoundException ex) {
                 ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
                             "Room already booked");
             } catch (SecurityException ex) {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
+                ErrorDialog.showDialog(parent, "Could not complete booking", "Error");
             } catch (DBException ex) {
                 ErrorDialog.showDialog(parent, "Could not complete booking", "Database error");
             } catch (NetworkException ex) {
