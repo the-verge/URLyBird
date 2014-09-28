@@ -1,8 +1,6 @@
 package suncertify.gui;
 
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;

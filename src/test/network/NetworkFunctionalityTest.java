@@ -7,7 +7,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

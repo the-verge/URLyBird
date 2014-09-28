@@ -2,7 +2,6 @@ package suncertify.network;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.logging.Logger;
 
 import suncertify.db.DB;
 import suncertify.db.DBException;

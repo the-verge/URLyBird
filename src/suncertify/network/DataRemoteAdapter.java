@@ -3,7 +3,6 @@ package suncertify.network;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import suncertify.db.DB;
 import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;

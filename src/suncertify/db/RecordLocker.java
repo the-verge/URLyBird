@@ -1,6 +1,5 @@
 package suncertify.db;
 
-import suncertify.db.SecurityException;
 
 public interface RecordLocker {
     

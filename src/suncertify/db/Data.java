@@ -1,7 +1,6 @@
 package suncertify.db;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 /**
  * Objects of the Data class are used to create, read, update and delete

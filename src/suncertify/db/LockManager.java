@@ -3,7 +3,6 @@ package suncertify.db;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import suncertify.db.SecurityException;
 
 /**
  * The LockManager class logically locks records.
