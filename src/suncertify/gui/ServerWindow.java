@@ -161,6 +161,8 @@ public class ServerWindow extends JFrame {
     }
     
     private class StartButtonListener implements ActionListener {
+        
+        ServerWindow parent = ServerWindow.this;
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -172,7 +174,7 @@ public class ServerWindow extends JFrame {
 		        browseButton.setEnabled(false);
 		        ServerWindow.this.setTitle("URLyBird Server - Running...");
 			} catch (NetworkException ex) {
-				ErrorDialog.showDialog(null, ex.getMessage(), "Could not start server");
+				ErrorDialog.showDialog(parent, ex.getMessage(), "Could not start server");
 				System.exit(1);
 			}
         }
