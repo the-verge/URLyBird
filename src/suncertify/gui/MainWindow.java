@@ -48,7 +48,7 @@ public class MainWindow extends JFrame implements Observer {
     
     private static final String EIGHT_DIGITS_MASK = "########";
 
-    private BusinessModel model;
+    private BusinessService service;
     
     private SearchCriteria lastSearch = null;
     
@@ -66,10 +66,10 @@ public class MainWindow extends JFrame implements Observer {
 	
 	private JButton bookButton;
 	
-    public MainWindow(BusinessModel businessModel) {
+    public MainWindow(BusinessService businessService) {
         super("URLyBird");
-        this.model = businessModel;
-        this.model.addObserver(this);
+        this.service = businessService;
+        this.service.addObserver(this);
         this.createStripedTable();
         table.setSelectionBackground(Color.decode("#8AA37B"));
         setUpGUI();
@@ -257,7 +257,7 @@ public class MainWindow extends JFrame implements Observer {
             criteria = lastSearch;
         }
 		try {
-		    rooms = model.searchRooms(criteria);
+		    rooms = service.searchRooms(criteria);
 		    tableModel.setRoomMap(rooms);
 		} catch (DBException e) {
             ErrorDialog.showDialog(this, "Cannot show the latest bookings", "Database error");
@@ -330,7 +330,7 @@ public class MainWindow extends JFrame implements Observer {
             }
             
             try {
-                matches = model.searchRooms(criteria);
+                matches = service.searchRooms(criteria);
             } catch (DBException ex) {
                 ErrorDialog.showDialog(parent, "Could not retrieve data", "Database error");
             } catch (NetworkException ex) {
@@ -353,7 +353,7 @@ public class MainWindow extends JFrame implements Observer {
 		    room.setOwner(customerId);
 		    
 		    try {
-                model.book(room);
+		        service.book(room);
             } catch (RecordNotFoundException ex) {
                 ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
                             "Room already booked");

@@ -13,13 +13,13 @@ import suncertify.db.SecurityException;
  * @author john
  *
  */
-public class BusinessModel {
+public class BusinessService {
 	
 	private Observer observer;
 	
 	private DB dataAccess;
 	
-	public BusinessModel(DB dataAccess) {
+	public BusinessService(DB dataAccess) {
 		this.dataAccess = dataAccess;
 	}
 	

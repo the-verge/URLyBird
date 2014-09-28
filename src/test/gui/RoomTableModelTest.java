@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
-import suncertify.gui.BusinessModel;
+import suncertify.gui.BusinessService;
 import suncertify.gui.Room;
 import suncertify.gui.RoomTableModel;
 import suncertify.gui.SearchCriteria;
@@ -24,7 +24,7 @@ public class RoomTableModelTest {
     @Test
     public void getValueAtTest() throws RecordNotFoundException {
     	Data data = new Data("/home/ejhnhng/URLyBird/db-1x3.db");
-        BusinessModel model = new BusinessModel(data);
+        BusinessService model = new BusinessService(data);
         SearchCriteria criteria = new SearchCriteria();
         RoomTableModel tableModel = new RoomTableModel();
         
