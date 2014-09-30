@@ -193,7 +193,7 @@ public class DBAccessor {
      * @throws IOException if there is an error reading from 
      * 			the file.
      */
-    private byte[] retrieveRecord(long position) throws IOException {
+    public byte[] retrieveRecord(long position) throws IOException {
         log.entering("DBAccessor.java", "retrieveRecord", position);
         
     	final byte[] record = new byte[RECORD_LENGTH];
@@ -248,64 +248,45 @@ public class DBAccessor {
         }
     }
     
+    
     /**
      * Searches the database file for records whose fields match
      * the supplied criteria. 
      * @param criteria the criteria for which to search.
      * @return <code>int[]</code> the record numbers that match the
-     * 			criteria.
+     *         criteria.
      * @throws DBException if an IOException is thrown 
-     * 			when attempting to read from the database file.
+     *         when attempting to read from the database file.
      */
     public int[] find(String[] criteria) {
+        log.entering("DBAccessor.java", "find");
+        
         ArrayList<Integer> matches = new ArrayList<Integer>();
-        ArrayList<String[]> allData;
-        allData = retrieveAllRecords();
-        
-        for (int i = 0; i < allData.size(); i++) {
-            String[] data = allData.get(i);
-            boolean match = this.matchRecord(data, criteria);
-            int recordNumber = i + 1;
-            
-            if (match) {
-                matches.add(recordNumber);
-            }
-        }
-        
-        return arrayListToArray(matches);
-    }
-    
-    /**
-     * Retrieves <code>String</code> array representations
-     * of all records in the file.
-     * @return <code>ArrayList<String[]></code> containing
-     * 			the fields of all records.
-     * @throws DBException if an IOException is thrown 
-     * 			when attempting to read from the database file.
-     */
-    public ArrayList<String[]> retrieveAllRecords() {
-        log.entering("DBAccessor.java", "retrieveAllRecords");
-        
-        ArrayList<String[]> result = new ArrayList<String[]>();
         long filePosition = FILE_DATA_SECTION_OFFSET;
         
         try {
 			while (filePosition < database.length()) {
 			    byte[] record = retrieveRecord(filePosition);
-			    filePosition += RECORD_LENGTH;
 			    if (isDeletedRecord(record)) {
 			        log.fine("Found deleted record at position " + filePosition);
+		            filePosition += RECORD_LENGTH;
 			        continue;
 			    }
 			    else {
 			        String[] data = recordToStringArray(record);
-			        result.add(data);
+			        if (matchRecord(data, criteria)) {
+			            int recNo = calculateRecordNumber(filePosition);
+			            matches.add(recNo);
+			        }
+		            filePosition += RECORD_LENGTH;
 			    }
 			}
 		} catch (IOException e) {
 			throw new DBException("Could not retrieve records", e);
 		}
-        log.exiting("DBAccessor.java", "retrieveAllRecords", result);
+        int[] result = arrayListToArray(matches);
+        
+        log.exiting("DBAccessor.java", "find", result);
         
         return result;
     }
@@ -435,7 +416,7 @@ public class DBAccessor {
      * 			the record.
      * @throws UnsupportedEncodingException 
      */
-    private String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
+    public String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
         
         int offset = RECORD_DATA_SECTION_OFFSET;
         String[] data = new String[FIELD_LENGTHS_ARRAY.length];

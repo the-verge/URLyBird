@@ -100,14 +100,6 @@ public class Data implements DB {
     }
     
     /**
-     * Retrieves all records in the database.
-     * @return ArrayList<String[]>
-     */
-    public ArrayList<String[]> findAll() {
-    	return database.retrieveAllRecords();
-    }
-    
-    /**
      * {@inheritDoc}
      */
     @Override
