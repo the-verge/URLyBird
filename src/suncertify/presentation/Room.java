@@ -1,4 +1,4 @@
-package suncertify.gui;
+package suncertify.presentation;
 
 /**
  * Class that represents a hotel room.

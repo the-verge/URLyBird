@@ -3,4 +3,4 @@
  * The classes in this package are primarily used to
  * provide the GUI layer of the application.
  */
-package suncertify.gui;
+package suncertify.presentation;

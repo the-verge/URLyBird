@@ -9,10 +9,10 @@ import org.junit.Test;
 
 import suncertify.db.Data;
 import suncertify.db.RecordNotFoundException;
-import suncertify.gui.BusinessService;
-import suncertify.gui.Room;
-import suncertify.gui.RoomTableModel;
-import suncertify.gui.SearchCriteria;
+import suncertify.presentation.BusinessService;
+import suncertify.presentation.Room;
+import suncertify.presentation.RoomTableModel;
+import suncertify.presentation.SearchCriteria;
 
 public class RoomTableModelTest {
     

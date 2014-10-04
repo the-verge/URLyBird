@@ -3,12 +3,12 @@ package suncertify.application;
 
 import suncertify.db.DB;
 import suncertify.db.DBException;
-import suncertify.gui.BusinessService;
-import suncertify.gui.ConnectionDialog;
-import suncertify.gui.ErrorDialog;
-import suncertify.gui.MainWindow;
-import suncertify.gui.ServerWindow;
 import suncertify.network.NetworkException;
+import suncertify.presentation.BusinessService;
+import suncertify.presentation.ConnectionDialog;
+import suncertify.presentation.Dialogs;
+import suncertify.presentation.MainWindow;
+import suncertify.presentation.ServerWindow;
 
 /**
  * The entry point to the application.  This class reads the command line
@@ -74,7 +74,7 @@ public class Application {
 				showServerWindow();
 			}
 			else {
-				ErrorDialog.showDialog(null, "Valid arguments are:\n\n1: server,\n2: alone, \n3: leave blank.", 
+				Dialogs.showErrorDialog(null, "Valid arguments are:\n\n1: server,\n2: alone, \n3: leave blank.", 
 				                        "Invalid arguments");
 				System.exit(1);
 			}
@@ -94,8 +94,8 @@ public class Application {
         try {
             config = PropertiesAccessor.getConfiguration(mode);
         } catch (ConfigurationException e) {
-            ErrorDialog.showDialog(null, "Error reading configuration data.\nPlease enter details manually.", 
-                    "Could not load previous configuration");
+            Dialogs.showInfoDialog(null, "Configuration data not found.\nPlease enter "
+                    + "database connection\ndetails manually.", "Could not read configuration data");
         }
         ConnectionDialog dialog = new ConnectionDialog(mode, config);
 	    
@@ -130,7 +130,7 @@ public class Application {
 			createClientGUI(dataAccess);
 		    saveConfiguration();
 		} catch (DBException e) {
-			ErrorDialog.showDialog(null, e.getMessage(), "Connection error");
+			Dialogs.showErrorDialog(null, e.getMessage(), "Database connection error");
 			System.exit(1);
 		}
 	}
@@ -149,7 +149,7 @@ public class Application {
 			createClientGUI(dataAccess);
 		    saveConfiguration();
 		} catch (DBException | NetworkException e) {
-			ErrorDialog.showDialog(null, e.getMessage(), "Could not connect to server");
+			Dialogs.showErrorDialog(null, e.getMessage(), "Could not connect to server");
 			System.exit(1);
 		}
 	}

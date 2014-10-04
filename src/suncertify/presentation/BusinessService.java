@@ -1,4 +1,4 @@
-package suncertify.gui;
+package suncertify.presentation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

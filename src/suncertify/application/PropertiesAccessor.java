@@ -81,7 +81,10 @@ public class PropertiesAccessor {
 		try (FileReader reader = new FileReader(propertiesFile)) {
 			properties.load(reader);
 			property = properties.getProperty(propertyName);
-		} catch (IOException e) {
+			if (property == null) {
+			    throw new ConfigurationException();
+			}
+		} catch (Exception e) {
             throw new ConfigurationException();
         } 
 		return property;
@@ -97,7 +100,7 @@ public class PropertiesAccessor {
 		try (FileWriter writer = new FileWriter(propertiesFile)) {
 		    properties.setProperty(key, value);
 		    properties.store(writer, "Configuration updated");
-		} catch (IOException e) {
+		} catch (Exception e) {
             throw new ConfigurationException();
         } 
 	}

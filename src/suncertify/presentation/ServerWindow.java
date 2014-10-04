@@ -1,4 +1,4 @@
-package suncertify.gui;
+package suncertify.presentation;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -6,13 +6,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -22,19 +20,15 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import suncertify.application.ApplicationMode;
-import suncertify.application.Configuration;
+import suncertify.network.NetworkException;
+import suncertify.network.Server;
 
-/**
- * @author john
- *
- */
-public class ConnectionDialog extends JDialog {
+public class ServerWindow extends JFrame {
     
     /**
      * 
      */
-    private static final long serialVersionUID = 1661L;
+    private static final long serialVersionUID = 1991L;
 
     private static final int LOWEST_VALID_PORT = 1025;
     
@@ -46,15 +40,11 @@ public class ConnectionDialog extends JDialog {
     
     private JLabel portLabel = new JLabel("Port");
     
-    private JLabel hostLabel = new JLabel("Hostname");
-    
     private JTextField locationTextField = new JTextField();
-    
-    private JTextField hostnameTextField = new JTextField();
     
     private JTextField portTextField = new JTextField();
     
-    private JButton connectButton = new JButton("Connect");
+    private JButton startButton = new JButton("Start");
     
     private JButton exitButton = new JButton("Exit");
     
@@ -64,35 +54,18 @@ public class ConnectionDialog extends JDialog {
     
     private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
-    private ApplicationMode mode;
-    
-    private String databaseLocation = "";
-    
-    private String hostname = "";
+    private String databaseLocation;
     
     private int port;
     
-    public ConnectionDialog(ApplicationMode mode, Configuration config) {
-        this.mode = mode;
+    public ServerWindow() {
+        super("URLyBird Server");
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         addListeners();
-        
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        mainPanel.add(serverPanel());
         
-        if (mode == ApplicationMode.STANDALONE_CLIENT) {
-            this.setTitle("Connect to a local database");
-            mainPanel.add(standAlonePanel());
-        }
-        else if (mode == ApplicationMode.NETWORK_CLIENT) {
-            this.setTitle("Connect to a remote database");
-            mainPanel.add(networkClientPanel());
-        }
-        
-        if (config != null) {
-            loadConfigurationData(config);
-        }
-
-        this.setModal(true);
         this.add(mainPanel);
         this.pack();
         this.setLocationRelativeTo(null);
@@ -101,52 +74,20 @@ public class ConnectionDialog extends JDialog {
         this.setVisible(true);
     }
     
-    private void loadConfigurationData(Configuration config) {
-       
-        if (mode == ApplicationMode.STANDALONE_CLIENT) {
-            String location = config.getDatabaseLocation();
-            
-            if (location != null) {
-                databaseLocation = location;
-                locationTextField.setText(databaseLocation);
-            }
-        }
-        else if (mode == ApplicationMode.NETWORK_CLIENT) {
-            String host = config.getHostname();
-            String portNumber = config.getPort();
-            
-            if (host != null) {
-                hostname = host;
-                hostnameTextField.setText(hostname);
-            }
-            if (portNumber != null) {
-                port = Integer.parseInt(portNumber); // number format exception
-                portTextField.setText(portNumber);
-            }
-        }
-    }
-    
     private void addListeners() {
-        
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) { 
-                System.exit(0);
-            }
-        });
-
+               
         browseButton.addActionListener(new BrowseButtonListener());
         exitButton.addActionListener(new ExitButtonListener());
-        connectButton.addActionListener(new ConnectButtonListener());
-        connectButton.setEnabled(false);
+        exitButton.setEnabled(false);
+        startButton.addActionListener(new StartButtonListener());
+        startButton.setEnabled(false);
         
-        DocumentListener listener = new ConnectButtonEnabler();
+        DocumentListener listener = new StartButtonEnabler();
         locationTextField.getDocument().addDocumentListener(listener);
-        hostnameTextField.getDocument().addDocumentListener(listener);
         portTextField.getDocument().addDocumentListener(listener);
     }
     
-    private JPanel standAlonePanel() {
+    private JPanel serverPanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c;
@@ -169,41 +110,8 @@ public class ConnectionDialog extends JDialog {
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 0;
-        panel.add(browseButton, c);
-        
-        c = new GridBagConstraints();
-        c.gridx = 2;
-        c.gridy = 1;
-        c.insets = new Insets(10, 0, 5, 0);
-        c.anchor = GridBagConstraints.EAST;
-        panel.add(exitButton, c);
-        
-        c = new GridBagConstraints();
-        c.gridx = 3;
-        c.gridy = 1;
-        c.insets = new Insets(10, 0, 5, 0);
-        panel.add(connectButton, c);
-        
-        return panel;
-    }
-    
-    private JPanel networkClientPanel() {
-        
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints c;
-        
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.ipadx = 15;
-        panel.add(hostLabel, c);
-        
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 0;
         c.gridwidth = 2;
-        hostnameTextField.setColumns(25);
-        panel.add(hostnameTextField, c);
+        panel.add(browseButton, c);
         
         c = new GridBagConstraints();
         c.gridx = 0;
@@ -220,7 +128,7 @@ public class ConnectionDialog extends JDialog {
         panel.add(portTextField, c);
         
         c = new GridBagConstraints();
-        c.gridx = 1;
+        c.gridx = 2;
         c.gridy = 2;
         c.insets = new Insets(10, 0, 5, 0);
         c.anchor = GridBagConstraints.EAST;
@@ -228,27 +136,47 @@ public class ConnectionDialog extends JDialog {
         panel.add(exitButton, c);
         
         c = new GridBagConstraints();
-        c.gridx = 2;
+        c.gridx = 3;
         c.gridy = 2;
         c.insets = new Insets(10, 0, 5, 0);
         c.anchor = GridBagConstraints.EAST;
-        panel.add(connectButton, c);
+        c.weightx = 1.0;
+        panel.add(startButton, c);
         
         return panel;
     }
     
     private class BrowseButtonListener implements ActionListener {
         
-        ConnectionDialog parent = ConnectionDialog.this;
+        ServerWindow parent = ServerWindow.this;
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            int returnVal = parent.chooser.showDialog(parent, "Select");
+        	int returnVal = parent.chooser.showDialog(parent, "Select");
             if (returnVal == JFileChooser.APPROVE_OPTION) {
             	 databaseLocation = chooser.getSelectedFile().getAbsolutePath();
                  locationTextField.setText(databaseLocation);
-                 connectButton.setEnabled(true);
             }
+        }
+    }
+    
+    private class StartButtonListener implements ActionListener {
+        
+        ServerWindow parent = ServerWindow.this;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+				Server.startServer(databaseLocation, port);
+				startButton.setEnabled(false);
+		        exitButton.setEnabled(true);
+		        portTextField.setEditable(false);
+		        browseButton.setEnabled(false);
+		        ServerWindow.this.setTitle("URLyBird Server - Running...");
+			} catch (NetworkException ex) {
+				Dialogs.showErrorDialog(parent, ex.getMessage(), "Could not start server");
+				System.exit(1);
+			}
         }
     }
     
@@ -256,22 +184,12 @@ public class ConnectionDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            System.out.println("Stopping server...");
             System.exit(0);
         }
     }
     
-    private class ConnectButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-        	if (mode == ApplicationMode.NETWORK_CLIENT) {
-        		hostname = hostnameTextField.getText();
-        	}
-            ConnectionDialog.this.dispose();
-        }
-    }
-    
-    private class ConnectButtonEnabler implements DocumentListener {
+    private class StartButtonEnabler implements DocumentListener {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -290,24 +208,13 @@ public class ConnectionDialog extends JDialog {
         
         public void check() {
             String location = locationTextField.getText().trim();
-            String host = hostnameTextField.getText().trim();
             String port = portTextField.getText().trim();
             
-            if (mode == ApplicationMode.STANDALONE_CLIENT) {
-                if (location.length() > MINIMUM_LOCATION_LENGTH) {
-                    connectButton.setEnabled(true);
-                }
-                else {
-                    connectButton.setEnabled(false);
-                }
+            if (location.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
+                startButton.setEnabled(true);
             }
-            else if (mode == ApplicationMode.NETWORK_CLIENT) {
-                if (host.length() > MINIMUM_LOCATION_LENGTH && validPort(port)) {
-                    connectButton.setEnabled(true);
-                }
-                else {
-                    connectButton.setEnabled(false);
-                }
+            else {
+                startButton.setEnabled(false);
             }
         }
     }
@@ -333,12 +240,9 @@ public class ConnectionDialog extends JDialog {
         return databaseLocation;
     }
     
-    public String getHostname() {
-    	return hostname;
-    }
-    
     public int getPort() {
         return port;
     }
 
 }
+

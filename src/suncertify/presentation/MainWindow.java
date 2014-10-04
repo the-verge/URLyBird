@@ -1,4 +1,4 @@
-package suncertify.gui;
+package suncertify.presentation;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -260,9 +260,9 @@ public class MainWindow extends JFrame implements Observer {
 		    rooms = service.searchRooms(criteria);
 		    tableModel.setRoomMap(rooms);
 		} catch (DBException e) {
-            ErrorDialog.showDialog(this, "Cannot show the latest bookings", "Database error");
+            Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Database error");
         } catch (NetworkException e) {
-            ErrorDialog.showDialog(this, "Cannot show the latest bookings", "Network error");
+            Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Network error");
         }
     }
     
@@ -332,9 +332,9 @@ public class MainWindow extends JFrame implements Observer {
             try {
                 matches = service.searchRooms(criteria);
             } catch (DBException ex) {
-                ErrorDialog.showDialog(parent, "Could not retrieve data", "Database error");
+                Dialogs.showErrorDialog(parent, "Could not retrieve data", "Database error");
             } catch (NetworkException ex) {
-                ErrorDialog.showDialog(parent, "Could not retrieve data", "Network error");
+                Dialogs.showErrorDialog(parent, "Could not retrieve data", "Network error");
             }
             lastSearch = criteria;
             tableModel.setRoomMap(matches);
@@ -355,14 +355,14 @@ public class MainWindow extends JFrame implements Observer {
 		    try {
 		        service.bookRoom(room);
             } catch (RecordNotFoundException ex) {
-                ErrorDialog.showDialog(parent, "Sorry, this room is no longer available", 
+                Dialogs.showErrorDialog(parent, "Sorry, this room is no longer available", 
                             "Room already booked");
             } catch (SecurityException ex) {
-                ErrorDialog.showDialog(parent, "Could not complete booking", "Error");
+                Dialogs.showErrorDialog(parent, "Could not complete booking", "Error");
             } catch (DBException ex) {
-                ErrorDialog.showDialog(parent, "Could not complete booking", "Database error");
+                Dialogs.showErrorDialog(parent, "Could not complete booking", "Database error");
             } catch (NetworkException ex) {
-                ErrorDialog.showDialog(parent, "Could not complete booking", "Network error");
+                Dialogs.showErrorDialog(parent, "Could not complete booking", "Network error");
             } finally {
                 refreshTable();
             }
