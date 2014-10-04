@@ -185,6 +185,7 @@ public class ServerWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println("Stopping server...");
+            Server.closeDatabaseConnection();
             System.exit(0);
         }
     }

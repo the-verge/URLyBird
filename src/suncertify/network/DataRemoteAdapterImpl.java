@@ -1,9 +1,10 @@
 package suncertify.network;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import suncertify.db.DB;
+import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.db.Data;
 import suncertify.db.DuplicateKeyException;
@@ -28,7 +29,7 @@ public class DataRemoteAdapterImpl extends UnicastRemoteObject
     /**
      * The <code>DB</code> instance that this class wraps.
      */
-    private DB database;
+    private CloseableDB database;
     
     /**
      * Class constructor.
@@ -110,6 +111,14 @@ public class DataRemoteAdapterImpl extends UnicastRemoteObject
             SecurityException, RemoteException {
         
         database.unlock(recNo, cookie);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void closeDatabaseConnection() throws IOException {
+        database.closeDatabaseConnection();
     }
 
     

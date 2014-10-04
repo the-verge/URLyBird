@@ -270,6 +270,7 @@ public class MainWindow extends JFrame implements Observer {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+		    service.cleanUp();
 			System.exit(0);
 		}
     }

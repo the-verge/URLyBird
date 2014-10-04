@@ -1,10 +1,11 @@
 package suncertify.presentation;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Observer;
 
-import suncertify.db.DB;
+import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
@@ -20,9 +21,9 @@ public class BusinessService {
 	
 	private Observer observer;
 	
-	private DB dataAccess;
+	private CloseableDB dataAccess;
 	
-	public BusinessService(DB dataAccess) {
+	public BusinessService(CloseableDB dataAccess) {
 		this.dataAccess = dataAccess;
 	}
 	
@@ -167,5 +168,15 @@ public class BusinessService {
         dataAccess.create(data);
     }
 	
-	
+	public void cleanUp() {
+	    try {
+            dataAccess.closeDatabaseConnection();
+        } catch (IOException e) {
+            /**
+             * Nothing of use can be conveyed to the user
+             * if closing the database connection fails,
+             * so this exception is propagated no further.
+             */
+        }
+	}
 }

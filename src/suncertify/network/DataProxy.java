@@ -1,8 +1,9 @@
 package suncertify.network;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
-import suncertify.db.DB;
+import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
@@ -20,7 +21,7 @@ import suncertify.db.SecurityException;
  * @author john
  *
  */
-public class DataProxy implements DB {
+public class DataProxy implements CloseableDB {
 	
     /**
      * The <code>DataRemoteAdapter</code> instance that 
@@ -138,5 +139,11 @@ public class DataProxy implements DB {
 			throw new NetworkException("Network error", e);
 		}
 	}
+
+    @Override
+    public void closeDatabaseConnection() throws IOException {
+        database.closeDatabaseConnection();
+    }
+
 	
 }

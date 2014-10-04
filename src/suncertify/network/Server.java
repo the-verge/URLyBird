@@ -1,5 +1,6 @@
 package suncertify.network;
 
+import java.io.IOException;
 import java.net.BindException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,6 +17,8 @@ import java.rmi.registry.Registry;
  *
  */
 public class Server {
+    
+    private static DataRemoteAdapterImpl remoteObject;
 	
     /**
      * Starts RMI registry and registers <code>DataRemoteAdapterImpl</code>.
@@ -50,6 +53,21 @@ public class Server {
 	}
 	
 	/**
+	 * Closes the database connection.
+	 */
+	public static void closeDatabaseConnection() {
+	    try {
+            remoteObject.closeDatabaseConnection();
+        } catch (IOException e) {
+            /**
+             * Nothing of use can be conveyed to the user
+             * if closing the database connection fails,
+             * so this exception is propagated no further.
+             */
+        }
+	}
+	
+	/**
 	 * Exports <code>DataRemoteAdapterImpl</code> to an RMI registry.
 	 * @param dbLocation the location of the database on the database server
      *        machine.
@@ -59,7 +77,7 @@ public class Server {
      *         instance <code>remoteObject</code> cannot be created.
 	 */
 	private static void registerObject(String dbLocation, int port) throws RemoteException {
-		DataRemoteAdapterImpl remoteObject = new DataRemoteAdapterImpl(dbLocation);
+		remoteObject = new DataRemoteAdapterImpl(dbLocation);
 		Registry registry = LocateRegistry.getRegistry(port);
 		registry.rebind("Data", remoteObject);
     }

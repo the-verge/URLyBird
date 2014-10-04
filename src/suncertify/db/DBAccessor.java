@@ -534,6 +534,11 @@ public class DBAccessor {
         return (position < database.length()) && (position > 0);
     }
     
+    public void close() throws IOException {
+        database.close();
+        System.out.println("DB file closed");
+    }
+    
     public RandomAccessFile getDatabase() {
         return database;
     }

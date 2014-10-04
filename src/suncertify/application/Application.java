@@ -1,7 +1,7 @@
 package suncertify.application;
 
 
-import suncertify.db.DB;
+import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.network.NetworkException;
 import suncertify.presentation.BusinessService;
@@ -124,7 +124,7 @@ public class Application {
 	 * @param dbLocation the path to the database file.
 	 */
 	private void createLocalConnection(String dbLocation) {
-		DB dataAccess = null;
+		CloseableDB dataAccess = null;
 		try {
 			dataAccess = DatabaseConnection.getLocalConnection(dbLocation);
 			createClientGUI(dataAccess);
@@ -145,7 +145,7 @@ public class Application {
 	 */
 	private void createRemoteConnection(String hostname, int port) {
 		try {
-			DB dataAccess = DatabaseConnection.getRemoteConnection(hostname, port);
+			CloseableDB dataAccess = DatabaseConnection.getRemoteConnection(hostname, port);
 			createClientGUI(dataAccess);
 		    saveConfiguration();
 		} catch (DBException | NetworkException e) {
@@ -159,7 +159,7 @@ public class Application {
 	 * @param dataAccess the database connection - 
 	 *        may be local or remote.
 	 */
-	private void createClientGUI(DB dataAccess) {
+	private void createClientGUI(CloseableDB dataAccess) {
 		BusinessService service = new BusinessService(dataAccess);
 	    new MainWindow(service);
 	}

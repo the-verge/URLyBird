@@ -1,6 +1,6 @@
 package suncertify.db;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
 /**
  * Objects of the Data class are used to create, read, update and delete
@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author 
  * 
  */
-public class Data implements DB {
+public class Data implements CloseableDB {
     
     /**
      * The static LockManager instance takes care of record 
@@ -133,6 +133,14 @@ public class Data implements DB {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void closeDatabaseConnection() throws IOException {
+        database.close();
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author john
  *
  */
-public class LockManager implements RecordLocker {
+public class LockManager {
     
     /**
      * Mutex object used to synchronize on the 

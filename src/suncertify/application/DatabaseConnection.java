@@ -6,7 +6,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.UnknownHostException;
 
-import suncertify.db.DB;
+import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.db.Data;
 import suncertify.network.DataProxy;
@@ -28,7 +28,7 @@ public class DatabaseConnection {
      *         cannot be instantiated. 
      * @return a <code>Data</code> instance.
      */
-	public static DB getLocalConnection(String dbLocation) {
+	public static CloseableDB getLocalConnection(String dbLocation) {
 		return new Data(dbLocation);
 	}
 	
@@ -41,8 +41,8 @@ public class DatabaseConnection {
      * @throws NetworkException if networking errors occur. 
 	 * @return a <code>DataProxy</code> instance.
 	 */
-	public static DB getRemoteConnection(String hostname, int port) {
-		DB data = null;
+	public static CloseableDB getRemoteConnection(String hostname, int port) {
+		CloseableDB data = null;
 		String url = "rmi://" + hostname + ":" + port + "/Data";
 		try {
 			DataRemoteAdapter remote = (DataRemoteAdapter) Naming.lookup(url);

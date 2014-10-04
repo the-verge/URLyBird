@@ -1,5 +1,6 @@
 package suncertify.network;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -122,5 +123,13 @@ public interface DataRemoteAdapter extends Remote {
      */
     public void unlock(int recNo, long cookie)
       throws RecordNotFoundException, SecurityException, RemoteException;
+    
+    /**
+     * Closes the database connection.
+     * 
+     * @throws IOException if the connection
+     *         cannot be closed.
+     */
+    public void closeDatabaseConnection() throws IOException;
 
 }
