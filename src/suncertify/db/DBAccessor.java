@@ -153,11 +153,11 @@ public class DBAccessor {
      * Reads a record from the database file.
      * @param recNo the record number to retrieve.
      * @return a <code>String</code> array containing
-     * 			the fields of the record.
+     * 		   the fields of the record.
      * @throws RecordNotFoundException if the record doesn't
-     * 			exist in the database.
+     * 		   exist in the database.
      * @throws DBException if an IOException is thrown when 
-     * 			trying to read from the database file.
+     * 		   trying to read from the database file.
      */
     public String[] readRecord(int recNo) throws RecordNotFoundException {
         log.entering("DBAccessor.java", "readRecord", recNo);
@@ -189,9 +189,9 @@ public class DBAccessor {
      * in the file.
      * @param position the position of the record in the file.
      * @return <code>byte[]</code> the bytes that constitute
-     * 			the record.
+     * 		   the record.
      * @throws IOException if there is an error reading from 
-     * 			the file.
+     * 		   the file.
      */
     public byte[] retrieveRecord(long position) throws IOException {
         log.entering("DBAccessor.java", "retrieveRecord", position);
@@ -212,7 +212,7 @@ public class DBAccessor {
      * @param data <code>String</code> array containing the
      * 		   fields of the record to update.
      * @throws DBException if an IOException is thrown when
-     * 			trying to write to the database file.
+     * 		   trying to write to the database file.
      */
     public void updateRecord(int recNo, String[] data) {
         final long position = calculateFilePosition(recNo);
@@ -291,6 +291,11 @@ public class DBAccessor {
         return result;
     }
     
+    /**
+     * Determines whether a record is markes as deleted.
+     * @param record the byte array that constitutes the record.
+     * @return boolean
+     */
     private boolean isDeletedRecord(byte[] record) {
         return record[0] == DELETED_FLAG;
     }
@@ -303,9 +308,9 @@ public class DBAccessor {
      * for all non-null criteria[n].
      * @param data array containing the fields of a record.
      * @param criteria array containing the query criteria
-     * 		   for each element in the record field array.  An attempt is made
-     * 		   to match the beginning of <code>data[n]</code> 
-     * 		   with <code>criteria[n]</code>.
+     * 		  for each element in the record field array.  An attempt is made
+     * 		  to match the beginning of <code>data[n]</code> 
+     * 		  with <code>criteria[n]</code>.
      * @return <code>boolean</code> indicating a match or not.
      */
     public boolean matchRecord(String[] data, String[] criteria) {
@@ -316,7 +321,6 @@ public class DBAccessor {
         for (int i = 0; i < criteria.length; i++) {
             String query = criteria[i];
             String field = data[i];
-            // should send null from gui if textfield is empty string
             if (query == null) {
                 nullCriteria++;
                 continue;
@@ -358,7 +362,7 @@ public class DBAccessor {
     /**
      * Creates a new record.
      * @param data <code>String</code> array containing the 
-     * fields of the record to be created.
+     *        fields of the record to be created.
      * @return the number of the newly created record.
      * @throws DBException if an IOException is thrown 
      * 			when attempting to write to the database file.
@@ -392,7 +396,7 @@ public class DBAccessor {
      * the position of the end of the file is
      * returned.
      * @return the first available position in which
-     * a record can be written.
+     *         a record can be written.
      * @throws IOException
      */
     public long firstAvailablePosition() throws IOException {
@@ -413,7 +417,7 @@ public class DBAccessor {
      * array read from the database file.
      * @param record <code>byte</code> array read from database file.
      * @return <code>String</code> array containing the fields of
-     * 			the record.
+     * 		   the record.
      * @throws UnsupportedEncodingException 
      */
     public String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
@@ -436,14 +440,14 @@ public class DBAccessor {
      * Converts a <code>String</code> array containing record fields
      * to a <code>byte</code> array that can be written to file.
      * @param data <code>String</code> array containing the 
-     * 		   fields of the record to be written to file.
+     * 		  fields of the record to be written to file.
      * @return a <code>byte</code> array that can be written to file.
      */
     private byte[] stringArrayToRecord(String[] data) {
         byte[] emptyRecordByteArray = new byte[RECORD_LENGTH];
         String emptyRecordString = new String(emptyRecordByteArray);
         StringBuilder builder = new StringBuilder(emptyRecordString);
-        //BYTES OR CHAR POSITION?
+        
         int startPosition = RECORD_DATA_SECTION_OFFSET;
         // 1st byte will automatically be 0 and therefore be a valid record
         

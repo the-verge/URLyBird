@@ -200,39 +200,5 @@ public class DBAccessorTest {
         assertEquals(room3Number, matchThreeRecords[2]);
     }
     
-//    @Test
-//    public void retrieveAllRecordsTest() throws IOException, RecordNotFoundException {
-//        ArrayList<String[]> allRecords = accessor.retrieveAllRecords();
-//        int total = allRecords.size();
-//        assertEquals(34, total);
-//        
-//        for(int i = 0; i < allRecords.size(); i++) {
-//            String[] record = accessor.readRecord(i + 1);
-//            assertArrayEquals(record, allRecords.get(i));
-//        }
-//    }
-//    
-//    @Test
-//    public void retrieveAllRecordsAfterDeleteTest() throws IOException {
-//        ArrayList<String[]> allRecords;
-//        int total;
-//        
-//        accessor.deleteRecord(31);
-//        allRecords = accessor.retrieveAllRecords();
-//        total = allRecords.size();
-//        assertEquals(33, total);
-//        
-//        accessor.deleteRecord(32);
-//        allRecords = accessor.retrieveAllRecords();
-//        total = allRecords.size();
-//        assertEquals(32, total);
-//       
-//        accessor.deleteRecord(33);
-//        allRecords = accessor.retrieveAllRecords();
-//        total = allRecords.size();
-//        assertEquals(31, total);
-//        
-//    }
-    
     
 }
