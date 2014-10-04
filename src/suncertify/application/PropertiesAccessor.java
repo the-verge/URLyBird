@@ -81,7 +81,7 @@ public class PropertiesAccessor {
 		try (FileReader reader = new FileReader(propertiesFile)) {
 			properties.load(reader);
 			property = properties.getProperty(propertyName);
-			if (property == null) {
+			if (property == null || property.equals("")) {
 			    throw new ConfigurationException();
 			}
 		} catch (Exception e) {
