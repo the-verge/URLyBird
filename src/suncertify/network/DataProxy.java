@@ -154,5 +154,10 @@ public class DataProxy implements CloseableDB {
         database.closeDatabaseConnection();
     }
 
+    @Override
+    public boolean hasLocalDatabaseConnection() {
+        return false;
+    }
+
 	
 }

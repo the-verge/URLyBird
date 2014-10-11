@@ -105,7 +105,7 @@ public class SearchCriteria {
      */
     public void matchAllRecords() {
         for (int i = 0; i < criteria.length; i++) {
-            criteria[i] = null;
+            criteria[i] = "";
         }
     }
 }

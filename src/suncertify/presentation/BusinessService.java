@@ -170,7 +170,10 @@ public class BusinessService {
 	
 	public void cleanUp() {
 	    try {
-            dataAccess.closeDatabaseConnection();
+	        boolean shouldClose = dataAccess.hasLocalDatabaseConnection();
+	        if (shouldClose) {
+	            dataAccess.closeDatabaseConnection();
+	        }
         } catch (IOException e) {
             /**
              * Nothing of use can be conveyed to the user

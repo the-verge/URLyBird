@@ -20,4 +20,6 @@ public interface CloseableDB extends DB {
      */
     public void closeDatabaseConnection() throws IOException;
     
+    public boolean hasLocalDatabaseConnection();
+    
 }
