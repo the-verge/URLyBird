@@ -67,7 +67,7 @@ public class ServerWindow extends JFrame {
     private JLabel portLabel = new JLabel("Port");
     
     /**
-     * Database location test field.
+     * Database location text field.
      */
     private JTextField locationTextField = new JTextField();
     
@@ -97,7 +97,7 @@ public class ServerWindow extends JFrame {
     private JFileChooser chooser = new JFileChooser(".");
     
     /**
-     * Filter used to display files of type .db.
+     * Filter used to restrict the types of files displayed.
      */
     private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
@@ -149,8 +149,7 @@ public class ServerWindow extends JFrame {
     }
     
     /**
-     * Adds GUI components to a <code>JPanel</code>
-     * @return JPanel.
+     * Adds GUI components to a JPanel
      */
     private JPanel createServerPanel() {
         

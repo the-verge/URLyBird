@@ -135,7 +135,7 @@ public class ConnectionDialog extends JDialog {
     
     /**
      * Class constructor.
-     * @param mode the mode in which the application was strted in.
+     * @param mode the mode in which the application was started in.
      * @param config the configuration data saved from the previous
      *        run of the application.
      */
@@ -222,9 +222,8 @@ public class ConnectionDialog extends JDialog {
     }
     
     /**
-     * Creates a <code>JPanel</code> used to specify
+     * Creates a JPanel used to specify
      * data for a local database connection.
-     * @return JPanel.
      */
     private JPanel standAlonePanel() {
         
@@ -268,9 +267,8 @@ public class ConnectionDialog extends JDialog {
     }
     
     /**
-     * Creates a <code>JPanel</code> used to specify
+     * Creates a JPanel used to specify
      * data for a remote database connection.
-     * @return JPanel.
      */
     private JPanel networkClientPanel() {
         
