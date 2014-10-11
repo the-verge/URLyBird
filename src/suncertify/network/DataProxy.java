@@ -12,11 +12,13 @@ import suncertify.db.SecurityException;
 /**
  * <code>DataProxy</code> adapts an instance of 
  * <code>DataRemoteAdapterImpl</code>.  It implements
- * the <code>DB</code> interface.  This adaption allows
- * the GUI layer to accept a remote object of type <code>DB</code>.
- * The GUI layer is therefore not concerned about whether
- * the database connection is local, or provided by a
- * remote database server application.
+ * the <code>CloseableDB</code> interface.  This adaption allows
+ * the GUI layer to accept an object that provides a remote
+ * database connection that conforms to the <code>CloseableDB</code>
+ * (and by extension the <code>DB</code>) interface. The GUI layer 
+ * is therefore unconcerned about whether the database 
+ * connection is local, or provided by a remote database server
+ * application.
  * 
  * @author john
  *
@@ -40,7 +42,8 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
-	 * @throws DBException if the read operation fails.
+	 * @throws DBException if a database failure occurs.
+	 * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public String[] read(int recNo) throws RecordNotFoundException {
@@ -55,7 +58,8 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
-	 * @throws DBException if the update operation fails.
+     * @throws DBException if a database failure occurs.
+     * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public void update(int recNo, String[] data, long lockCookie)
@@ -70,7 +74,8 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
-	 * @throws DBException if the delete operation fails.
+     * @throws DBException if a database failure occurs.
+     * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public void delete(int recNo, long lockCookie)
@@ -84,7 +89,8 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
-	 * @throws DBException if the find operation fails.
+     * @throws DBException if a database failure occurs.
+     * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public int[] find(String[] criteria) {
@@ -99,7 +105,8 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
-	 * @throws DBException if the create operation fails.
+     * @throws DBException if a database failure occurs.
+     * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public int create(String[] data) throws DuplicateKeyException {
@@ -114,6 +121,7 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
+	 * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public long lock(int recNo) throws RecordNotFoundException {
@@ -128,6 +136,7 @@ public class DataProxy implements CloseableDB {
 	
 	/**
 	 * {@inheritDoc}
+	 * @throws NetworkException if a network error occurs.
 	 */
 	@Override
 	public void unlock(int recNo, long cookie) throws RecordNotFoundException,

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * This interface extends the supplied <code>DB</code>
- * interface in order to add a <code>close</code>
+ * interface in order to add a <code>closeDatabaseConnection</code>
  * method to <code>Data</code>.  This method is used 
  * to close the database connection just before the
  * application exits.
