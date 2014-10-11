@@ -536,6 +536,7 @@ public class DBAccessor {
     
     public void close() throws IOException {
         database.close();
+        log.info("DB file closed");
         System.out.println("DB file closed");
     }
     

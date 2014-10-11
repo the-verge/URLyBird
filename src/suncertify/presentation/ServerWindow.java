@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -60,18 +62,18 @@ public class ServerWindow extends JFrame {
     
     public ServerWindow() {
         super("URLyBird Server");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         addListeners();
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        mainPanel.add(serverPanel());
+        mainPanel.add(createServerPanel());
         
-        this.add(mainPanel);
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setMinimumSize(this.getSize());
-        this.setResizable(false);
-        this.setVisible(true);
+        add(mainPanel);
+        pack();
+        setLocationRelativeTo(null);
+        setMinimumSize(getSize());
+        setResizable(false);
+        setVisible(true);
     }
     
     private void addListeners() {
@@ -85,9 +87,11 @@ public class ServerWindow extends JFrame {
         DocumentListener listener = new StartButtonEnabler();
         locationTextField.getDocument().addDocumentListener(listener);
         portTextField.getDocument().addDocumentListener(listener);
+        
+        addExitListener();
     }
     
-    private JPanel serverPanel() {
+    private JPanel createServerPanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c;
@@ -146,6 +150,17 @@ public class ServerWindow extends JFrame {
         return panel;
     }
     
+    private void addExitListener() {
+        addWindowListener(new WindowAdapter() {
+            
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Stopping server...");
+                Server.closeDatabaseConnection();
+            }
+        });
+    }
+    
     private class BrowseButtonListener implements ActionListener {
         
         ServerWindow parent = ServerWindow.this;
@@ -172,7 +187,7 @@ public class ServerWindow extends JFrame {
 		        exitButton.setEnabled(true);
 		        portTextField.setEditable(false);
 		        browseButton.setEnabled(false);
-		        ServerWindow.this.setTitle("URLyBird Server - Running...");
+		        parent.setTitle("URLyBird Server - Running...");
 			} catch (NetworkException ex) {
 				Dialogs.showErrorDialog(parent, ex.getMessage(), "Could not start server");
 				System.exit(1);

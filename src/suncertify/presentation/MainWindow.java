@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -68,9 +70,9 @@ public class MainWindow extends JFrame implements Observer {
 	
     public MainWindow(BusinessService businessService) {
         super("URLyBird");
-        this.service = businessService;
-        this.service.addObserver(this);
-        this.createStripedTable();
+        service = businessService;
+        service.addObserver(this);
+        createStripedTable();
         table.setSelectionBackground(Color.decode("#8AA37B"));
         setUpGUI();
         refreshTable();
@@ -103,13 +105,14 @@ public class MainWindow extends JFrame implements Observer {
     
     private void setUpGUI() {
     	setDefaultCloseOperation(EXIT_ON_CLOSE);
+    	addExitListener();
         JMenuBar menuBar = new JMenuBar();
         JMenu appMenu = new JMenu("Application");
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener(new QuitActionListener());
         appMenu.add(exitMenuItem);
         menuBar.add(appMenu);
-        this.setJMenuBar(menuBar);
+        setJMenuBar(menuBar);
         
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -120,7 +123,7 @@ public class MainWindow extends JFrame implements Observer {
         c.gridx = 0;
         c.gridy = 0;
         c.fill = GridBagConstraints.VERTICAL;
-        mainPanel.add(this.SideBarPanel(), c);
+        mainPanel.add(createSideBarPanel(), c);
         
         c = new GridBagConstraints();
         c.gridx = 1;
@@ -128,23 +131,23 @@ public class MainWindow extends JFrame implements Observer {
         c.weightx = 1.0;
         c.weighty = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        mainPanel.add(this.TablePanel(), c);
+        mainPanel.add(createTablePanel(), c);
         
         c = new GridBagConstraints();
         c.gridx = 1;
         c.ipadx = 4;
         c.ipady = 10;
         c.anchor = GridBagConstraints.EAST;
-        mainPanel.add(this.BookPanel(), c);
+        mainPanel.add(createBookPanel(), c);
         
-        this.add(mainPanel);
-        this.setMinimumSize(new Dimension(750, 575));
-        this.setLocationRelativeTo(null);
-        this.pack();
-        this.setVisible(true);
+        add(mainPanel);
+        setMinimumSize(new Dimension(750, 575));
+        setLocationRelativeTo(null);
+        pack();
+        setVisible(true);
     }
     
-    private JPanel SideBarPanel() {
+    private JPanel createSideBarPanel() {
     	JPanel panel = new JPanel(new GridBagLayout());
     	panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
     	
@@ -159,7 +162,7 @@ public class MainWindow extends JFrame implements Observer {
         c.insets = new Insets(100, 5, 5, 5);
         panel.add(nameLabel, c);
         
-        this.nameTextField = new JTextField(15);
+        nameTextField = new JTextField(15);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 1;
@@ -172,13 +175,13 @@ public class MainWindow extends JFrame implements Observer {
         c.gridy = 2;
         panel.add(locationLabel, c);
         
-        this.locationTextField = new JTextField(15);
+        locationTextField = new JTextField(15);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 2;
         panel.add(locationTextField, c);
         
-        this.searchButton = new JButton("Search");
+        searchButton = new JButton("Search");
         searchButton.addActionListener(new SearchButtonListener());
         c = new GridBagConstraints();
         c.gridx = 1;
@@ -191,7 +194,7 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
     
-    private JPanel TablePanel() {
+    private JPanel createTablePanel() {
     	JPanel panel = new JPanel(new GridLayout(1,1));
     	panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -200,7 +203,7 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
     
-    private JPanel BookPanel() {
+    private JPanel createBookPanel() {
     	
     	JPanel panel = new JPanel(new GridBagLayout());
     	
@@ -216,7 +219,7 @@ public class MainWindow extends JFrame implements Observer {
         MaskFormatter eightDigits = null;
 		try {
 			eightDigits = new MaskFormatter(EIGHT_DIGITS_MASK);
-			this.customerIdTextField = new JFormattedTextField(eightDigits);
+			customerIdTextField = new JFormattedTextField(eightDigits);
 		} catch (ParseException e1) {
 			/**
 			 * While catch blocks that swallow exceptions are a bad idea
@@ -264,6 +267,16 @@ public class MainWindow extends JFrame implements Observer {
         } catch (NetworkException e) {
             Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Network error");
         }
+    }
+    
+    private void addExitListener() {
+        addWindowListener(new WindowAdapter() {
+            
+            @Override
+            public void windowClosing(WindowEvent e) {
+                service.cleanUp();
+            }
+        });
     }
     
     private class QuitActionListener implements ActionListener {

@@ -57,7 +57,9 @@ public class Server {
 	 */
 	public static void closeDatabaseConnection() {
 	    try {
-            remoteObject.closeDatabaseConnection();
+	        if (remoteObject != null) {
+	            remoteObject.closeDatabaseConnection();
+	        }
         } catch (IOException e) {
             /**
              * Nothing of use can be conveyed to the user
