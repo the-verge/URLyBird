@@ -534,6 +534,10 @@ public class DBAccessor {
         return (position < database.length()) && (position > 0);
     }
     
+    /**
+     * Closes the <code>RandomAccessFile</code> instance.
+     * @throws IOException
+     */
     public void close() throws IOException {
         database.close();
         log.info("DB file closed");

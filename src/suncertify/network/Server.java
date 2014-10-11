@@ -27,6 +27,7 @@ public class Server {
      * @param port the port on which to run RMI registry.
      * @throws DBException if a problem occurs registering
      *         a remote object in the RMI registry.
+     * @throws NetworkException if a network error occurs.
      */
 	public static void startServer(String dbLocation, int port) {
 		try {

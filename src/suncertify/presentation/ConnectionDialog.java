@@ -26,52 +26,119 @@ import suncertify.application.ApplicationMode;
 import suncertify.application.Configuration;
 
 /**
+ * This class provides a GUI to enable the user to
+ * specify database connection details. If the application
+ * is started in stand alone mode, the user can specify the
+ * location of the database file.  If the application is run in
+ * network client mode, the user can input the hostname or IP
+ * address of the machine that hosts the database server. The
+ * port on which the server is running must also be specified.
  * @author john
  *
  */
 public class ConnectionDialog extends JDialog {
     
     /**
-     * 
+     * The SUID
      */
     private static final long serialVersionUID = 1661L;
-
+    
+    /**
+     * The lowest valid port number.
+     */
     private static final int LOWEST_VALID_PORT = 1025;
     
+    /**
+     * The highest valid port number.
+     */
     private static final int HIGHEST_VALID_PORT = 65535;
     
+    /**
+     * The minimum possible path length for a database file
+     */
     private static final int MINIMUM_LOCATION_LENGTH = 4;
     
+    /**
+     * JLabel for database location field.
+     */
     private JLabel locationLabel = new JLabel("Database location");
     
+    /**
+     * JLabel for port field.
+     */
     private JLabel portLabel = new JLabel("Port");
     
+    /**
+     * JLabel for hostname field.
+     */
     private JLabel hostLabel = new JLabel("Hostname");
     
+    /**
+     * JTextField for database location details.
+     */
     private JTextField locationTextField = new JTextField();
     
+    /**
+     * JTextField for hostname details.
+     */
     private JTextField hostnameTextField = new JTextField();
     
+    /**
+     * JTextField for port details.
+     */
     private JTextField portTextField = new JTextField();
     
+    /**
+     * JButton used to connect to server.
+     */
     private JButton connectButton = new JButton("Connect");
     
+    /**
+     * JButton used to exit the application.
+     */
     private JButton exitButton = new JButton("Exit");
     
+    /**
+     * JButton used to open file chooser.
+     */
     private JButton browseButton = new JButton(" Browse ");
     
+    /**
+     * JFileChooser used to browse for database file.
+     */
     private JFileChooser chooser = new JFileChooser(".");
     
+    /**
+     * FileFilter used to restrict types of files shown.
+     */
     private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
+    /**
+     * The mode in which the application is to be run.
+     */
     private ApplicationMode mode;
     
+    /**
+     * The location of the database file.
+     */
     private String databaseLocation = "";
     
+    /**
+     * The database server hostname.
+     */
     private String hostname = "";
     
+    /**
+     * The port on which the database server is listening.
+     */
     private int port;
     
+    /**
+     * Class constructor.
+     * @param mode the mode in which the application was strted in.
+     * @param config the configuration data saved from the previous
+     *        run of the application.
+     */
     public ConnectionDialog(ApplicationMode mode, Configuration config) {
         this.mode = mode;
         addListeners();
@@ -101,6 +168,11 @@ public class ConnectionDialog extends JDialog {
         this.setVisible(true);
     }
     
+    /**
+     * Displays the configuration data saved from the previous
+     * run of the application.
+     * @param config the configuration data.
+     */
     private void loadConfigurationData(Configuration config) {
        
         if (mode == ApplicationMode.STANDALONE_CLIENT) {
@@ -126,6 +198,9 @@ public class ConnectionDialog extends JDialog {
         }
     }
     
+    /**
+     * Adds listeners to the various GUI components.
+     */
     private void addListeners() {
         
         this.addWindowListener(new WindowAdapter() {
@@ -146,6 +221,11 @@ public class ConnectionDialog extends JDialog {
         portTextField.getDocument().addDocumentListener(listener);
     }
     
+    /**
+     * Creates a <code>JPanel</code> used to specify
+     * data for a local database connection.
+     * @return JPanel.
+     */
     private JPanel standAlonePanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -187,6 +267,11 @@ public class ConnectionDialog extends JDialog {
         return panel;
     }
     
+    /**
+     * Creates a <code>JPanel</code> used to specify
+     * data for a remote database connection.
+     * @return JPanel.
+     */
     private JPanel networkClientPanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -237,6 +322,9 @@ public class ConnectionDialog extends JDialog {
         return panel;
     }
     
+    /**
+     * ActionListener for browse button functionality.
+     */
     private class BrowseButtonListener implements ActionListener {
         
         ConnectionDialog parent = ConnectionDialog.this;
@@ -252,6 +340,9 @@ public class ConnectionDialog extends JDialog {
         }
     }
     
+    /**
+     * ActionListener for exit button functionality.
+     */
     private class ExitButtonListener implements ActionListener {
 
         @Override
@@ -260,6 +351,9 @@ public class ConnectionDialog extends JDialog {
         }
     }
     
+    /**
+     * ActionListener for connect button functionality.
+     */
     private class ConnectButtonListener implements ActionListener {
 
         @Override
@@ -271,24 +365,28 @@ public class ConnectionDialog extends JDialog {
         }
     }
     
+    /**
+     * DocumentListener that checks that text field data
+     * meets criteria. If so, the connect button is enabled.
+     */
     private class ConnectButtonEnabler implements DocumentListener {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            check();
+            checkFields();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            check();
+            checkFields();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            check();
+            checkFields();
         }
         
-        public void check() {
+        public void checkFields() {
             String location = locationTextField.getText().trim();
             String host = hostnameTextField.getText().trim();
             String port = portTextField.getText().trim();
@@ -312,13 +410,19 @@ public class ConnectionDialog extends JDialog {
         }
     }
     
-    
+    /**
+     * Checks if the supplied port number is valid.
+     * @param portNumber <code>String</code> representation
+     *        of the port number.
+     * @return boolean.
+     */
     private boolean validPort(String portNumber) {
         int port = 0;
         try {
             port = Integer.parseInt(portNumber);
         } catch (NumberFormatException e) {
-            // LOG EXCEPTION
+            portTextField.setBorder(BorderFactory.createLineBorder(Color.RED));
+            return false;
         }
         if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
             this.port = port;
@@ -329,14 +433,26 @@ public class ConnectionDialog extends JDialog {
         return false;
     }
     
+    /**
+     * Getter.
+     * @return location of the database file (in standalone mode).
+     */
     public String getDatabaseLocation() {
         return databaseLocation;
     }
     
+    /**
+     * Getter.
+     * @return the database server hostname.
+     */
     public String getHostname() {
     	return hostname;
     }
     
+    /**
+     * Getter.
+     * @return the port on which the database server is listening.
+     */
     public int getPort() {
         return port;
     }

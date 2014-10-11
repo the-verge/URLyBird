@@ -22,44 +22,98 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import suncertify.db.DBException;
 import suncertify.network.NetworkException;
 import suncertify.network.Server;
 
+/**
+ * This class provides the GUI component for the 
+ * database server. It allows the user to choose the 
+ * database file and specify the port on which to 
+ * listen for requests.
+ * @author john
+ *
+ */
 public class ServerWindow extends JFrame {
     
     /**
-     * 
+     * The SUID.
      */
     private static final long serialVersionUID = 1991L;
-
+    
+    /**
+     * The lowest possible port number.
+     */
     private static final int LOWEST_VALID_PORT = 1025;
     
+    /**
+     * The highest possible port number.
+     */
     private static final int HIGHEST_VALID_PORT = 65535;
     
+    /**
+     * The smallest possible path length for the database file.
+     */
     private static final int MINIMUM_LOCATION_LENGTH = 4;
     
+    /**
+     * Label for database file location field.
+     */
     private JLabel locationLabel = new JLabel("Database location");
     
+    /**
+     * Label for port field.
+     */
     private JLabel portLabel = new JLabel("Port");
     
+    /**
+     * Database location test field.
+     */
     private JTextField locationTextField = new JTextField();
     
+    /**
+     * Port text field.
+     */
     private JTextField portTextField = new JTextField();
     
+    /**
+     * Start button.
+     */
     private JButton startButton = new JButton("Start");
     
+    /**
+     * Exit button.
+     */
     private JButton exitButton = new JButton("Exit");
     
+    /**
+     * Browse button.
+     */
     private JButton browseButton = new JButton(" Browse ");
     
+    /**
+     * File chooser to enable selection of database file.
+     */
     private JFileChooser chooser = new JFileChooser(".");
     
+    /**
+     * Filter used to display files of type .db.
+     */
     private FileFilter filter = new FileNameExtensionFilter("db files", "db");
     
+    /**
+     * The location of the database file.
+     */
     private String databaseLocation;
     
+    /**
+     * The port on which the server is to listen for requests.
+     */
     private int port;
     
+    /**
+     * Class constructor.
+     */
     public ServerWindow() {
         super("URLyBird Server");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -76,6 +130,9 @@ public class ServerWindow extends JFrame {
         setVisible(true);
     }
     
+    /**
+     * Adds listeners to various GUI components.
+     */
     private void addListeners() {
                
         browseButton.addActionListener(new BrowseButtonListener());
@@ -91,6 +148,10 @@ public class ServerWindow extends JFrame {
         addExitListener();
     }
     
+    /**
+     * Adds GUI components to a <code>JPanel</code>
+     * @return JPanel.
+     */
     private JPanel createServerPanel() {
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -150,6 +211,9 @@ public class ServerWindow extends JFrame {
         return panel;
     }
     
+    /**
+     * Adds a listener to the window's close button.
+     */
     private void addExitListener() {
         addWindowListener(new WindowAdapter() {
             
@@ -161,6 +225,9 @@ public class ServerWindow extends JFrame {
         });
     }
     
+    /**
+     * ActionListener for browse button functionality.
+     */
     private class BrowseButtonListener implements ActionListener {
         
         ServerWindow parent = ServerWindow.this;
@@ -175,10 +242,13 @@ public class ServerWindow extends JFrame {
         }
     }
     
+    /**
+     * ActionListener for start button functionality.
+     */
     private class StartButtonListener implements ActionListener {
         
         ServerWindow parent = ServerWindow.this;
-
+        
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
@@ -188,13 +258,16 @@ public class ServerWindow extends JFrame {
 		        portTextField.setEditable(false);
 		        browseButton.setEnabled(false);
 		        parent.setTitle("URLyBird Server - Running...");
-			} catch (NetworkException ex) {
+			} catch (DBException | NetworkException ex) {
 				Dialogs.showErrorDialog(parent, ex.getMessage(), "Could not start server");
 				System.exit(1);
 			}
         }
     }
     
+    /**
+     * ActionListener for exit button functionality.
+     */
     private class ExitButtonListener implements ActionListener {
 
         @Override
@@ -205,24 +278,28 @@ public class ServerWindow extends JFrame {
         }
     }
     
+    /**
+     * DocumentListener that checks if hostname and port meet 
+     * acceptable criteria. If so, the start button is enabled.
+     */
     private class StartButtonEnabler implements DocumentListener {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            check();
+            checkFields();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            check();
+            checkFields();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            check();
+            checkFields();
         }
         
-        public void check() {
+        public void checkFields() {
             String location = locationTextField.getText().trim();
             String port = portTextField.getText().trim();
             
@@ -235,13 +312,17 @@ public class ServerWindow extends JFrame {
         }
     }
     
-    
+    /**
+     * Checks whether the port number is valid.
+     * @param portNumber  - String representation of port number.
+     * @return boolean.
+     */
     private boolean validPort(String portNumber) {
         int port = 0;
         try {
             port = Integer.parseInt(portNumber);
         } catch (NumberFormatException e) {
-            // LOG EXCEPTION
+            return false;
         }
         if (port >= LOWEST_VALID_PORT && port <= HIGHEST_VALID_PORT) {
             this.port = port;
@@ -252,10 +333,18 @@ public class ServerWindow extends JFrame {
         return false;
     }
     
+    /**
+     * Getter.
+     * @return the database file location.
+     */
     public String getDatabaseLocation() {
         return databaseLocation;
     }
     
+    /**
+     * Getter.
+     * @return the port number.
+     */
     public int getPort() {
         return port;
     }

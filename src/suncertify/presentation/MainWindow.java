@@ -44,7 +44,7 @@ import suncertify.network.NetworkException;
 public class MainWindow extends JFrame implements Observer {
 	
 	/**
-     * 
+     * The SUID
      */
     private static final long serialVersionUID = 1771L;
     
