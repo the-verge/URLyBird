@@ -48,26 +48,63 @@ public class MainWindow extends JFrame implements Observer {
      */
     private static final long serialVersionUID = 1771L;
     
+    /**
+     * Mask format that only allows digits in the customer ID field.
+     */
     private static final String EIGHT_DIGITS_MASK = "########";
-
+    
+    /**
+     * <code>BusinessService</code> is the service class
+     * that provides functionality to search and book records.
+     */
     private BusinessService service;
     
+    /**
+     * The last search performed.
+     */
     private SearchCriteria lastSearch = null;
     
+    /**
+     * Table model for <code>JTable</code>.
+     */
 	private RoomTableModel tableModel = new RoomTableModel();
 	
+	/**
+	 * <code>JTable</code> used to display records.
+	 */
 	private JTable table;
 	
+	/**
+	 * Text fields for hotel name search.
+	 */
 	private JTextField nameTextField;
 	
+	/**
+	 * Text field for hotel location search.
+	 */
 	private JTextField locationTextField;
 	
+	/**
+	 * Text field for inputting a customer ID
+	 * in order to book a room.
+	 */
 	private JTextField customerIdTextField;
 	
+	/**
+	 * Search button.
+	 */
 	private JButton searchButton;
 	
+	/**
+	 * Book button.
+	 */
 	private JButton bookButton;
 	
+	/**
+	 * Class constructor.
+	 * @param businessService the <code>BusinessService</code>
+	 *        instance that provides search and book functionality.
+	 */
     public MainWindow(BusinessService businessService) {
         super("URLyBird");
         service = businessService;
@@ -78,12 +115,18 @@ public class MainWindow extends JFrame implements Observer {
         refreshTable();
     }
     
+    /**
+     * Refreshes the table model.
+     */
     @Override
     public void update(Observable arg0, Object arg1) {
         // TODO Auto-generated method stub
         tableModel.fireTableDataChanged();
     }
     
+    /**
+     * Creates a striped JTable.
+     */
     private void createStripedTable() {
         
         table = new JTable(tableModel) {
@@ -103,6 +146,10 @@ public class MainWindow extends JFrame implements Observer {
         };
     }
     
+    /**
+     * Sets up the GUI by instantiating and positioning
+     * various GUI components.
+     */
     private void setUpGUI() {
     	setDefaultCloseOperation(EXIT_ON_CLOSE);
     	addExitListener();
@@ -147,6 +194,9 @@ public class MainWindow extends JFrame implements Observer {
         setVisible(true);
     }
     
+    /**
+     * Creates the side bar JPanel that contains the search controls.
+     */
     private JPanel createSideBarPanel() {
     	JPanel panel = new JPanel(new GridBagLayout());
     	panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -194,6 +244,9 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
     
+    /**
+     * Creates the JPanel that contains the table.
+     */
     private JPanel createTablePanel() {
     	JPanel panel = new JPanel(new GridLayout(1,1));
     	panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -203,6 +256,9 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
     
+    /**
+     * Creates the JPanel that contains the booking controls.
+     */
     private JPanel createBookPanel() {
     	
     	JPanel panel = new JPanel(new GridBagLayout());
@@ -249,6 +305,13 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
     
+    /**
+     * Refreshes the table data by performing the last search, if there was
+     * a previous search.  If the lastSearch variable is null, a search for all
+     * records is performed. This functionality was introduced to update the 
+     * data displayed to the user if he / she tries to book a record that has
+     * been booked by another remote client in the time between performing
+     */
     private void refreshTable() {
         Map<Integer, Room> rooms = new LinkedHashMap<Integer, Room>();
         SearchCriteria criteria;
@@ -269,6 +332,9 @@ public class MainWindow extends JFrame implements Observer {
         }
     }
     
+    /**
+     * Adds a listener to the window exit button
+     */
     private void addExitListener() {
         addWindowListener(new WindowAdapter() {
             
@@ -279,6 +345,9 @@ public class MainWindow extends JFrame implements Observer {
         });
     }
     
+    /**
+     * ActionListener for quit menu item functionality.
+     */
     private class QuitActionListener implements ActionListener {
 
 		@Override
@@ -288,6 +357,11 @@ public class MainWindow extends JFrame implements Observer {
 		}
     }
     
+    /**
+     * KeyListener that enables the book button if a row is
+     * selected and an 8 digit customer ID is entered into
+     * the appropriate field.
+     */
     private class ButtonEnabler implements KeyListener {
     	
     	JTextField textField;
@@ -324,6 +398,9 @@ public class MainWindow extends JFrame implements Observer {
     	
     }
     
+    /**
+     * ActionListener for search button functionality.
+     */
     private class SearchButtonListener implements ActionListener {
         
         MainWindow parent = MainWindow.this;
@@ -355,6 +432,9 @@ public class MainWindow extends JFrame implements Observer {
         }
     }
     
+    /**
+     * ActionListener for book button functionality. 
+     */
     private class BookButtonListener implements ActionListener {
     	
     	MainWindow parent = MainWindow.this;
