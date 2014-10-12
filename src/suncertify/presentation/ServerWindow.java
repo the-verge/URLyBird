@@ -218,7 +218,6 @@ public class ServerWindow extends JFrame {
             
             @Override
             public void windowClosing(WindowEvent e) {
-                System.out.println("Stopping server...");
                 Server.closeDatabaseConnection();
             }
         });

@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import suncertify.application.Utils;
+
 /**
  * The DBAccessor class provides direct access to the underlying database file.
  * It uses a RandomAccessFile instance to read from and write to the file.
@@ -124,6 +126,7 @@ public class DBAccessor {
      *         instance cannot be created.
      */
     public DBAccessor(String dbLocation) {
+        Utils.setLogLevel(log, Level.FINER);
         if (database == null) {
             try {
                 File file = new File(dbLocation);
@@ -138,14 +141,14 @@ public class DBAccessor {
                     throw new DBException("Could not open " + dbLocation);
                 }
             } catch (FileNotFoundException e) {
+                log.throwing("DBAccessor.java", "Constructor", e);
                 throw new DBException("Could not open " + dbLocation, e);
             }
             databaseLocation = dbLocation;
         }
         else if (dbLocation != databaseLocation) {
-            log.logp(Level.WARNING, "DBAccessor.java", "Constructor", 
-                    "Ignored database file path "
-                  + "- database location already initialised");
+            log.warning("Ignored database location " + dbLocation +
+                    " database already initialised");
         }
     }
     
@@ -160,13 +163,13 @@ public class DBAccessor {
      * 		   trying to read from the database file.
      */
     public String[] readRecord(int recNo) throws RecordNotFoundException {
-        log.entering("DBAccessor.java", "readRecord", recNo);
         final long position = calculateFilePosition(recNo);
         byte[] record;
         String[] result;
         
         try {
             if (!recordExists(recNo)) {
+                log.warning("Record number " + recNo + " does not exist");
                 throw new RecordNotFoundException("Record number " + recNo + " does not exist");
             }
             else {
@@ -174,12 +177,12 @@ public class DBAccessor {
                 result = recordToStringArray(record); 
             }
         } catch (UnsupportedEncodingException e) {
+            log.throwing("DBAccessor.java", "readRecord", e);
             throw new DBException("Could not decode data", e);
         } catch (IOException e) {
+            log.throwing("DBAccessor.java", "readRecord", e);
             throw new DBException("Could not retrieve record", e);
         }
-        
-        log.exiting("DBAccessor.java", "readRecord", result);
         
         return result;
     }
@@ -194,8 +197,6 @@ public class DBAccessor {
      * 		   the file.
      */
     public byte[] retrieveRecord(long position) throws IOException {
-        log.entering("DBAccessor.java", "retrieveRecord", position);
-        
     	final byte[] record = new byte[RECORD_LENGTH];
         
         synchronized (database) {
@@ -215,6 +216,7 @@ public class DBAccessor {
      * 		   trying to write to the database file.
      */
     public void updateRecord(int recNo, String[] data) {
+        log.info("Updating record number " + recNo);
         final long position = calculateFilePosition(recNo);
         byte[] record = stringArrayToRecord(data);
         
@@ -223,6 +225,7 @@ public class DBAccessor {
                 database.seek(position);
                 database.write(record);
             } catch (IOException e) {
+                log.throwing("DBAccessor.java", "updateRecord", e);
                 throw new DBException("Could not update record", e);
             }
         }
@@ -236,16 +239,17 @@ public class DBAccessor {
      * 		   when attempting to write to the database file.
      */
     public void deleteRecord(int recNo) {
-        log.entering("DBAccessor.java", "deleteRecord", recNo);
         long position = calculateFilePosition(recNo);
         synchronized (database) {
             try {
                 database.seek(position);
                 database.writeByte(DELETED_FLAG);
             } catch (IOException e) {
+                log.throwing("DBAccessor.java", "deleteRecord", e);
                 throw new DBException("Could not delete record", e);
             }
         }
+        log.info("Deleted record number " + recNo);
     }
     
     
@@ -259,8 +263,6 @@ public class DBAccessor {
      *         when attempting to read from the database file.
      */
     public int[] find(String[] criteria) {
-        log.entering("DBAccessor.java", "find");
-        
         ArrayList<Integer> matches = new ArrayList<Integer>();
         long filePosition = FILE_DATA_SECTION_OFFSET;
         
@@ -268,7 +270,7 @@ public class DBAccessor {
 			while (filePosition < database.length()) {
 			    byte[] record = retrieveRecord(filePosition);
 			    if (isDeletedRecord(record)) {
-			        log.fine("Found deleted record at position " + filePosition);
+			        log.info("Found deleted record at position " + filePosition);
 		            filePosition += RECORD_LENGTH;
 			        continue;
 			    }
@@ -282,12 +284,11 @@ public class DBAccessor {
 			    }
 			}
 		} catch (IOException e) {
+		    log.throwing("DBAccessor.java", "find", e);
 			throw new DBException("Could not retrieve records", e);
 		}
         int[] result = arrayListToArray(matches);
-        
-        log.exiting("DBAccessor.java", "find", result);
-        
+        log.info("Matched " + result.length + " records");
         return result;
     }
     
@@ -368,7 +369,6 @@ public class DBAccessor {
      * 			when attempting to write to the database file.
      */
     public int createRecord(String[] data) {
-        log.entering("DBAccessor.java", "createRecord", data);
         byte[] record = stringArrayToRecord(data);
         int recordNumber = 0;
         synchronized (database) {
@@ -378,11 +378,11 @@ public class DBAccessor {
                 database.seek(position);
                 database.write(record);
             } catch (IOException e) {
+                log.throwing("DBAccessor.java", "createRecord", e);
                 throw new DBException("Could not create record", e);
             }
         }
-        log.exiting("DBAccessor.java", "createRecord", recordNumber);
-        
+        log.info("Created new record with number: " + recordNumber);
         return recordNumber;
     }
     
@@ -405,10 +405,12 @@ public class DBAccessor {
             database.seek(filePosition);
             byte validRecord = database.readByte();
             if (validRecord == DELETED_FLAG) {
+                log.info("First available position is: " + filePosition);
                 return filePosition;
             }
             filePosition += RECORD_LENGTH;
         }
+        log.info("First available position is: " + database.length());
         return database.length();
     }
     
@@ -499,6 +501,7 @@ public class DBAccessor {
         try {
             return validFilePosition(position) && !markedAsDeleted(recNo);
         } catch (IOException e) {
+            log.throwing("DBAccessor.java", "recordExists", e);
             throw new DBException("Could not determine if record number "
                       + recNo + " exists", e);
         }
@@ -541,7 +544,6 @@ public class DBAccessor {
     public void close() throws IOException {
         database.close();
         log.info("DB file closed");
-        System.out.println("DB file closed");
     }
     
     public RandomAccessFile getDatabase() {

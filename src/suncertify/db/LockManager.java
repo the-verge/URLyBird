@@ -2,7 +2,10 @@ package suncertify.db;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import suncertify.application.Utils;
 
 /**
  * The LockManager class logically locks records.
@@ -35,9 +38,13 @@ public class LockManager {
     private static long cookieCount = 0L;
     
     /**
-     * Logger instance for the LockManager class.
+     * Logger for the LockManager class.
      */
     private final Logger log = Logger.getLogger(LockManager.class.getName());
+    
+    public LockManager() {
+        Utils.setLogLevel(log, Level.FINER);
+    }
     
     /**
      * Locks a record by adding the record's number to the LOCKMAP
@@ -52,13 +59,10 @@ public class LockManager {
      */
     public long lockRecord(int recNo) {
         String threadName = Thread.currentThread().getName();
-        log.entering("LockManager.java", "lockRecord",
-                      new Object[]{threadName, recNo});
         
         synchronized (MUTEX) {
             while (LOCKMAP.containsKey(recNo)) {
-                System.out.println(threadName + ": Record number " + recNo + " is locked.  waiting...");
-                System.out.println(threadName + ": STATE: " + Thread.currentThread().getState());
+                log.info(threadName + ": Record number " + recNo + " is locked.  waiting...");
                 try {
                     MUTEX.wait();
                 } catch (InterruptedException e) {
@@ -69,14 +73,11 @@ public class LockManager {
             }
             long cookie = generateCookie();
             
-            log.fine("Generated cookie for recNo "  + recNo + ": thread: " 
+            log.info("Generated cookie for recNo "  + recNo + ": thread: " 
                      + threadName + " cookie: " + cookie);
             
             LOCKMAP.put(recNo, cookie);
-            log.fine("Total number of locks: " + LOCKMAP.size());
-            System.out.println(threadName + ": Locked record number " + recNo);
-            log.exiting("LockManger.java", "lockRecord",
-                         new Object[]{threadName, recNo, cookie});
+            log.info(threadName + ": Locked record number " + recNo);
             
             return cookie;
         }
@@ -95,15 +96,12 @@ public class LockManager {
     public void unlockRecord(int recNo, long cookie) throws SecurityException {
         String threadName = Thread.currentThread().getName();
         
-        log.entering("LockManager.java", "unlockRecord",
-                      new Object[]{threadName, recNo, cookie});
-        
         synchronized (MUTEX) {
             if (LOCKMAP.get(recNo) == cookie) {
-                System.out.println(threadName + ": Unlocking record number " + recNo);
+                log.info(threadName + ": Unlocking record number " + recNo);
                 LOCKMAP.remove(recNo);
                 MUTEX.notifyAll();
-                System.out.println(threadName + ": Notifying threads that record number " + recNo + " is unlocked");
+                log.info(threadName + ": Notifying threads that record number " + recNo + " is unlocked");
             }
             else {
                 log.warning("An illegal attempt was made to unlock record number " + recNo);

@@ -5,6 +5,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
@@ -20,7 +22,12 @@ import suncertify.network.NetworkException;
  *
  */
 public class DatabaseConnection {
-	
+    
+    /**
+     * Logger for the DatabaseConnection class.
+     */
+    private static Logger log = Logger.getLogger(DatabaseConnection.class.getName());
+    
     /**
      * Returns an object used to connect to a local database.
      * @param dbLocation the path to the database file.
@@ -42,14 +49,17 @@ public class DatabaseConnection {
 	 * @return a <code>DataProxy</code> instance.
 	 */
 	public static CloseableDB getRemoteConnection(String hostname, int port) {
+	    Utils.setLogLevel(log, Level.FINER);
 		CloseableDB data = null;
 		String url = "rmi://" + hostname + ":" + port + "/Data";
 		try {
 			DataRemoteAdapter remote = (DataRemoteAdapter) Naming.lookup(url);
 			data = new DataProxy(remote);
 		} catch (UnknownHostException e) {
+		    log.throwing("DatabaseConnection", "getRemoteConnection", e);
 			throw new NetworkException("Cannot resolve host " + hostname, e);
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+	        log.throwing("DatabaseConnection", "getRemoteConnection", e);
 			throw new NetworkException("Network error:\nCheck hostname and port", e);
 		} 
 		return data;
