@@ -42,6 +42,9 @@ public class LockManager {
      */
     private final Logger log = Logger.getLogger(LockManager.class.getName());
     
+    /**
+     * Class constructor.
+     */
     public LockManager() {
         Utils.setLogLevel(log, Level.FINER);
     }

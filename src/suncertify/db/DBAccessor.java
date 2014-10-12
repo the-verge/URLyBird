@@ -405,12 +405,10 @@ public class DBAccessor {
             database.seek(filePosition);
             byte validRecord = database.readByte();
             if (validRecord == DELETED_FLAG) {
-                log.info("First available position is: " + filePosition);
                 return filePosition;
             }
             filePosition += RECORD_LENGTH;
         }
-        log.info("First available position is: " + database.length());
         return database.length();
     }
     
