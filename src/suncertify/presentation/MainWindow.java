@@ -110,9 +110,6 @@ public class MainWindow extends JFrame implements Observer {
         super("URLyBird");
         service = businessService;
         service.addObserver(this);
-        createStripedTable();
-        table.setSelectionBackground(Color.decode("#8AA37B"));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setUpGUI();
         refreshTable();
     }
@@ -124,28 +121,6 @@ public class MainWindow extends JFrame implements Observer {
     public void update(Observable arg0, Object arg1) {
         // TODO Auto-generated method stub
         tableModel.fireTableDataChanged();
-    }
-    
-    /**
-     * Creates a striped JTable.
-     */
-    private void createStripedTable() {
-        
-        table = new JTable(tableModel) {
-            
-            private static final long serialVersionUID = 2442L;
-
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component comp = super.prepareRenderer(renderer, row, column);
-                if (!isRowSelected(row)) {
-                    comp.setBackground(getBackground());
-                    if(row % 2 == 0) {
-                        comp.setBackground(Color.decode("#E0EEEE"));
-                    }
-                }
-                return comp;
-            }
-        };
     }
     
     /**
@@ -162,6 +137,9 @@ public class MainWindow extends JFrame implements Observer {
         appMenu.add(exitMenuItem);
         menuBar.add(appMenu);
         setJMenuBar(menuBar);
+        createStripedTable();
+        table.setSelectionBackground(Color.decode("#8AA37B"));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -194,6 +172,28 @@ public class MainWindow extends JFrame implements Observer {
         setLocationRelativeTo(null);
         pack();
         setVisible(true);
+    }
+    
+    /**
+     * Creates a striped JTable.
+     */
+    private void createStripedTable() {
+        
+        table = new JTable(tableModel) {
+            
+            private static final long serialVersionUID = 2442L;
+
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component comp = super.prepareRenderer(renderer, row, column);
+                if (!isRowSelected(row)) {
+                    comp.setBackground(getBackground());
+                    if(row % 2 == 0) {
+                        comp.setBackground(Color.decode("#E0EEEE"));
+                    }
+                }
+                return comp;
+            }
+        };
     }
     
     /**
