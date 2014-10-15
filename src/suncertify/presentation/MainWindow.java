@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.MaskFormatter;
@@ -111,6 +112,7 @@ public class MainWindow extends JFrame implements Observer {
         service.addObserver(this);
         createStripedTable();
         table.setSelectionBackground(Color.decode("#8AA37B"));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setUpGUI();
         refreshTable();
     }
