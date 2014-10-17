@@ -3,4 +3,7 @@
 .settings
 .project
 doc/
-suncertify.properties
+*.properties
+*.iml
+*.jar
+.idea/

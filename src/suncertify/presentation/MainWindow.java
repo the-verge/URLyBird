@@ -33,6 +33,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.MaskFormatter;
 
@@ -195,6 +197,8 @@ public class MainWindow extends JFrame implements Observer {
                 return comp;
             }
         };
+
+        table.getSelectionModel().addListSelectionListener(new TableSelectionListener());
     }
 
     /**
@@ -279,6 +283,7 @@ public class MainWindow extends JFrame implements Observer {
 		try {
 			eightDigits = new MaskFormatter(EIGHT_DIGITS_MASK);
 			customerIdTextField = new JFormattedTextField(eightDigits);
+            customerIdTextField.setEditable(false);
 		} catch (ParseException e1) {
 			/**
 			 * While catch blocks that swallow exceptions are a bad idea
@@ -346,6 +351,16 @@ public class MainWindow extends JFrame implements Observer {
                 service.cleanUp();
             }
         });
+    }
+
+    private class TableSelectionListener implements ListSelectionListener {
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (!e.getValueIsAdjusting()) {
+                customerIdTextField.setEditable(true);
+            }
+        }
     }
 
     /**
@@ -432,6 +447,8 @@ public class MainWindow extends JFrame implements Observer {
             }
             lastSearch = criteria;
             tableModel.setRoomMap(matches);
+            customerIdTextField.setText("");
+            customerIdTextField.setEditable(false);
         }
     }
 
@@ -465,6 +482,7 @@ public class MainWindow extends JFrame implements Observer {
             }
 
 		    customerIdTextField.setText("");
+            customerIdTextField.setEditable(false);
 		    bookButton.setEnabled(false);
 		}
     }
