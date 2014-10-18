@@ -1,5 +1,17 @@
 package suncertify.presentation;
 
+import suncertify.db.DBException;
+import suncertify.db.RecordNotFoundException;
+import suncertify.db.SecurityException;
+import suncertify.network.NetworkException;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.MaskFormatter;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -9,8 +21,10 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
@@ -18,30 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.MaskFormatter;
-
-import suncertify.db.DBException;
-import suncertify.db.RecordNotFoundException;
-import suncertify.db.SecurityException;
-import suncertify.network.NetworkException;
 
 
 public class MainWindow extends JFrame implements Observer {
@@ -80,12 +70,12 @@ public class MainWindow extends JFrame implements Observer {
 	/**
 	 * Text fields for hotel name search.
 	 */
-	private JTextField nameTextField;
+	private JTextField nameTextField = new JTextField(15);
 
 	/**
 	 * Text field for hotel location search.
 	 */
-	private JTextField locationTextField;
+	private JTextField locationTextField = new JTextField(15);
 
 	/**
 	 * Text field for inputting a customer ID
@@ -102,6 +92,11 @@ public class MainWindow extends JFrame implements Observer {
 	 * Book button.
 	 */
 	private JButton bookButton;
+
+    /**
+     * Information label
+     */
+    private JLabel infoLabel = new JLabel("Please select a row first...");
 
 	/**
 	 * Class constructor.
@@ -219,11 +214,11 @@ public class MainWindow extends JFrame implements Observer {
         c.insets = new Insets(100, 5, 5, 5);
         panel.add(nameLabel, c);
 
-        nameTextField = new JTextField(15);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 1;
         c.insets = new Insets(100, 5, 5, 5);
+        nameTextField.setMinimumSize(new Dimension(194, 28));
         panel.add(nameTextField, c);
 
         JLabel locationLabel = new JLabel("Location");
@@ -232,10 +227,10 @@ public class MainWindow extends JFrame implements Observer {
         c.gridy = 2;
         panel.add(locationLabel, c);
 
-        locationTextField = new JTextField(15);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 2;
+        locationTextField.setMinimumSize(new Dimension(194, 28));
         panel.add(locationTextField, c);
 
         searchButton = new JButton("Search");
@@ -247,6 +242,16 @@ public class MainWindow extends JFrame implements Observer {
         c.insets = new Insets(10, 5, 5, 5);
         c.anchor = GridBagConstraints.NORTHEAST;
         panel.add(searchButton, c);
+
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 4;
+        c.insets = new Insets(10, 0, 0, 15);
+        infoLabel.setForeground(Color.ORANGE);
+        infoLabel.setVisible(false);
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(0, 0, 25, 42);
+        panel.add(infoLabel, c);
 
         return panel;
     }
@@ -270,9 +275,9 @@ public class MainWindow extends JFrame implements Observer {
 
     	JPanel panel = new JPanel(new GridBagLayout());
 
-    	GridBagConstraints c;
+        GridBagConstraints c;
 
-    	JLabel customerIdLabel = new JLabel("Customer ID:");
+        JLabel customerIdLabel = new JLabel("Customer ID:");
     	c = new GridBagConstraints();
     	c.gridx = 0;
     	c.gridy = 0;
@@ -297,6 +302,8 @@ public class MainWindow extends JFrame implements Observer {
         c.gridx = 1;
         c.gridy = 0;
         c.insets = new Insets(10, 0, 0, 25);
+        customerIdTextField.addMouseListener(new ClickListener());
+        customerIdTextField.setMinimumSize(new Dimension(134, 28));
         panel.add(customerIdTextField, c);
 
         bookButton = new JButton("Book");
@@ -353,26 +360,44 @@ public class MainWindow extends JFrame implements Observer {
         });
     }
 
+    /**
+     * ActionListener for quit menu item functionality.
+     */
+    private class QuitActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            service.cleanUp();
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Allows input to the customer ID text field when a row is selected.
+     */
     private class TableSelectionListener implements ListSelectionListener {
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 customerIdTextField.setEditable(true);
+                infoLabel.setVisible(false);
             }
         }
     }
 
-    /**
-     * ActionListener for quit menu item functionality.
-     */
-    private class QuitActionListener implements ActionListener {
+    private class ClickListener extends MouseAdapter {
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    service.cleanUp();
-			System.exit(0);
-		}
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            boolean aRowIsSelected = table.getSelectedRow() != -1;
+            if (!aRowIsSelected) {
+                infoLabel.setVisible(true);
+            }
+            else {
+                infoLabel.setVisible(false);
+            }
+        }
     }
 
     /**
@@ -380,7 +405,7 @@ public class MainWindow extends JFrame implements Observer {
      * selected and an 8 digit customer ID is entered into
      * the appropriate field.
      */
-    private class ButtonEnabler implements KeyListener {
+    private class ButtonEnabler extends KeyAdapter {
 
     	JTextField textField;
 
@@ -407,12 +432,6 @@ public class MainWindow extends JFrame implements Observer {
 				this.button.setEnabled(false);
 			}
 		}
-
-		@Override
-		public void keyPressed(KeyEvent arg0) {}
-
-		@Override
-		public void keyTyped(KeyEvent arg0) {}
 
     }
 
@@ -449,6 +468,7 @@ public class MainWindow extends JFrame implements Observer {
             tableModel.setRoomMap(matches);
             customerIdTextField.setText("");
             customerIdTextField.setEditable(false);
+            infoLabel.setVisible(false);
         }
     }
 
