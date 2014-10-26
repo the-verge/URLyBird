@@ -28,8 +28,8 @@ public class PropertiesAccessor {
 	/**
 	 * Retrieves configuration data from <code>suncertify.properties</code>
 	 * @param mode the client <code>ApplicationMode</code> that represents
-	 *        either a local or remote client.
-	 * @return a <code>Configuration</code> instance
+	 *        the mode the application is being executed in.
+	 * @return a <code>Configuration</code> instance.
 	 * @throws ConfigurationException if the configuration data cannot be
 	 *         retrieved.
 	 */
@@ -37,13 +37,18 @@ public class PropertiesAccessor {
 	    Configuration config = null;
 	    
 	    if (mode == ApplicationMode.STANDALONE_CLIENT) {
-	        String databaseLocation = readProperty("local.databaseLocation");
-	        config = new Configuration(databaseLocation);
+	        String databaseLocation = readProperty("standalone.databaseLocation");
+	        config = Configuration.standaloneClientConfig(databaseLocation);
 	    }
 	    else if (mode == ApplicationMode.NETWORK_CLIENT) {
-	        String hostname = readProperty("server.hostname");
-	        String port = readProperty("server.port");
-	        config = new Configuration(hostname, port);
+	        String hostname = readProperty("networkClient.hostname");
+	        String port = readProperty("networkClient.port");
+	        config = Configuration.networkClientConfig(hostname, port);
+	    }
+	    else if (mode == ApplicationMode.SERVER) {
+	        String databaseLocation = readProperty("server.databaseLocation");
+            String port = readProperty("server.port");
+            config = Configuration.serverConfig(databaseLocation, port);
 	    }
 	    return config;
     }
@@ -51,21 +56,27 @@ public class PropertiesAccessor {
 	/**
 	 * Saves configuration data to <code>suncertify.properties</code>.
 	 * @param config the <code>Configuration</code> instance that
-	 *        wraps the local or remote client connection data.
+	 *        wraps the application mode config data.
 	 * @param mode the client <code>ApplicationMode</code> that 
-	 *        represents either a local or remote client.
-	 * @throws ConfigurationException if the connection data cannot 
+	 *        represents the mode that the application is being run in.
+	 * @throws ConfigurationException if the configuration data cannot 
 	 *         be written to file.
 	 */
     public static void saveConfiguration(Configuration config, ApplicationMode mode) throws ConfigurationException {
         if (mode == ApplicationMode.STANDALONE_CLIENT) {
             String databaseLocation = config.getDatabaseLocation();
-            writeProperty("local.databaseLocation", databaseLocation);
+            writeProperty("standalone.databaseLocation", databaseLocation);
         }
         else if(mode == ApplicationMode.NETWORK_CLIENT) {
             String hostname = config.getHostname();
             String port = config.getPort();
-            writeProperty("server.hostname", hostname);
+            writeProperty("networkClient.hostname", hostname);
+            writeProperty("networkClient.port", port);
+        }
+        else if (mode == ApplicationMode.SERVER) {
+            String databaseLocation = config.getDatabaseLocation();
+            String port = config.getPort();
+            writeProperty("server.databaseLocation", databaseLocation);
             writeProperty("server.port", port);
         }
     }

@@ -22,6 +22,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import suncertify.application.Configuration;
 import suncertify.db.DBException;
 import suncertify.network.NetworkException;
 import suncertify.network.Server;
@@ -114,7 +115,7 @@ public class ServerWindow extends JFrame {
     /**
      * Class constructor.
      */
-    public ServerWindow() {
+    public ServerWindow(Configuration config) {
         super("URLyBird Server");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         addListeners();
@@ -122,12 +123,25 @@ public class ServerWindow extends JFrame {
         mainPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         mainPanel.add(createServerPanel());
         
+        if (config != null) {
+            loadConfigurationData(config);
+        }
+        
         add(mainPanel);
         pack();
         setLocationRelativeTo(null);
         setMinimumSize(getSize());
         setResizable(false);
         setVisible(true);
+    }
+    
+    /**
+     * Provides a means of adding an <code>ActionListener</code>
+     * to <code>ServerWindow</code> start button.
+     * @param listener <code>ActionListener</code> instance.
+     */
+    public void addExternalListener(ActionListener listener) {
+        this.startButton.addActionListener(listener);
     }
     
     /**
@@ -146,6 +160,20 @@ public class ServerWindow extends JFrame {
         portTextField.getDocument().addDocumentListener(listener);
         
         addExitListener();
+    }
+    
+    private void loadConfigurationData(Configuration config) {
+        String location = config.getDatabaseLocation();
+        String portNumber = config.getPort();
+        
+        if (location != null) {
+            databaseLocation = location;
+            locationTextField.setText(databaseLocation);
+        }
+        if (portNumber != null) {
+            port = Integer.parseInt(portNumber); // number format exception
+            portTextField.setText(portNumber);
+        }
     }
     
     /**
@@ -270,7 +298,6 @@ public class ServerWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Stopping server...");
             Server.closeDatabaseConnection();
             System.exit(0);
         }

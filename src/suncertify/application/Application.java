@@ -1,6 +1,9 @@
 package suncertify.application;
 
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.network.NetworkException;
@@ -28,7 +31,7 @@ public class Application {
     private ApplicationMode mode;
     
     /**
-     * The location of the database - used when in non-networked client mode.
+     * The location of the database.
      */
     private String databaseLocation;
     
@@ -38,7 +41,7 @@ public class Application {
     private String hostname;
     
     /**
-     * The port on which the server application is listening for requests.
+     * The port in use.
      */
     private int port;
 	
@@ -63,14 +66,17 @@ public class Application {
 	private void start(String[] args) {
 		
 		if (args.length == 0) {
-			showConnectionDialog(ApplicationMode.NETWORK_CLIENT);
+		    mode = ApplicationMode.NETWORK_CLIENT;
+			showConnectionDialog(mode);
 		}
 		else {
-			String mode = args[0].trim();
-			if (mode.equalsIgnoreCase("alone")) {
-				showConnectionDialog(ApplicationMode.STANDALONE_CLIENT);
+			String arg = args[0].trim();
+			if (arg.equalsIgnoreCase("alone")) {
+			    mode = ApplicationMode.STANDALONE_CLIENT;
+				showConnectionDialog(mode);
 			}
-			else if (mode.equalsIgnoreCase("server")) {
+			else if (arg.equalsIgnoreCase("server")) {
+			    mode = ApplicationMode.SERVER;
 				showServerWindow();
 			}
 			else {
@@ -89,7 +95,6 @@ public class Application {
 	 * @param mode the mode that the application is running in.
 	 */
 	private void showConnectionDialog(ApplicationMode mode) {
-	    this.mode = mode;
 		Configuration config = null;
         try {
             config = PropertiesAccessor.getConfiguration(mode);
@@ -112,10 +117,30 @@ public class Application {
 	}
 	
 	/**
-	 * Creates and displays a new <code>ServerWindow</code>
+	 * Creates and displays a new <code>ServerWindow</code>.
+	 * Adds an action listener to the <code>ServerWindow</code>
+	 * in order to determine when the user has pressed the start
+	 * button and configuration data is available to save.
 	 */
 	private void showServerWindow() {
-		new ServerWindow();
+	    Configuration config = null;
+        try {
+            config = PropertiesAccessor.getConfiguration(mode);
+        } catch (ConfigurationException e) {
+            Dialogs.showInfoDialog(null, "Configuration data not found.\nPlease enter "
+                    + "database connection\ndetails manually.", "Could not read configuration data");
+        }
+        
+		final ServerWindow window = new ServerWindow(config);
+		window.addExternalListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                databaseLocation = window.getDatabaseLocation();
+                port = window.getPort();
+                saveConfiguration();
+            }
+		});
 	}
 	
 	/**
@@ -128,7 +153,6 @@ public class Application {
 		try {
 			dataAccess = DatabaseConnection.getLocalConnection(dbLocation);
 			createClientGUI(dataAccess);
-		    saveConfiguration();
 		} catch (DBException e) {
 			Dialogs.showErrorDialog(null, e.getMessage(), "Database connection error");
 			System.exit(1);
@@ -147,7 +171,6 @@ public class Application {
 		try {
 			CloseableDB dataAccess = DatabaseConnection.getRemoteConnection(hostname, port);
 			createClientGUI(dataAccess);
-		    saveConfiguration();
 		} catch (DBException | NetworkException e) {
 			Dialogs.showErrorDialog(null, e.getMessage(), "Could not connect to server");
 			System.exit(1);
@@ -160,6 +183,7 @@ public class Application {
 	 *        may be local or remote.
 	 */
 	private void createClientGUI(CloseableDB dataAccess) {
+        saveConfiguration();
 		BusinessService service = new BusinessService(dataAccess);
 	    new MainWindow(service);
 	}
@@ -171,11 +195,15 @@ public class Application {
 	private void saveConfiguration() {
 	    Configuration config = null;
 	    if (mode == ApplicationMode.STANDALONE_CLIENT) {
-	        config = new Configuration(databaseLocation);
+	        config = Configuration.standaloneClientConfig(databaseLocation);
 	    }
 	    else if (mode == ApplicationMode.NETWORK_CLIENT) {
 	        String portNumber = Integer.toString(port);
-	        config = new Configuration(hostname, portNumber);
+	        config = Configuration.networkClientConfig(hostname, portNumber);
+	    }
+	    else if (mode == ApplicationMode.SERVER) {
+	        String portNumber = Integer.toString(port);
+	        config = Configuration.serverConfig(databaseLocation, portNumber);
 	    }
 	    try {
             PropertiesAccessor.saveConfiguration(config, mode);
