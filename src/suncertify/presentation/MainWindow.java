@@ -1,5 +1,6 @@
 package suncertify.presentation;
 
+import suncertify.application.ApplicationMode;
 import suncertify.db.DBException;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
@@ -108,16 +109,25 @@ public class MainWindow extends JFrame implements Observer {
         service = businessService;
         service.addObserver(this);
         setUpGUI();
-        refreshTable();
+        refreshData();
     }
 
     /**
-     * Refreshes the table model.
+     * Refreshes the table data. How this is accomplished
+     * depends on the mode the application is running in.
+     * If in stand alone mode, a simple GUI refresh is
+     * performed. If running in network mode, a search
+     * is carried out to see if other clients have updated
+     * data.
      */
     @Override
-    public void update(Observable arg0, Object arg1) {
-        // TODO Auto-generated method stub
-        tableModel.fireTableDataChanged();
+    public void update(Observable o, Object mode) {
+        if (mode == ApplicationMode.STANDALONE_CLIENT) {
+            tableModel.fireTableDataChanged();
+        }
+        else if (mode == ApplicationMode.NETWORK_CLIENT) {
+            refreshData();
+        }
     }
 
     /**
@@ -326,7 +336,7 @@ public class MainWindow extends JFrame implements Observer {
      * records is performed. This functionality was introduced to update the
      * data displayed to the user each time an attempt is made to book a room.
      */
-    private void refreshTable() {
+    private void refreshData() {
         Map<Integer, Room> rooms = new LinkedHashMap<Integer, Room>();
         SearchCriteria criteria;
         if (lastSearch == null) {
@@ -498,7 +508,6 @@ public class MainWindow extends JFrame implements Observer {
             } catch (NetworkException ex) {
                 Dialogs.showErrorDialog(parent, "Could not complete booking", "Network error");
             } finally {
-                refreshTable();
                 customerIdTextField.setText("");
                 customerIdTextField.setEditable(false);
                 bookButton.setEnabled(false);

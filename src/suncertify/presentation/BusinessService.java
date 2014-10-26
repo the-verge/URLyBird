@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.Observer;
 
+import suncertify.application.ApplicationMode;
 import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.db.DuplicateKeyException;
@@ -23,7 +25,7 @@ import suncertify.network.NetworkException;
  * @author john
  *
  */
-public class BusinessService {
+public class BusinessService extends Observable {
     
     /**
      * Index of the owner field in a database record.
@@ -50,21 +52,26 @@ public class BusinessService {
 	}
 	
 	/**
-	 * Adds an <code>Observer</code> to the <code>observers</code> list.
-	 * @param observer an <code>Observer</code> instance.
-	 */
-	public void addObserver(Observer observer) {
-		observers.add(observer);
+	* Adds an <code>Observer</code> to the <code>observers</code> list.
+	* @param observer an <code>Observer</code> instance.
+	*/
+	public void addObserver(Observer o) {
+	    observers.add(o);
 	}
 	
 	/**
-	 * Informs observers that data has changed.
-	 */
-	public void fireDataChangeEvent() {
-	    for (Observer o: observers) {
-	        o.update(null, null);
-	    }
-	}
+     * Informs observers that data has changed.
+     */
+    public void fireDataChangeEvent() {
+        for (Observer o: observers) {
+            if (dataAccess.hasLocalDatabaseConnection()) {
+                o.update(this, ApplicationMode.STANDALONE_CLIENT);
+            }
+            else {
+                o.update(this, ApplicationMode.NETWORK_CLIENT);
+            }
+        }
+    }
 	
 	/**
 	 * Searches for data matching supplied criteria.
