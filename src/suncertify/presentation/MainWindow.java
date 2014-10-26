@@ -324,8 +324,7 @@ public class MainWindow extends JFrame implements Observer {
      * Refreshes the table data by performing the last search, if there was
      * a previous search.  If the lastSearch variable is null, a search for all
      * records is performed. This functionality was introduced to update the
-     * data displayed to the user if he / she tries to book a record that has
-     * been booked by another remote client in the time between performing
+     * data displayed to the user each time an attempt is made to book a room.
      */
     private void refreshTable() {
         Map<Integer, Room> rooms = new LinkedHashMap<Integer, Room>();
@@ -380,6 +379,7 @@ public class MainWindow extends JFrame implements Observer {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
+                customerIdTextField.setText("");
                 customerIdTextField.setEditable(true);
                 infoLabel.setVisible(false);
             }
@@ -499,11 +499,11 @@ public class MainWindow extends JFrame implements Observer {
                 Dialogs.showErrorDialog(parent, "Could not complete booking", "Network error");
             } finally {
                 refreshTable();
+                customerIdTextField.setText("");
+                customerIdTextField.setEditable(false);
+                bookButton.setEnabled(false);
             }
 
-		    customerIdTextField.setText("");
-            customerIdTextField.setEditable(false);
-		    bookButton.setEnabled(false);
 		}
     }
 
