@@ -113,6 +113,32 @@ public class MainWindow extends JFrame implements Observer {
     }
 
     /**
+     * Refreshes the table data by performing the last search, if there was
+     * a previous search.  If the lastSearch variable is null, a search for all
+     * records is performed. This functionality was introduced to update the
+     * data displayed to the user each time an attempt is made to book a room.
+     */
+    private void refreshData() {
+        Map<Integer, Room> rooms = new LinkedHashMap<Integer, Room>();
+        SearchCriteria criteria;
+        if (lastSearch == null) {
+            criteria = new SearchCriteria();
+            criteria.matchAllRecords();
+        }
+        else {
+            criteria = lastSearch;
+        }
+        try {
+            rooms = service.searchRooms(criteria);
+            tableModel.setRoomMap(rooms);
+        } catch (DBException e) {
+            Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Database error");
+        } catch (NetworkException e) {
+            Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Network error");
+        }
+    }
+
+    /**
      * Refreshes the table data. How this is accomplished
      * depends on the mode the application is running in.
      * If in stand alone mode, a simple GUI refresh is
@@ -328,32 +354,6 @@ public class MainWindow extends JFrame implements Observer {
         panel.add(bookButton, c);
 
         return panel;
-    }
-
-    /**
-     * Refreshes the table data by performing the last search, if there was
-     * a previous search.  If the lastSearch variable is null, a search for all
-     * records is performed. This functionality was introduced to update the
-     * data displayed to the user each time an attempt is made to book a room.
-     */
-    private void refreshData() {
-        Map<Integer, Room> rooms = new LinkedHashMap<Integer, Room>();
-        SearchCriteria criteria;
-        if (lastSearch == null) {
-            criteria = new SearchCriteria();
-            criteria.matchAllRecords();
-        }
-        else {
-            criteria = lastSearch;
-        }
-		try {
-		    rooms = service.searchRooms(criteria);
-		    tableModel.setRoomMap(rooms);
-		} catch (DBException e) {
-            Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Database error");
-        } catch (NetworkException e) {
-            Dialogs.showErrorDialog(this, "Cannot show the latest bookings", "Network error");
-        }
     }
 
     /**

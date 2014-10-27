@@ -88,28 +88,29 @@ public class BusinessService extends Observable {
         String[] searchCriteria = criteria.getCriteria();
         int[] matchingRecordNumbers = dataAccess.find(searchCriteria);
         Map<Integer, Room> roomMap = new LinkedHashMap<Integer, Room>();
-        
-        for (int i = 0; i < matchingRecordNumbers.length; i++) {
-            int recNo = matchingRecordNumbers[i];
-            String[] data = null;
+        int tableIndex = 0;
+
+        for (int recNo: matchingRecordNumbers) {
             try {
-                data = dataAccess.read(recNo);
+                String[] data = dataAccess.read(recNo);
                 Room room = new Room(recNo, data);
-                roomMap.put(i, room);
-            } catch (RecordNotFoundException e) {
+                roomMap.put(tableIndex, room);
+                tableIndex++;
+            }
+            catch (RecordNotFoundException e) {
                 /*
                  * RecordNotFoundException will be thrown by the DB.read(int recNo)
                  * method if the record is marked as deleted. It is possible that
-                 * another client that uses Data.java has deleted a record number 
-                 * that matched the search criteria before this method invokes the 
-                 * DB.read(int recNo) method.  We don't want to display deleted 
+                 * another client that uses Data.java has deleted a record number
+                 * that matched the search criteria before this method invokes the
+                 * DB.read(int recNo) method.  We don't want to display deleted
                  * records, so the exception is caught here and the loop continues.
                  * Only non deleted records will be passed to the Room constructor.
                  */
                 continue;
             }
         }
-        
+
         return roomMap;
     }   
 	
