@@ -494,13 +494,16 @@ public class MainWindow extends JFrame implements Observer {
 		    int selectedRowIndex = table.getSelectedRow();
 	        String customerId = customerIdTextField.getText();
 		    Room room = tableModel.getRoom(selectedRowIndex);
-		    room.setOwner(customerId);
 
 		    try {
-		        service.bookRoom(room);
-            } catch (RecordNotFoundException ex) {
+		        service.bookRoom(room, customerId);
+            } catch (RoomAlreadyBookedException ex) {
                 Dialogs.showErrorDialog(parent, "Sorry, this room is no longer available",
-                            "Room already booked");
+                        "Room already booked");
+            }
+            catch (RecordNotFoundException ex) {
+                Dialogs.showErrorDialog(parent, "Sorry, this room is no longer available/n" + ex.getMessage(),
+                            "Room unavailable");
             } catch (SecurityException ex) {
                 Dialogs.showErrorDialog(parent, "Could not complete booking", "Error");
             } catch (DBException ex) {

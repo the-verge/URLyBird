@@ -8,3 +8,5 @@ doc/
 *.jar
 .idea/
 test-output/
+MANIFEST.mf
+classes/

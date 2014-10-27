@@ -126,14 +126,15 @@ public class BusinessService extends Observable {
      *         instance provides a remote database connection
      *         and a network error occurs.
 	 */
-	public void bookRoom(Room room) throws RecordNotFoundException, SecurityException {
+	public void bookRoom(Room room, String customerId) throws RecordNotFoundException, SecurityException, RoomAlreadyBookedException {
 	    int recNo = room.getRecNo();
-	    String[] data = room.getData();
-	    
+
 	    if (alreadyBooked(recNo)) {
-	    	throw new RecordNotFoundException();
+            fireDataChangeEvent();
+	    	throw new RoomAlreadyBookedException();
 	    }
 	    else {
+            room.setOwner(customerId);
 	        long lockCookie = dataAccess.lock(recNo);
 	        
 	        /**
@@ -149,6 +150,7 @@ public class BusinessService extends Observable {
 	         * update operation.
 	         */
             try {
+                String[] data = room.getData();
                 dataAccess.update(recNo, data, lockCookie);
             } catch (SecurityException e) {
                 throw e;
