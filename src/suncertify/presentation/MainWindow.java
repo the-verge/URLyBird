@@ -8,18 +8,13 @@ import suncertify.network.NetworkException;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.MaskFormatter;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -97,7 +92,7 @@ public class MainWindow extends JFrame implements Observer {
     /**
      * Information label
      */
-    private JLabel infoLabel = new JLabel("Please select a row first...");
+    private JLabel infoLabel = new JLabel("Please select a room first...");
 
 	/**
 	 * Class constructor.
@@ -194,11 +189,13 @@ public class MainWindow extends JFrame implements Observer {
         mainPanel.add(createTablePanel(), c);
 
         c = new GridBagConstraints();
-        c.gridx = 1;
+        c.gridx = 0;
         c.ipadx = 4;
         c.ipady = 10;
+        c.weightx = 1.0;
         c.anchor = GridBagConstraints.EAST;
-        mainPanel.add(createBookPanel(), c);
+        c.gridwidth = 2;
+        mainPanel.add(createBottomPanel(), c);
 
         add(mainPanel);
         setMinimumSize(new Dimension(750, 575));
@@ -279,16 +276,6 @@ public class MainWindow extends JFrame implements Observer {
         c.anchor = GridBagConstraints.NORTHEAST;
         panel.add(searchButton, c);
 
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 4;
-        c.insets = new Insets(10, 0, 0, 15);
-        infoLabel.setForeground(Color.ORANGE);
-        infoLabel.setVisible(false);
-        c.anchor = GridBagConstraints.EAST;
-        c.insets = new Insets(0, 0, 25, 42);
-        panel.add(infoLabel, c);
-
         return panel;
     }
 
@@ -304,6 +291,24 @@ public class MainWindow extends JFrame implements Observer {
         return panel;
     }
 
+    private JPanel createBottomPanel() {
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(createInfoPanel(), BorderLayout.WEST);
+        bottomPanel.add(createBookPanel(), BorderLayout.EAST);
+        return bottomPanel;
+    }
+
+    private JPanel createInfoPanel() {
+        JPanel infoPanel = new JPanel();
+        infoPanel.setBorder(new EmptyBorder(15, 0, 0, 140));
+        infoLabel.setForeground(Color.decode("#FFA500"));
+        infoLabel.setVisible(false);
+        infoPanel.add(infoLabel);
+        infoPanel.add(infoLabel);
+        return infoPanel;
+    }
+
     /**
      * Creates the JPanel that contains the booking controls.
      */
@@ -317,27 +322,26 @@ public class MainWindow extends JFrame implements Observer {
     	c = new GridBagConstraints();
     	c.gridx = 0;
     	c.gridy = 0;
-    	c.insets = new Insets(10, 0, 0, 15);
+    	c.insets = new Insets(10, 0, 10, 15);
         panel.add(customerIdLabel, c);
 
-        MaskFormatter eightDigits = null;
+        MaskFormatter eightDigits;
 		try {
 			eightDigits = new MaskFormatter(EIGHT_DIGITS_MASK);
 			customerIdTextField = new JFormattedTextField(eightDigits);
             customerIdTextField.setEditable(false);
 		} catch (ParseException e1) {
-			/**
-			 * While catch blocks that swallow exceptions are a bad idea
-			 * in this case I feel that it is acceptable given that the
-			 * mask to be used is a pre-defined hard coded constant.  As
-			 * a result ParseException should never be thrown.
-			 */
+            /**
+             * The mask to be used is a pre-defined
+             * hard coded constant. As a result
+             * ParseException should never be thrown.
+             */
 		}
 		customerIdTextField.setColumns(10);
 		c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 0;
-        c.insets = new Insets(10, 0, 0, 25);
+        c.insets = new Insets(10, 0, 10, 25);
         customerIdTextField.addMouseListener(new ClickListener());
         customerIdTextField.setMinimumSize(new Dimension(134, 28));
         panel.add(customerIdTextField, c);
@@ -349,7 +353,7 @@ public class MainWindow extends JFrame implements Observer {
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 0;
-        c.insets = new Insets(10, 0, 0, 25);
+        c.insets = new Insets(10, 0, 10, 25);
         c.anchor = GridBagConstraints.SOUTHEAST;
         panel.add(bookButton, c);
 
