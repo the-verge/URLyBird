@@ -26,7 +26,10 @@ public class Server {
      * Logger for the Server class.
      */
     private static Logger log = Logger.getLogger(Server.class.getName());
-    
+
+    /**
+     * Provides database connections for remote clients.
+     */
     private static DataRemoteAdapterImpl remoteObject;
 	
     /**

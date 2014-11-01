@@ -19,7 +19,12 @@ public interface CloseableDB extends DB {
      *         cannot be closed.
      */
     public void closeDatabaseConnection() throws IOException;
-    
+
+    /**
+     * Indicates whether implementing classes
+     * have a local database connection.
+     * @return boolean
+     */
     public boolean hasLocalDatabaseConnection();
     
 }

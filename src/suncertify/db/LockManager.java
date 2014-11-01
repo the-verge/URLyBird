@@ -29,7 +29,7 @@ public class LockManager {
      * Maps the numbers of records that are locked to
      * the cookie that they are locked with.
      */
-    private static final Map<Integer, Long> LOCKMAP
+    private static final Map<Integer, Long> lockMap
             = new HashMap<Integer, Long>();
     
     /**
@@ -50,7 +50,7 @@ public class LockManager {
     }
     
     /**
-     * Locks a record by adding the record's number to the LOCKMAP
+     * Locks a record by adding the record's number to the lockMap
      * HashMap as key, with the generated cookie as value.  If a 
      * thread tries to obtain a lock on a record that is already
      * locked, the thread enters an inactive state consuming no
@@ -64,7 +64,7 @@ public class LockManager {
         String threadName = Thread.currentThread().getName();
         
         synchronized (MUTEX) {
-            while (LOCKMAP.containsKey(recNo)) {
+            while (lockMap.containsKey(recNo)) {
                 log.info(threadName + ": Record number " + recNo + " is locked.  waiting...");
                 try {
                     MUTEX.wait();
@@ -79,7 +79,7 @@ public class LockManager {
             log.info("Generated cookie for recNo "  + recNo + ": thread: " 
                      + threadName + " cookie: " + cookie);
             
-            LOCKMAP.put(recNo, cookie);
+            lockMap.put(recNo, cookie);
             log.info(threadName + ": Locked record number " + recNo);
             
             return cookie;
@@ -88,7 +88,7 @@ public class LockManager {
     
     /**
      * Unlocks a record by removing the record number from the 
-     * LOCKMAP HashMap.  Other threads are notified that a record
+     * lockMap HashMap.  Other threads are notified that a record
      * has been unlocked.
      * @param recNo the number of the record to be unlocked.
      * @param cookie the cookie that the record was locked with.
@@ -100,9 +100,9 @@ public class LockManager {
         String threadName = Thread.currentThread().getName();
         
         synchronized (MUTEX) {
-            if (LOCKMAP.get(recNo) == cookie) {
+            if (lockMap.get(recNo) == cookie) {
                 log.info(threadName + ": Unlocking record number " + recNo);
-                LOCKMAP.remove(recNo);
+                lockMap.remove(recNo);
                 MUTEX.notifyAll();
                 log.info(threadName + ": Notifying threads that record number " + recNo + " is unlocked");
             }
@@ -125,10 +125,10 @@ public class LockManager {
     /**
      * Gets the HashMap that maps locked record numbers
      * to the cookies they are locked with.
-     * @return LOCKMAP
+     * @return lockMap
      */
     public Map<Integer, Long> getLockMap() {
-        return LOCKMAP;
+        return lockMap;
     }
 
 }

@@ -7,6 +7,10 @@ import java.util.logging.Logger;
 public class Utils {
     
     public static void setLogLevel(Logger log, Level level) {
+        /**
+         * No SecurityManager exists so java.lang.SecurityException
+         * will not be thrown.
+         */
         log.setUseParentHandlers(false);
         log.setLevel(level);
         ConsoleHandler handler = new ConsoleHandler();

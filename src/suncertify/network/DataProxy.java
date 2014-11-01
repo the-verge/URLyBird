@@ -47,7 +47,7 @@ public class DataProxy implements CloseableDB {
 	 */
 	@Override
 	public String[] read(int recNo) throws RecordNotFoundException {
-		String[] result = null;
+		String[] result;
 		try {
 			result = database.read(recNo);
 		} catch (RemoteException e) {
@@ -94,7 +94,7 @@ public class DataProxy implements CloseableDB {
 	 */
 	@Override
 	public int[] find(String[] criteria) {
-		int[] result = null;
+		int[] result;
 		try {
 			result = database.find(criteria);
 		} catch (RemoteException e) {
@@ -110,7 +110,7 @@ public class DataProxy implements CloseableDB {
 	 */
 	@Override
 	public int create(String[] data) throws DuplicateKeyException {
-		int recNo = 0;
+		int recNo;
 		try {
 			recNo = database.create(data);
 		} catch (RemoteException e) {
@@ -125,7 +125,7 @@ public class DataProxy implements CloseableDB {
 	 */
 	@Override
 	public long lock(int recNo) throws RecordNotFoundException {
-		long lockCookie = 1;
+		long lockCookie;
 		try {
 			lockCookie = database.lock(recNo);
 		} catch (RemoteException e) {

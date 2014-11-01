@@ -100,7 +100,7 @@ public class SearchCriteria {
     }
     
     /**
-     * Sets all values of the criteria array to null.
+     * Sets all values of the criteria array to an empty String.
      * The search will then match all records.
      */
     public void matchAllRecords() {
