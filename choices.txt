@@ -1,0 +1,72 @@
+INTRODUCTION
+------------
+
+The author will first outline general considerations and then proceed to detail the major choices made on a per package
+basis.
+
+Logging
+-------
+Logging was used sparingly throughout the application, being implemented in what were the most important and pertinent
+classes.  These classes are concerned with direct database file access and locking.  Log messages will include details
+such as how many records match a search, if deleted records were found during a search and if exceptions were thrown
+(displaying associated stack traces) during read / write operations.  The lock / update / unlock process is also logged.
+Finally, server startup and shutdown are also displayed.
+
+Record Indentification
+----------------------
+Record numbers are derived from the position in which they appear in the file.
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+suncertify.db
+--------------
+
+This package is primarily concerned with database access and record locking.  The supplied DB interface was extended
+to include 2 extra methods that specify that implementing classes should have a method to close their database connections,
+and to indicate if their database connection is of a local nature.  That is, if the database resides on the same machine.
+This allowed closing of the RandomAccessFile used to read from and write to the database file.
+
+Database operations
+-------------------
+The package is primarily concerned with database access and record locking.  The supplied DB interface was extended
+to include 2 extra methods that specify that implementing classes should have a method to close their database connections,
+and to indicate if their database connection is of a local nature.  That is, if the database resides on the same machine.
+This allowed closing of the RandomAccessFile used to read from and write to the database file.
+
+Data implements the extended CloseableDB interface and is in essence a facade which delegates CRUD operations on the
+database to DBAccessor and record locking responsibilities to LockManager.  DBAccessor uses a RandomAccessFile instance
+to perform the CRUD operations.  No caching of records is implemented so each read from or write to the database
+is performed directly on the file and so constitutes an IO operation.  Given that most methods in RandomAccessFile
+throw checked exceptions, for Data to maintain compliance with the supplied DB interface, it was deemed necessary to
+catch the checked exceptions and instead throw DBException.  DBException extends RuntimeException and is of course
+unchecked.
+
+As per best practice, DBException is not included in DBAccessor method signatures but it is however included in the @throws
+sections of Javadocs.  DBException is also shown in the Javadocs of classes that use DBAccessor such as Data (and indeed
+the classes that use Data).  This was done to make absolutely clear what users of Data should expect.
+
+Locking
+-------
+As mentioned, LockManager is responsible for record locking to prevent simultaneous updates of a record by several clients,
+resulting in data corruption.  LockManager maintains a Map<Integer, Long> hash map that maps a given record number to a lock
+cookie that is generated when the record is locked.  Thus when a client attempts to unlock the record after an update,
+it must do so by supplying the lock cookie generated in the lock phase.  Attempts to unlock a record with an invalid
+cookie result in a SecurityException being thrown.  If a client attempts to lock a record that is already locked, it is
+placed in a waiting state by the Object.wait() method which is called on a mutex.  When a record is successfully unlocked,
+Object.notifyAll() is invoked to indicate to other threads that a record has been unlocked and to attempt to obtain a
+lock on their desired record again.
+
+A potential problem with the locking mechanism was identified in that if a client locks a record and then fails for some
+reason, that record remains locked forever, unavailable to any other client.  An investigation was carried out into
+starting a timer after a lock had been obtained and giving a client an arbitrary amount of time to complete its task,
+after which the lock would automatically released.  This was however not in the requirements of the project and was
+not implemented.
+
+------------------------------------------------------------------------------------------------------------------------
+
+suncertify.network:
+-------------------
+
+
+

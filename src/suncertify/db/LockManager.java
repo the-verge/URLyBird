@@ -59,8 +59,11 @@ public class LockManager {
      * again.
      * @param recNo the number of the record to be locked.
      * @return the cookie that the record has been locked with.
+     * @throws suncertify.db.RecordNotFoundException if an
+     *         <code>InterruptedException</code> occurs when
+     *         a thread is in a waiting state.
      */
-    public long lockRecord(int recNo) {
+    public long lockRecord(int recNo) throws RecordNotFoundException {
         String threadName = Thread.currentThread().getName();
         
         synchronized (MUTEX) {
@@ -70,8 +73,7 @@ public class LockManager {
                     MUTEX.wait();
                 } catch (InterruptedException e) {
                     log.throwing("LockManager.java", "lockRecord", e);
-                    // NEED TO CLARIFY
-                    Thread.currentThread().interrupt();
+                    throw new RecordNotFoundException("Could not lock record number " + recNo);
                 }
             }
             long cookie = generateCookie();

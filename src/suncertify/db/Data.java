@@ -143,6 +143,9 @@ public class Data implements CloseableDB {
         database.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasLocalDatabaseConnection() {
         return true;

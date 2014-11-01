@@ -103,7 +103,8 @@ public interface DataRemoteAdapter extends Remote {
      * @return long cookie a unique token used to identify the owner
      * 		   of the lock on the record.
      * @throws RecordNotFoundException if the record does not exist 
-     * 		   in the database.
+     * 		   in the database or an <code>InterruptedException</code>
+     * 		   occurs when trying to lock the record.
      * @throws RemoteException if a networking error occurs.
      */
     public long lock(int recNo) throws RecordNotFoundException, RemoteException;

@@ -251,8 +251,14 @@ public class BusinessService extends Observable {
 	 * @param data the fields of the record to be created.
 	 * @throws DuplicateKeyException
 	 */
-	public void createRoom(String[] data) throws DuplicateKeyException {
-        dataAccess.create(data);
+	public void createRoom(String[] data) {
+        try {
+            dataAccess.create(data);
+        } catch (DuplicateKeyException e) {
+            /**
+             * DuplicateKeyException will never be thrown.
+             */
+        }
     }
 	
 	/**
