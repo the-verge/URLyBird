@@ -16,6 +16,11 @@ Record Indentification
 ----------------------
 Record numbers are derived from the position in which they appear in the file.
 
+Book once and only once
+-----------------------
+The application only allows a record to be booked once and cannot be updated, so care is needed when making a booking.
+The instructions did not specify that a record should be re-bookable, so such functionality is not included.
+
 ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -46,6 +51,8 @@ As per best practice, DBException is not included in DBAccessor method signature
 sections of Javadocs.  DBException is also shown in the Javadocs of classes that use DBAccessor such as Data (and indeed
 the classes that use Data).  This was done to make absolutely clear what users of Data should expect.
 
+
+
 Locking
 -------
 As mentioned, LockManager is responsible for record locking to prevent simultaneous updates of a record by several clients,
@@ -67,6 +74,33 @@ not implemented.
 
 suncertify.network:
 -------------------
+
+This package is concerned with providing network server functionality.  RMI was chosen over sockets for ease of use and
+the abstraction that it provides.
+
+Adapting Data for use as a remote object
+----------------------------------------
+In order to use Data as a remote object it was necessary to adapt it using a Remote interface.  This interface,
+DataRemoteAdapter, extends java.rmi.Remote and is indentical to the supplied DB interface except that every method
+additionally throws java.rmi.RemoteException.  DataRemoteAdapterImpl is the implementation of this interface.  It has
+a Data instance as a member and each DataRemoteAdapterImpl method invokes the corresponding method of this Data member.
+DataRemoteAdapterImpl is the object exported to the RMI registry.
+
+It was deemed important that the presentation layer of the application was unconcerned about whether the database it
+was accessing was local or remote and could accept an object of a single type to perform whatever functions necessary.
+The DataProxy class achieves this by adapting DataRemoteAdapterImpl in much the same way as DataRemoteAdapterImpl adapts
+Data.  That is, DataProxy has a DataRemoteAdapterImpl member and DataProxy methods call the corresponding
+DataRemoteAdapterImpl methods.  DataProxy also implements the CloseableDB interface, so the presentation layer
+can accept a single type of object.
+
+In DataProxy, the RemoteExceptions potentially thrown by DataRemoteAdapterImpl methods are caught and NetworkException is
+thrown instead.  NetworkException is a sub-class of RuntimeException.  This is done in order to maintain compliance
+with the CloseableDB and DB interfaces.
+
+Server functionality
+--------------------
+The Server class starts RMI registry programmatically and registers an instance of DataRemoteAdapterImpl under the name
+ "Data".
 
 
 
