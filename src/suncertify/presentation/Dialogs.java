@@ -33,4 +33,10 @@ public class Dialogs {
         JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public static int showConfirmQuitDialog(Container parent) {
+        int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", "Exit?",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        return response;
+    }
+
 }

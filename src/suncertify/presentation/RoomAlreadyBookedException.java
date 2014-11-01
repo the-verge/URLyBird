@@ -1,5 +1,9 @@
 package suncertify.presentation;
 
+/**
+ * This exception is thrown when a client tries to reserve
+ * a room that is already booked.
+ */
 public class RoomAlreadyBookedException extends Exception {
 
     /**

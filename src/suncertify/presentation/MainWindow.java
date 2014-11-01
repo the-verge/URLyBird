@@ -156,7 +156,7 @@ public class MainWindow extends JFrame implements Observer {
      * various GUI components.
      */
     private void setUpGUI() {
-    	setDefaultCloseOperation(EXIT_ON_CLOSE);
+    	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     	addExitListener();
         JMenuBar menuBar = new JMenuBar();
         JMenu appMenu = new JMenu("Application");
@@ -368,7 +368,7 @@ public class MainWindow extends JFrame implements Observer {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                service.cleanUp();
+               handleExitGesture();
             }
         });
     }
@@ -380,6 +380,18 @@ public class MainWindow extends JFrame implements Observer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            handleExitGesture();
+        }
+    }
+
+    /**
+     * Displays a confirm dialog asking the user if they are
+     * sure that they want to quit the application. If the
+     * user selects 'OK', the application will exit.
+     */
+    private void handleExitGesture() {
+        int response = Dialogs.showConfirmQuitDialog(this);
+        if (response == JOptionPane.OK_OPTION) {
             service.cleanUp();
             System.exit(0);
         }

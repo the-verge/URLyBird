@@ -9,13 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -141,6 +135,7 @@ public class ConnectionDialog extends JDialog {
      */
     public ConnectionDialog(ApplicationMode mode, Configuration config) {
         this.mode = mode;
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addListeners();
         
         JPanel mainPanel = new JPanel();
@@ -203,13 +198,7 @@ public class ConnectionDialog extends JDialog {
      */
     private void addListeners() {
         
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) { 
-                System.exit(0);
-            }
-        });
-
+        addExitListener();
         browseButton.addActionListener(new BrowseButtonListener());
         exitButton.addActionListener(new ExitButtonListener());
         connectButton.addActionListener(new ConnectButtonListener());
@@ -345,6 +334,31 @@ public class ConnectionDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            handleExitGesture();
+        }
+    }
+
+    /**
+     * Adds a listener to the dialog's close button.
+     */
+    private void addExitListener() {
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                handleExitGesture();
+            }
+        });
+    }
+
+    /**
+     * Displays a confirm dialog asking the user if they are
+     * sure that they want to quit the application. If the
+     * user selects 'OK', the application will exit.
+     */
+    private void handleExitGesture() {
+        int response = Dialogs.showConfirmQuitDialog(this);
+        if (response == JOptionPane.OK_OPTION) {
             System.exit(0);
         }
     }
