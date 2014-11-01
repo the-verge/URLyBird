@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import suncertify.db.LockManager;
+import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 
 public class LockManagerTest {
@@ -14,7 +15,7 @@ public class LockManagerTest {
     LockManager manager = new LockManager();
     
     @Test
-    public void numberOfLocksTest() throws SecurityException {
+    public void numberOfLocksTest() throws SecurityException, RecordNotFoundException {
         Map<Integer, Long> lockMap = manager.getLockMap();
         
         long returnedCookie1 = manager.lockRecord(1);
@@ -35,7 +36,7 @@ public class LockManagerTest {
     }
 
     @Test(expected=SecurityException.class)
-    public void securityExceptionTest() throws SecurityException {
+    public void securityExceptionTest() throws SecurityException, RecordNotFoundException {
         manager.lockRecord(1);
         long illegalCookie = 11L;
         manager.unlockRecord(1, illegalCookie);

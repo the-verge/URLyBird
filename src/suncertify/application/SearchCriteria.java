@@ -1,4 +1,4 @@
-package suncertify.presentation;
+package suncertify.application;
 
 /**
  * This class is used to instantiate objects

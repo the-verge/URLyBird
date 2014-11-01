@@ -1,5 +1,7 @@
 package suncertify.presentation;
 
+import suncertify.application.Room;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 

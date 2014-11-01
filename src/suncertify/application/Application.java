@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.network.NetworkException;
-import suncertify.presentation.BusinessService;
 import suncertify.presentation.ConnectionDialog;
 import suncertify.presentation.Dialogs;
 import suncertify.presentation.MainWindow;

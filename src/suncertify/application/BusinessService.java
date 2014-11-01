@@ -1,4 +1,4 @@
-package suncertify.presentation;
+package suncertify.application;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import suncertify.application.ApplicationMode;
 import suncertify.db.CloseableDB;
 import suncertify.db.DBException;
 import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 import suncertify.network.NetworkException;
+import suncertify.presentation.RoomAlreadyBookedException;
 
 /**
  * The <code>BusinessService</code> class is a utility
@@ -53,7 +53,7 @@ public class BusinessService extends Observable {
 	
 	/**
 	* Adds an <code>Observer</code> to the <code>observers</code> list.
-	* @param observer an <code>Observer</code> instance.
+	* @param o an <code>Observer</code> instance.
 	*/
 	public void addObserver(Observer o) {
 	    observers.add(o);

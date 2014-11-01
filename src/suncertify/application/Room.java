@@ -1,10 +1,8 @@
-package suncertify.presentation;
+package suncertify.application;
 
 /**
- * Class that represents a hotel room.
- * Used as a transfer object within the
- * presentation layer. It encapsulates
- * a record's data and it's number.
+ * Class that represents a hotel room. Used as a transfer object.
+ * It encapsulates a record's data and it's number.
  * @author 
  *
  */
@@ -26,7 +24,7 @@ public class Room {
      * @param recNo the database record number.
      * @param data the record data.
      */
-    protected Room(int recNo, String[] data) {
+    public Room(int recNo, String[] data) {
         this.recNo = recNo;
         this.data = data;
     }
@@ -35,7 +33,7 @@ public class Room {
      * Getter.
      * @return the record number.
      */
-    protected int getRecNo() {
+    public int getRecNo() {
         return recNo;
     }
     
@@ -43,7 +41,7 @@ public class Room {
      * Getter.
      * @return the record data.
      */
-    protected String[] getData() {
+    public String[] getData() {
         return data;
     }
     
@@ -51,7 +49,7 @@ public class Room {
      * Setter.
      * @param recNo the record number.
      */
-    protected void setRecNo(int recNo) {
+    public void setRecNo(int recNo) {
         this.recNo = recNo;
     }
     
@@ -59,7 +57,7 @@ public class Room {
      * Setter.
      * @param name the hotel name.
      */
-    protected void setName(String name) {
+    public void setName(String name) {
         data[0] = name;
     }
     
@@ -67,7 +65,7 @@ public class Room {
      * Setter.
      * @param location the hotel location.
      */
-    protected void setLocation(String location) {
+    public void setLocation(String location) {
         data[1] = location;
     }
     
@@ -75,7 +73,7 @@ public class Room {
      * Setter.
      * @param size the maximum occupancy of the room.
      */
-    protected void setSize(String size) {
+    public void setSize(String size) {
         data[2] = size;
     }
     
@@ -83,7 +81,7 @@ public class Room {
      * Setter.
      * @param smoking whether the room is a smoking room.
      */
-    protected void setSmoking(String smoking) {
+    public void setSmoking(String smoking) {
         data[3] = smoking;
     }
     
@@ -91,7 +89,7 @@ public class Room {
      * Setter.
      * @param rate the nightly rate.
      */
-    protected void setRate(String rate) {
+    public void setRate(String rate) {
         data[4] = rate;
     }
     
@@ -99,7 +97,7 @@ public class Room {
      * Setter.
      * @param date the date for which the room is booked.
      */
-    protected void setDate(String date) {
+    public void setDate(String date) {
         data[5] = date;
     }
     
@@ -107,7 +105,7 @@ public class Room {
      * Setter.
      * @param owner the customer that has booked the room.
      */
-    protected void setOwner(String owner) {
+    public void setOwner(String owner) {
         data[6] = owner;
     }
 

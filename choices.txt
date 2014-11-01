@@ -102,5 +102,51 @@ Server functionality
 The Server class starts RMI registry programmatically and registers an instance of DataRemoteAdapterImpl under the name
  "Data".
 
+ -----------------------------------------------------------------------------------------------------------------------
+
+suncertify.presentation
+-----------------------
+
+The suncertify.presentation package contains the classes that constitute the GUI layer of the application.  The main
+layout used was GridbagLayout, but some panels use BorderLayout to achieve the desired positioning of components.
+
+GUI windows and views
+---------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
