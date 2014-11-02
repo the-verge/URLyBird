@@ -1,5 +1,5 @@
-INTRODUCTION
-------------
+                                            INTRODUCTION
+                                            ------------
 
 The author will first outline general considerations and then proceed to detail the major choices made on a per package
 basis.
@@ -24,8 +24,8 @@ The instructions did not specify that a record should be re-bookable, so such fu
 ------------------------------------------------------------------------------------------------------------------------
 
 
-suncertify.db
---------------
+                                            suncertify.db
+                                            --------------
 
 This package is primarily concerned with database access and record locking.
 
@@ -71,8 +71,9 @@ not implemented.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-suncertify.network:
--------------------
+
+                                            suncertify.network:
+                                            -------------------
 
 This package is concerned with providing network server functionality.  RMI was chosen over sockets for ease of use and
 the abstraction that it provides.
@@ -101,10 +102,56 @@ Server functionality
 The Server class starts RMI registry programmatically and registers an instance of DataRemoteAdapterImpl under the name
 "Data".
 
- -----------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 
-suncertify.presentation
------------------------
+
+                                            suncertify.application
+                                            ----------------------
+
+The classes in this package can perhaps be regarded as 'infrastructure' classes.  They carry out functions such as
+application startup, reading and writing configuration data, Setting log levels and providing database connections to
+clients.
+
+Application startup
+-------------------
+
+The Application class is the main class and of course it accepts the command line arguments specified by the user.  If
+more than a single argument is provided, it is ignored.  Provided that the arguments (if any) satisfy the permitted
+values, Application decides on which mode to run the application: standalone, network client or server.  The appropriate
+objects are then constructed, local or remote database connections obtained and the GUI is shown.  If the supplied
+argument is invalid, the user is informed that this is the case via a JOptionPane and the application exits.
+
+Business logic
+--------------
+
+The BusinessService class provides the business logic of the application.  It extends java.util.Observable so that GUI
+components can observe it for changes in data.  It provides a full suite of methods for searching, booking, creating
+and deleting records.  Only search and book functionality is exposed through the GUI however.  BusinessService accepts
+an object of type CloseableDB that provides it's database connection.  The connection may be local, provided by Data, or
+remote, provided by DataProxy.
+
+Providing database connections
+------------------------------
+
+The DatabaseConnection class has 2 static methods that both return CloseableDB instances.  getLocalConnection() returns
+a Data object, while getRemoteConnection() uses Naming.lookup() to get a stub of a remote object of the
+DataRemoteAdapterImpl class.  A DataProxy instance (which also implements CloseableDB) is then instantiated and returned.
+
+Configuration data
+------------------
+
+Configuration data is loaded and saved using the PropertiesAccessor class.  Data for all 3 modes is persisted to the
+'suncertify.properties' file.  When the application is run for the first time, this file will not exist.  The user will
+be prompted to enter data manually, a properties file will be created and the data saved.  A Configuration object is used
+to encapsulate config data for all modes.  Configuration has a private constructor, so the only means of instantiation
+are 3 static methods, one for each application mode. This prevents incorrect use of the class.
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+                                            suncertify.presentation
+                                            -----------------------
 
 The suncertify.presentation package contains the classes that constitute the GUI layer of the application.  The main
 layout used was GridbagLayout, but some panels use BorderLayout to achieve the desired positioning of components.
@@ -122,7 +169,7 @@ used to connect to the server is disabled until a valid port number is entered.
 Upon successful connection the user will be presented with a MainWindow instance.  MainWindow has a BusinessService object
 as a member variable which is passed to it upon construction.  As mentioned earlier, Business service is a subclass of
 java.util.Observable.  MainWindow implements the java.util.Observer interface and it registers itself with BusinessService
-as an observer.  Thus when data changes as a result of BusinessService functions, MainWindow is updated to reflect
+as an observer.  Thus when data changes as a result of BusinessService methods, MainWindow is updated to reflect
 these changes.
 
 MainWindow is composed of several panels: 1 for search, 1 for display of records and 1 for making a booking.  All
@@ -151,38 +198,3 @@ JTextField allows the input of the port on which the server is to listen for req
 unless a valid port number is entered.
 
 ------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
