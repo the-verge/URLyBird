@@ -1,4 +1,4 @@
-package suncertify.presentation;
+package suncertify.application;
 
 /**
  * This exception is thrown when a client tries to reserve

@@ -14,7 +14,6 @@ import suncertify.db.DuplicateKeyException;
 import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 import suncertify.network.NetworkException;
-import suncertify.presentation.RoomAlreadyBookedException;
 
 /**
  * The <code>BusinessService</code> class is a utility
@@ -180,8 +179,13 @@ public class BusinessService extends Observable {
 	 * Checks if a given record is already booked.
 	 * @param recNo the record number to check.
 	 * @return boolean.
-	 * @throws RecordNotFoundException.
-	 */
+	 * @throws RecordNotFoundException if the record
+     *         does not exist in the database.
+     * @throws DBException if a database failure occurs.
+     * @throws NetworkException if the <code>CloseableDB</code>
+     *         instance provides a remote database connection
+     *         and a network error occurs.
+     */
 	private boolean alreadyBooked(int recNo) throws RecordNotFoundException {
 		String[] roomData = dataAccess.read(recNo);
 		String owner = roomData[OWNER_INDEX];
