@@ -4,8 +4,8 @@ package suncertify.db;
  * Thrown if an attempt is made to update, delete
  * or unlock a record with a cookie other than the
  * cookie that the record was locked with.
- * @author john
  *
+ * @author John Harding
  */
 public class SecurityException extends Exception {
     

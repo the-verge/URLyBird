@@ -16,8 +16,8 @@ import suncertify.db.SecurityException;
  * class and provide identical functionality remotely without having to
  * alter <code>Data</code> or any of its member classes.
  * @see suncertify.network.DataRemoteAdapterImpl
- * @author john
  *
+ * @author John Harding
  */
 public interface DataRemoteAdapter extends Remote {
     

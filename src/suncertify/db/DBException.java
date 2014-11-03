@@ -7,8 +7,8 @@ package suncertify.db;
  * <code>DBAccessor</code> and <code>LockManager</code> classes. It extends 
  * <code>RuntimeException</code> (which is not a checked exception) in order 
  * to maintain compliance with supplied <code>DB</code> interface.
- * @author john
  *
+ * @author John Harding
  */
 public class DBException extends RuntimeException {
     

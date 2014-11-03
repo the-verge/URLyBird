@@ -8,8 +8,7 @@ import java.io.IOException;
  * and record locking responsibilities to the DBAccessor and LockManager classes
  * respectively.
  * 
- * @author 
- * 
+ * @author John Harding
  */
 public class Data implements CloseableDB {
     

@@ -23,7 +23,7 @@ import suncertify.application.Utils;
  * maintaining <code>Data</code> compliance with the supplied DB.java 
  * interface.
  * 
- * @author 
+ * @author John Harding
  */
 public class DBAccessor {
     

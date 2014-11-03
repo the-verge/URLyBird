@@ -26,8 +26,8 @@ import suncertify.network.Server;
  * database server. It allows the user to choose the 
  * database file and specify the port on which to 
  * listen for requests.
- * @author john
  *
+ * @author John Harding
  */
 public class ServerWindow extends JFrame {
     

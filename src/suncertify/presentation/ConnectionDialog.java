@@ -27,8 +27,8 @@ import suncertify.application.Configuration;
  * network client mode, the user can input the hostname or IP
  * address of the machine that hosts the database server. The
  * port on which the server is running must also be specified.
- * @author john
  *
+ * @author John Harding
  */
 public class ConnectionDialog extends JDialog {
     

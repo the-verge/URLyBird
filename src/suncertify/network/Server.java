@@ -17,8 +17,8 @@ import suncertify.application.Utils;
  * <code>DataRemoteAdapterImpl</code>, binding the
  * <code>DataRemoteAdapterImpl</code> to the name
  * "Data" in the registry.
- * @author john
  *
+ * @author John Harding
  */
 public class Server {
     

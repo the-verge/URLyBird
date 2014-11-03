@@ -8,8 +8,8 @@ import javax.swing.JOptionPane;
  * This class provides static methods to obtain 
  * <code>JOptionPane</code> information an error
  * dialogs.
- * @author john
  *
+ * @author John Harding
  */
 public class Dialogs {
     

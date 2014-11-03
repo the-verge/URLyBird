@@ -3,8 +3,8 @@ package suncertify.application;
 /**
  * This exception is used to wrap <code>IOException</code> if it is thrown
  * from the private methods in the <code>PropertiesAccessor</code> class.
- * @author john
  *
+ * @author John Harding
  */
 public class ConfigurationException extends Exception {
     

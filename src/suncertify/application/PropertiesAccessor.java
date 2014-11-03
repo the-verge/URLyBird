@@ -9,8 +9,8 @@ import java.util.Properties;
 /**
  * This class handles writing configuration data to and 
  * retrieving configuration data from <code>suncertify.properties</code>.
- * @author john
  *
+ * @author John Harding
  */
 public class PropertiesAccessor {
 	

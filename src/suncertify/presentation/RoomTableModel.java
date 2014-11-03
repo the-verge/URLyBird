@@ -15,8 +15,8 @@ import javax.swing.table.AbstractTableModel;
  * Table row <code>i</code> corresponds to <code>roomMap[i]</code> 
  * and each <code>Room</code> object encapsulates the corresponding
  * database record number.
- * @author john
  *
+ * @author John Harding
  */
 public class RoomTableModel extends AbstractTableModel {
     

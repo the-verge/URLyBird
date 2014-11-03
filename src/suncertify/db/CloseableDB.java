@@ -8,8 +8,8 @@ import java.io.IOException;
  * method to <code>Data</code>.  This method is used 
  * to close the database connection just before the
  * application exits.
- * @author john
  *
+ * @author John Harding
  */
 public interface CloseableDB extends DB {
     

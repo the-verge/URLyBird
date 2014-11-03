@@ -6,8 +6,8 @@ package suncertify.application;
  * databaseLocation, hostname and port are sufficient to
  * encapsulate configuration data for all three application
  * modes.
- * @author john
  *
+ * @author John Harding
  */
 public class Configuration {
     

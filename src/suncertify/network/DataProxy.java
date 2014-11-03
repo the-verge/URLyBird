@@ -19,9 +19,8 @@ import suncertify.db.SecurityException;
  * is therefore unconcerned about whether the database 
  * connection is local, or provided by a remote database server
  * application.
- * 
- * @author john
  *
+ * @author John Harding
  */
 public class DataProxy implements CloseableDB {
 	

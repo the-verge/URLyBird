@@ -4,6 +4,11 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A utility class whose only function is to set logging levels
+ *
+ * @author John Harding
+ */
 public class Utils {
     
     public static void setLogLevel(Logger log, Level level) {

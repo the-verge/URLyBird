@@ -19,8 +19,8 @@ import suncertify.presentation.ServerWindow;
  * Following the successful input of configuration parameters the main 
  * functionality of the application will be available and the configuration
  * data is saved to suncertify.properties (for client modes only).
- * @author john
  *
+ * @author John Harding
  */
 public class Application {
     

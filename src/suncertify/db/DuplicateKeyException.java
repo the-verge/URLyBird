@@ -4,8 +4,8 @@ package suncertify.db;
  * This exception is not thrown at any point in the application.
  * The reasons for this are outlined in choices.txt.
  * It is implemented as it is a requirement of the project. 
- * @author john
- * 
+ *
+ * @author John Harding
  */
 public class DuplicateKeyException extends Exception {
     

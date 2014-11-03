@@ -3,8 +3,8 @@ package suncertify.db;
 /**
  * Thrown when a specified record does not exist
  * or is marked as deleted in the database.
- * @author john
  *
+ * @author John Harding
  */
 public class RecordNotFoundException extends Exception {
     

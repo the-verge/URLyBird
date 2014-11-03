@@ -21,8 +21,7 @@ import suncertify.network.NetworkException;
  * a <code>CloseableDB</code> instance, which may provide
  * a local or remote database connection.
  * 
- * @author john
- *
+ * @author John Harding
  */
 public class BusinessService extends Observable {
     

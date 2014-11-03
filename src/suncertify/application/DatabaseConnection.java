@@ -18,8 +18,8 @@ import suncertify.network.NetworkException;
 /**
  * The static methods of this class return a <code>DB</code>
  * instance for both local and remote database connections.
- * @author john
  *
+ * @author John Harding
  */
 public class DatabaseConnection {
     

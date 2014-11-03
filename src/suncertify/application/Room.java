@@ -3,8 +3,8 @@ package suncertify.application;
 /**
  * Class that represents a hotel room. Used as a transfer object.
  * It encapsulates a record's data and it's number.
- * @author 
  *
+ * @author John Harding
  */
 public class Room {
     

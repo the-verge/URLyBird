@@ -56,12 +56,12 @@ Locking
 -------
 As mentioned, LockManager is responsible for record locking to prevent simultaneous updates of a record by several clients,
 resulting in data corruption.  LockManager maintains a Map<Integer, Long> hash map that maps a given record number to a lock
-cookie that is generated when the record is locked.  Thus when a client attempts to unlock the record after an update,
-it must do so by supplying the lock cookie generated in the lock phase.  Attempts to unlock a record with an invalid
-cookie result in a SecurityException being thrown.  If a client attempts to lock a record that is already locked, it is
-placed in a waiting state by the Object.wait() method which is called on a mutex.  When a record is successfully unlocked,
-Object.notifyAll() is invoked to indicate to other threads that a record has been unlocked and to attempt to obtain a
-lock on their desired record again.
+cookie that is generated when the record is locked.  Thus when a client attempts to update a record, or unlock a record
+after an update, it must do so by supplying the lock cookie generated in the lock phase.  Attempts to update or unlock
+with an invalid cookie result in a SecurityException being thrown.  If a client attempts to lock a record that is
+already locked, it is placed in a waiting state by the Object.wait() method which is called on a mutex.  When a record
+is successfully unlocked, Object.notifyAll() is invoked to indicate to other threads that a record has been unlocked and
+to attempt to obtain a lock on their desired record again.
 
 A potential problem with the locking mechanism was identified in that if a client locks a record and then fails for some
 reason, that record remains locked forever, unavailable to any other client.  An investigation was carried out into
@@ -163,7 +163,7 @@ ConnectionDialog extends JDialog and is the first GUI component the user of a cl
 class alters it's appearance according to whether the application is being run in local or remote client mode.  In local
 mode, the user chooses the database file by means of a JFileChooser.  Only files with the extension '.db' are selectable.
 In network client mode, JTextField is used to input the database server hostname / IP and the port number that the
-server is accepting requests on.  Checks are carried out that the port number is withing acceptable limits.  The button
+server is accepting requests on.  Checks are carried out that the port number is within acceptable limits.  The button
 used to connect to the server is disabled until a valid port number is entered.
 
 Upon successful connection the user will be presented with a MainWindow instance.  MainWindow has a BusinessService object

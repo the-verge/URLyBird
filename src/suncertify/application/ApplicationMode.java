@@ -2,8 +2,8 @@ package suncertify.application;
 
 /**
  * Enumeration representing the client application modes.
- * @author john
  *
+ * @author John Harding
  */
 public enum ApplicationMode {
     STANDALONE_CLIENT,

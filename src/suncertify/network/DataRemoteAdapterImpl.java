@@ -15,8 +15,8 @@ import suncertify.db.SecurityException;
  * <code>DataRemoteAdapterImpl</code> wraps an instance of 
  * <code>db.Data</code> in order to use it as a remote object.
  * In essence it is an implementation of the Adapter design pattern.
- * @author 
  *
+ * @author John Harding
  */
 public class DataRemoteAdapterImpl extends UnicastRemoteObject 
 		implements DataRemoteAdapter {

@@ -13,8 +13,7 @@ import suncertify.application.Utils;
  * update or delete a record to ensure a record
  * is being edited by only one thread at a time.
  * 
- * @author john
- *
+ * @author John Harding
  */
 public class LockManager {
     

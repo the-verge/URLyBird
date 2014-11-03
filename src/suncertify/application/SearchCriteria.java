@@ -10,8 +10,8 @@ package suncertify.application;
  * flexible.  Most methods in this class return
  * <code>this</code> in order to allow method 
  * chaining.
- * @author john
  *
+ * @author John Harding
  */
 public class SearchCriteria {
     

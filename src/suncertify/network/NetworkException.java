@@ -6,8 +6,8 @@ package suncertify.network;
  * performed in the DataProxy class. It extends RuntimeException 
  * (which is not a checked exception) in order for DataProxy 
  * to maintain compliance with supplied DB interface.
- * @author john
  *
+ * @author John Harding
  */
 public class NetworkException extends RuntimeException {
     

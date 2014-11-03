@@ -29,7 +29,12 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-
+/**
+ * This class is the main client GUI component where all
+ * search and booking functions are carried out by the user.
+ *
+ * @author John Harding
+ */
 public class MainWindow extends JFrame implements Observer {
 
 	/**
