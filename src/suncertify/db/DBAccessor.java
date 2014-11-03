@@ -196,7 +196,7 @@ public class DBAccessor {
      * @throws IOException if there is an error reading from 
      * 		   the file.
      */
-    public byte[] retrieveRecord(long position) throws IOException {
+    private byte[] retrieveRecord(long position) throws IOException {
     	final byte[] record = new byte[RECORD_LENGTH];
         
         synchronized (database) {
@@ -314,7 +314,7 @@ public class DBAccessor {
      * 		  with <code>criteria[n]</code>.
      * @return <code>boolean</code> indicating a match or not.
      */
-    public boolean matchRecord(String[] data, String[] criteria) {
+    private boolean matchRecord(String[] data, String[] criteria) {
         
         int nullCriteria = 0;
         int matches = 0;
@@ -399,7 +399,7 @@ public class DBAccessor {
      *         a record can be written.
      * @throws IOException
      */
-    public long firstAvailablePosition() throws IOException {
+    private long firstAvailablePosition() throws IOException {
         long filePosition = FILE_DATA_SECTION_OFFSET;
         while (filePosition < database.length()) {
             database.seek(filePosition);
@@ -420,7 +420,7 @@ public class DBAccessor {
      * 		   the record.
      * @throws UnsupportedEncodingException 
      */
-    public String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
+    private String[] recordToStringArray(byte[] record) throws UnsupportedEncodingException {
         
         int offset = RECORD_DATA_SECTION_OFFSET;
         String[] data = new String[FIELD_LENGTHS_ARRAY.length];
@@ -471,7 +471,7 @@ public class DBAccessor {
      * @return the position in the file where the record
      * 		   is stored.
      */
-    public long calculateFilePosition(int recNo) {
+    private long calculateFilePosition(int recNo) {
         return FILE_DATA_SECTION_OFFSET + ((recNo - 1) * RECORD_LENGTH);
     }
     
@@ -481,7 +481,7 @@ public class DBAccessor {
      * @return <code>int</code> record number of the file at the specified
      * 			position.
      */
-    public int calculateRecordNumber(long filePosition) {
+    private int calculateRecordNumber(long filePosition) {
         return (int) (filePosition - FILE_DATA_SECTION_OFFSET) / RECORD_LENGTH + 1;
     }
     
@@ -542,10 +542,6 @@ public class DBAccessor {
     public void close() throws IOException {
         database.close();
         log.info("DB file closed");
-    }
-    
-    public RandomAccessFile getDatabase() {
-        return database;
     }
     
 }
