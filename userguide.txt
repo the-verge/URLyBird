@@ -1,0 +1,81 @@
+                                            URLyBird user guide
+                                            -------------------
+
+Table of contents
+-----------------
+1. Overview
+2. Requirements
+3. Starting the application
+    3.1. Running the application in standalone mode
+    3.2. Running the application in server mode
+    3.3. Running the application in network client mode
+4. Using the client GUI
+    4.1 GUI overview
+    4.2 Searching for rooms
+    4.3 Booking a room
+5. Quitting the application
+
+1. Overview
+-----------
+
+The URLyBird application allows users to search for hotels rooms and to book selected rooms on behalf of clients.
+The user can search for hotel rooms by name and / or location.  Data is persisted to a database file.  The application
+may be run locally or as a distributed system.
+
+2. Requirements
+---------------
+
+URLyBird requires a minimum of Java version 1.7 to run.  If running the application in standalone mode or server mode,
+the database file must be located on the same machine that the application is running on.  If the application is to be
+run in network client mode, there must already be a server running to accept client requests.
+
+3. Starting the application
+---------------------------
+
+URLyBird comes packaged as an executable jar file.  The archive file "runme.jar" is this executable.  The commands to
+start the application all have similar form, with just mode "flags" differentiating them.  They take the form:
+
+    java -jar <path_to_runme.jar> [<mode>]
+
+The mode flag must be either "server", indicating the server program must run, "alone", indicating standalone mode,
+or left out entirely, in which case the network client and gui must run.
+
+Application configuration data is persisted between runs to a file called "suncertify.properties".  When the application
+is run for the first time, this file will not exist.  It will however be created in the current working directory
+and the configuration data entered by the user will be saved to the file.  Whenever configuration data is inaccessible
+for whatever reason (suncertify.properties isn't locatable or doesn't contain the correct data), the user will be
+informed of this and prompted to input the data manually.
+
+3.1 Running the application in standalone mode
+----------------------------------------------
+
+Assuming that the current working directory contains runme.jar, the application may be started in standalone mode with
+the following command:
+
+    java -jar runme.jar alone
+
+A dialog should now appear on the screen.  Click the "Browse" button to open a file chooser and select the database
+file.  Once a database file with file extension '.db' has been selected the "Connect" button is enabled.  To display the
+main GUI, click the "Connect" button.  The application will now read the data from the selected file and display all
+available rooms in the client GUI.
+
+3.2 Running the application in server mode
+------------------------------------------
+
+Assuming once again that the current working directory contains runme.jar, start the application in server mode with
+the following command:
+
+    java -jar runme.jar server
+
+The server GUI will now be displayed.  To select a database file, click the "Browse" button and navigate to the desired
+file using the file chooser.  To set the port that the server should listen for requests on, enter a port number in the
+"Port Number" text field.  Valid port numbers are in the range 1025 - 65535 inclusive.  Note that the selected port
+must not be in use by another application or URLyBird will not start.  Once a database file is selected and a valid port
+number entered the "Start" button becomes enabled.  Click the "Start" button to run the server.  The server will now
+listen for requests from remote clients.
+
+3.3 Running the application in network client mode
+--------------------------------------------------
+
+
+
