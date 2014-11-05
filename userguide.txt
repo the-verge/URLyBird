@@ -57,7 +57,7 @@ the following command:
 A dialog should now appear on the screen.  Click the "Browse" button to open a file chooser and select the database
 file.  Once a database file with file extension '.db' has been selected the "Connect" button is enabled.  To display the
 main GUI, click the "Connect" button.  The application will now read the data from the selected file and display all
-available rooms in the client GUI.
+rooms in the client GUI.
 
 3.2 Running the application in server mode
 ------------------------------------------
@@ -76,6 +76,33 @@ listen for requests from remote clients.
 
 3.3 Running the application in network client mode
 --------------------------------------------------
+
+To start URLyBird in network client mode, there must first be a server running that is accessible via a network
+connection.  Start the client with the command:
+
+    java -jar runme.jar
+
+A dialog should now be displayed.  In the "Hostname" field, enter the hostname or IP address of the database server.
+In the "Port" field, enter the port that the server is accepting requests on. Valid port numbers are in the range
+1025 - 65535 inclusive.  Once a hostname / IP address and a valid port number are entered, the "Connect" button will be
+enabled.  Click the "Connect" button to connect to the server and run the client GUI.  The client will request data
+from the database server and all rooms will be displayed.
+
+4. Using the Client GUI
+-----------------------
+
+4.1 GUI overview
+----------------
+
+The client GUI consists of 3 main panels.  On the left is the "Search" panel.  It contains text fields and a "Search"
+button to enable search by hotel name and / or location.  The bottom panel is where booking functions are performed.
+It contains a customer ID text field and a "Book" button.  The third area is the table panel where rooms that match a
+search are displayed.
+
+4.2
+Searches are case insensitive and full hotel name and / or location details are not required.  For instance, entering
+"alb" in the "Name" field and pressing search will return rooms from hotels whose names begin with those 3 letters.
+So a search for "alb" matches "Alberta" and "Albion".
 
 
 
