@@ -16,7 +16,7 @@ import suncertify.network.DataRemoteAdapter;
 import suncertify.network.NetworkException;
 
 /**
- * The static methods of this class return a <code>DB</code>
+ * The static methods of this class return a <code>CloseableDB</code>
  * instance for both local and remote database connections.
  *
  * @author John Harding

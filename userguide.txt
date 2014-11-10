@@ -115,6 +115,16 @@ displayed.
 
 IMPORTANT:  ONCE A BOOKING IS MADE IT CANNOT BE ALTERED OF CANCELLED, SO PROCEED WITH CAUTION.
 
+A brief explanation of the record fields follows:
+
+Name:       The name of the hotel.
+Location:   The city in which th hotel is located.
+Size:       The maximum occupancy of the room.
+Smoking:    Whether or not smoking is permitted - Yes or No.
+Rate:       The nightly rate for the room - currency is USD.
+Date:       The date on which the room is available.
+Owner:      The ID of the customer who has booked the room.
+
 To book a room for a customer, the room of interest must be displayed on screen and must be selected.  You will know
 when a room is selected as the row is highlighted in a green colour.  If there is no room selected, the "Customer ID"
 field is disabled.  After selecting a room, enter an 8 digit customer ID in the field.  You will only be permitted to

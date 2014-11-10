@@ -9,9 +9,9 @@ import suncertify.db.RecordNotFoundException;
 import suncertify.db.SecurityException;
 
 /**
- * The DataRemoteAdapter interface is identical to the supplied
- * DB.java interface except that each method also throws
- * RemoteException.  This will enable a class that implements
+ * The <code>DataRemoteAdapter</code> interface is identical to the
+ * supplied DB.java interface except that each method also throws
+ * <code>RemoteException</code>.  This will enable a class that implements
  * this interface to wrap an instance of the <code>db.Data</code>
  * class and provide identical functionality remotely without having to
  * alter <code>Data</code> or any of its member classes.

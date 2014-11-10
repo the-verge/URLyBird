@@ -3,7 +3,7 @@ package suncertify.db;
 import java.io.IOException;
 
 /**
- * Objects of the Data class are used to create, read, update and delete
+ * Objects of the <code>Data</code> class are used to create, read, update and delete
  * room records.  It uses the Facade design pattern to delegate database access
  * and record locking responsibilities to the DBAccessor and LockManager classes
  * respectively.

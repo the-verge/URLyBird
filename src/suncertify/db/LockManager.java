@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 import suncertify.application.Utils;
 
 /**
- * The LockManager class logically locks records.
- * This is necessary when an attempt is made to
+ * The <code>LockManager</code> class logically locks
+ * records. This is necessary when an attempt is made to
  * update or delete a record to ensure a record
  * is being edited by only one thread at a time.
  * 

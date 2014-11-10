@@ -1,7 +1,7 @@
 package suncertify.application;
 
 /**
- * Enumeration representing the client application modes.
+ * Enumeration representing the application modes.
  *
  * @author John Harding
  */

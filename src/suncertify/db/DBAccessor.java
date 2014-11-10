@@ -14,13 +14,14 @@ import java.util.regex.Pattern;
 import suncertify.application.Utils;
 
 /**
- * The DBAccessor class provides direct access to the underlying database file.
- * It uses a RandomAccessFile instance to read from and write to the file.
- * The constructor and public methods of this class (excluding getters) throw 
- * DBException which extends RunTimeException. This exception wraps checked 
- * Exceptions such as FileNotFoundException, IOException and 
- * UnsupportedEncodingException in order to deal with these while still 
- * maintaining <code>Data</code> compliance with the supplied DB.java 
+ * The <code>DBAccessor</code> class provides direct access to the underlying
+ * database file. It uses a RandomAccessFile instance to read from and write
+ * to the file. The constructor and public methods of this class
+ * (excluding getters) throw <code>DBException</code> which extends
+ * <code>RunTimeException</code>. This exception wraps checked
+ * Exceptions such as <code>FileNotFoundException</code>, <code>IOException</code>
+ * and <code>UnsupportedEncodingException</code> in order to deal with these
+ * while still maintaining <code>Data</code> compliance with the supplied DB.java
  * interface.
  * 
  * @author John Harding

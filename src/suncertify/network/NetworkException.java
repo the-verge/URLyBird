@@ -2,10 +2,11 @@ package suncertify.network;
 
 /**
  * This exception is implemented to handle networking 
- * exceptions such as RemoteException which result from operations 
- * performed in the DataProxy class. It extends RuntimeException 
- * (which is not a checked exception) in order for DataProxy 
- * to maintain compliance with supplied DB interface.
+ * exceptions such as <code>RemoteException</code> which result from operations
+ * performed in the <code>DataProxy</code> class. It extends
+ * <code>RuntimeException</code> (which is not a checked exception)
+ * in order for <code>DataProxy</code> to maintain compliance with supplied
+ * <code>DB</code> interface.
  *
  * @author John Harding
  */
