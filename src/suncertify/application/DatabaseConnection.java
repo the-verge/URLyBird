@@ -50,7 +50,7 @@ public class DatabaseConnection {
 	 */
 	public static CloseableDB getRemoteConnection(String hostname, int port) {
 	    Utils.setLogLevel(log, Level.FINER);
-		CloseableDB data = null;
+		CloseableDB data;
 		String url = "rmi://" + hostname + ":" + port + "/Data";
 		try {
 			DataRemoteAdapter remote = (DataRemoteAdapter) Naming.lookup(url);

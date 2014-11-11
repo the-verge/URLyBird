@@ -148,7 +148,7 @@ public class Application {
 	 * @param dbLocation the path to the database file.
 	 */
 	private void createLocalConnection(String dbLocation) {
-		CloseableDB dataAccess = null;
+		CloseableDB dataAccess;
 		try {
 			dataAccess = DatabaseConnection.getLocalConnection(dbLocation);
 			createClientGUI(dataAccess);

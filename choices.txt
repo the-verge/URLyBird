@@ -66,7 +66,7 @@ to attempt to obtain a lock on their desired record again.
 A potential problem with the locking mechanism was identified in that if a client locks a record and then fails for some
 reason, that record remains locked forever, unavailable to any other client.  An investigation was carried out into
 starting a timer after a lock had been obtained and giving a client an arbitrary amount of time to complete its task,
-after which the lock would automatically released.  This was however not in the requirements of the project and was
+after which the lock would be automatically released.  This was however not in the requirements of the project and was
 not implemented.
 
 ------------------------------------------------------------------------------------------------------------------------
