@@ -124,8 +124,10 @@ public class BusinessService extends Observable {
      * @throws NetworkException if the <code>CloseableDB</code>
      *         instance provides a remote database connection
      *         and a network error occurs.
+     * @throws RoomAlreadyBookedException if the room is already booked.
 	 */
-	public void bookRoom(Room room, String customerId) throws RecordNotFoundException, SecurityException, RoomAlreadyBookedException {
+	public void bookRoom(Room room, String customerId) throws RecordNotFoundException,
+            SecurityException, RoomAlreadyBookedException {
 	    int recNo = room.getRecNo();
 
 	    if (alreadyBooked(recNo)) {
