@@ -96,7 +96,7 @@ public class BusinessService extends Observable {
                 tableIndex++;
             }
             catch (RecordNotFoundException e) {
-                /*
+                /**
                  * RecordNotFoundException will be thrown by the DB.read(int recNo)
                  * method if the record is marked as deleted. It is possible that
                  * another client that uses Data.java has deleted a record number

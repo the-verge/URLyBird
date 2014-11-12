@@ -490,13 +490,13 @@ public class MainWindow extends JFrame implements Observer {
 
             try {
                 matches = service.searchRooms(criteria);
+                tableModel.setRoomMap(matches);
             } catch (DBException ex) {
                 Dialogs.showErrorDialog(parent, "Could not retrieve data", "Database error");
             } catch (NetworkException ex) {
                 Dialogs.showErrorDialog(parent, "Could not retrieve data", "Network error");
             }
             lastSearch = criteria;
-            tableModel.setRoomMap(matches);
             customerIdTextField.setText("");
             customerIdTextField.setEditable(false);
             infoLabel.setVisible(false);
