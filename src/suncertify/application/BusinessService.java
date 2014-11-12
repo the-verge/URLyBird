@@ -128,52 +128,33 @@ public class BusinessService extends Observable {
 	 */
 	public void bookRoom(Room room, String customerId) throws RecordNotFoundException,
             SecurityException, RoomAlreadyBookedException {
-	    int recNo = room.getRecNo();
 
-	    if (alreadyBooked(recNo)) {
-            fireDataChangeEvent();
-	    	throw new RoomAlreadyBookedException();
-	    }
-	    else {
-            room.setOwner(customerId);
-	        long lockCookie = dataAccess.lock(recNo);
-	        
-	        /**
-	         * Exceptions are caught and re-thrown here
-	         * to convey to a user that the booking was 
-	         * unsuccessful.  Given that both the update
-	         * and unlock methods potentially throw the
-	         * same exceptions, placing both methods in
-	         * the same try-catch block would not allow
-	         * us to make a distinction between failure
-	         * in making the booking and failure
-	         * in unlocking the record after a successful
-	         * update operation.
-	         */
-            try {
-                String[] data = room.getData();
-                dataAccess.update(recNo, data, lockCookie);
-            } catch (SecurityException e) {
-                throw e;
-            } catch (DBException e) {
-                throw e;
-            } catch (NetworkException e) {
-                throw e;
+	    int recNo = room.getRecNo();
+        long lockCookie = 0;
+
+        try {
+            lockCookie = dataAccess.lock(recNo);
+            if (alreadyBooked(recNo)) {
+                fireDataChangeEvent();
+                throw new RoomAlreadyBookedException();
             }
-            
+            room.setOwner(customerId);
+            String[] data = room.getData();
+            dataAccess.update(recNo, data, lockCookie);
+            fireDataChangeEvent();
+        } finally {
             try {
                 dataAccess.unlock(recNo, lockCookie);
             } catch (Exception e) {
                 /**
-                 * Nothing of use can be conveyed to the
-                 * user if for some reason an Exception
-                 * is thrown when unlocking a record. As
-                 * such the exception is not propagated
-                 * further.
+                 * Nothing of use can be conveyed to the user
+                 * if an Exception is thrown while trying to
+                 * unlock a record, so Exceptions are propagated
+                 * no further.
                  */
             }
-	    }
-		fireDataChangeEvent();
+        }
+
 	}
 	
 	/**
