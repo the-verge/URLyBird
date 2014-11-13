@@ -113,12 +113,12 @@ displayed.
 4.3 Booking a room
 ------------------
 
-IMPORTANT:  ONCE A BOOKING IS MADE IT CANNOT BE ALTERED OF CANCELLED, SO PROCEED WITH CAUTION.
+IMPORTANT:  ONCE A BOOKING IS MADE IT CANNOT BE ALTERED OR CANCELLED, SO PROCEED WITH CAUTION.
 
 A brief explanation of the record fields follows:
 
 Name:       The name of the hotel.
-Location:   The city in which th hotel is located.
+Location:   The city in which the hotel is located.
 Size:       The maximum occupancy of the room.
 Smoking:    Whether or not smoking is permitted - Yes or No.
 Rate:       The nightly rate for the room - currency is USD.
@@ -143,7 +143,7 @@ displayed stating that the room has already been booked.
 
 Several means of quitting the application exist.  What they are depends on the application mode and whether or not
 the main GUIs or configuration dialogs are displayed.  In all cases the 'X' button displayed at the top of each window
-(on the left or right depends on your host platform) brings up a dialog asking if the user really wants to quit the
+(on the left or right depending on your host platform) brings up a dialog asking if the user really wants to quit the
 application.  To exit click "OK", to resume click "Cancel"
 
 The client configuration dialogs additionally have an "Exit" button.  Clicking this button displays the confirm dialog

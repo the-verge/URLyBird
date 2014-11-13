@@ -50,7 +50,8 @@ the classes that use Data).  This was done to make absolutely clear what users o
 
 New records are written to the database by first searching for a deleted record in the file.  Upon discovery of a record
 marked as deleted, the newly created record is written to this position in the file, overwriting the fields of the
-deleted record.  If no deleted records are found, the new data is appended to the end of the database file.
+deleted record.  If no deleted records are found, the new data is appended to the end of the database file.  Given this
+scheme, DuplicateKeyException will never be thrown.
 
 Locking
 -------
@@ -64,7 +65,7 @@ is successfully unlocked, Object.notifyAll() is invoked to indicate to other thr
 to attempt to obtain a lock on their desired record again.
 
 A potential problem with the locking mechanism was identified in that if a client locks a record and then fails for some
-reason, that record remains locked forever, unavailable to any other client.  An investigation was carried out into
+reason, that record could remain locked forever, unavailable to any other client.  An investigation was carried out into
 starting a timer after a lock had been obtained and giving a client an arbitrary amount of time to complete its task,
 after which the lock would be automatically released.  This was however not in the requirements of the project and was
 not implemented.
@@ -81,7 +82,7 @@ the abstraction that it provides.
 Adapting Data for use as a remote object
 ----------------------------------------
 In order to use Data as a remote object it was necessary to adapt it using a Remote interface.  This interface,
-DataRemoteAdapter, extends java.rmi.Remote and is indentical to the supplied DB interface except that every method
+DataRemoteAdapter, extends java.rmi.Remote and is identical to the supplied DB interface except that every method
 additionally throws java.rmi.RemoteException.  DataRemoteAdapterImpl is the implementation of this interface.  It has
 a Data instance as a member and each DataRemoteAdapterImpl method invokes the corresponding method of this Data member.
 DataRemoteAdapterImpl is the object exported to the RMI registry.
